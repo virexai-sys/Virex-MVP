@@ -30,7 +30,7 @@ app = Flask(__name__)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 
 # Current Virex AI model
-OPENAI_MODEL = "gpt-5.6-luna"
+OPENAI_MODEL = "gpt-5"
 
 client = None
 
