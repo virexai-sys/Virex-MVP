@@ -5,7 +5,11 @@ from pathlib import Path
 from datetime import datetime
 
 from flask import Flask, jsonify, request, render_template
-from openai import OpenAI
+
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
 
 
 # =========================================================
@@ -14,7 +18,6 @@ from openai import OpenAI
 
 BASE = Path(__file__).parent
 DATA = BASE / "data"
-
 DATA.mkdir(exist_ok=True)
 
 app = Flask(__name__)
@@ -24,22 +27,37 @@ app = Flask(__name__)
 # OPENAI CONFIGURATION
 # =========================================================
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 
+# Current Virex AI model
 OPENAI_MODEL = "gpt-5.6-luna"
 
 client = None
 
-if OPENAI_API_KEY:
-    try:
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        print("✅ OpenAI client initialized")
-    except Exception as error:
-        print("❌ OpenAI initialization error:", error)
-        client = None
-else:
+if not OPENAI_API_KEY:
     print("⚠️ OPENAI_API_KEY not found")
-    print("Virex will use local fallback mode.")
+    print("⚠️ Virex will use LOCAL FALLBACK mode.")
+
+elif OpenAI is None:
+    print("❌ OpenAI package is not installed.")
+    print("Run: pip install openai")
+    print("⚠️ Virex will use LOCAL FALLBACK mode.")
+
+else:
+    try:
+        client = OpenAI(
+            api_key=OPENAI_API_KEY
+        )
+
+        print("======================================")
+        print("✅ OpenAI client initialized")
+        print(f"🤖 Model: {OPENAI_MODEL}")
+        print("======================================")
+
+    except Exception as error:
+        print("❌ OpenAI initialization error:")
+        print(repr(error))
+        client = None
 
 
 # =========================================================
@@ -47,6 +65,7 @@ else:
 # =========================================================
 
 PRODUCTS = [
+
     {
         "name": "212 MEN NYC",
         "aliases": ["212", "212 men", "212 nyc"],
@@ -58,6 +77,7 @@ PRODUCTS = [
         "price_30": 549,
         "regular_30": 799,
     },
+
     {
         "name": "DUNHILL DESIRE",
         "aliases": ["dunhill", "dunhill desire"],
@@ -69,6 +89,7 @@ PRODUCTS = [
         "price_30": 499,
         "regular_30": 1499,
     },
+
     {
         "name": "HAWAS FIRE",
         "aliases": ["hawas fire"],
@@ -80,6 +101,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1499,
     },
+
     {
         "name": "ONE MILLION",
         "aliases": ["1 million", "one million", "one-million"],
@@ -91,6 +113,7 @@ PRODUCTS = [
         "price_30": 499,
         "regular_30": 1499,
     },
+
     {
         "name": "DIOR SAUVAGE",
         "aliases": ["dior", "dior sauvage", "sauvage"],
@@ -102,6 +125,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1499,
     },
+
     {
         "name": "NAUTICA VOYAGE",
         "aliases": ["nautica", "nautica voyage", "voyage"],
@@ -113,6 +137,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1499,
     },
+
     {
         "name": "HAWAS ICE",
         "aliases": ["hawas ice"],
@@ -124,6 +149,7 @@ PRODUCTS = [
         "price_30": 549,
         "regular_30": 1499,
     },
+
     {
         "name": "BLEU DE CHANEL",
         "aliases": ["bleu", "bleu de chanel", "bdc"],
@@ -135,6 +161,7 @@ PRODUCTS = [
         "price_30": 549,
         "regular_30": 1499,
     },
+
     {
         "name": "VAMPIRE BLOOD",
         "aliases": ["vampire", "vampire blood"],
@@ -146,6 +173,7 @@ PRODUCTS = [
         "price_30": 649,
         "regular_30": 1499,
     },
+
     {
         "name": "SRK",
         "aliases": ["srk", "shah rukh", "shahrukh", "shah rukh inspired"],
@@ -157,6 +185,7 @@ PRODUCTS = [
         "price_30": 499,
         "regular_30": 1499,
     },
+
     {
         "name": "STRONGER WITH YOU",
         "aliases": ["stronger with you", "sw y", "swy"],
@@ -168,6 +197,7 @@ PRODUCTS = [
         "price_30": 499,
         "regular_30": 1499,
     },
+
     {
         "name": "GUCCI FLORA",
         "aliases": ["gucci flora", "flora", "gucci"],
@@ -179,6 +209,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1499,
     },
+
     {
         "name": "CK1",
         "aliases": ["ck1", "ck 1", "calvin klein"],
@@ -190,6 +221,7 @@ PRODUCTS = [
         "price_30": 499,
         "regular_30": 1299,
     },
+
     {
         "name": "9PM",
         "aliases": ["9pm", "9 pm", "nine pm"],
@@ -201,6 +233,7 @@ PRODUCTS = [
         "price_30": 549,
         "regular_30": 1499,
     },
+
     {
         "name": "COOL WATER",
         "aliases": ["cool water", "coolwater"],
@@ -212,6 +245,7 @@ PRODUCTS = [
         "price_30": 499,
         "regular_30": 1299,
     },
+
     {
         "name": "LATTAFA KHAMRAH",
         "aliases": ["khamrah", "lattafa", "lattafa khamrah"],
@@ -223,6 +257,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1699,
     },
+
     {
         "name": "CREED AVENTUS",
         "aliases": ["creed", "creed aventus", "aventus"],
@@ -234,6 +269,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1799,
     },
+
     {
         "name": "BLUEBERRY",
         "aliases": ["blueberry"],
@@ -245,6 +281,7 @@ PRODUCTS = [
         "price_30": 499,
         "regular_30": 1299,
     },
+
     {
         "name": "TOBACCO VANILLE",
         "aliases": ["tobacco", "tobacco vanille", "tobacco vanilla"],
@@ -256,6 +293,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1699,
     },
+
     {
         "name": "GOOD GIRL",
         "aliases": ["good girl"],
@@ -267,6 +305,7 @@ PRODUCTS = [
         "price_30": 599,
         "regular_30": 1699,
     },
+
     {
         "name": "VERSACE EROS",
         "aliases": ["eros", "versace", "versace eros"],
@@ -278,6 +317,7 @@ PRODUCTS = [
         "price_30": 549,
         "regular_30": 1499,
     },
+
     {
         "name": "BAD BOY",
         "aliases": ["bad boy"],
@@ -301,20 +341,34 @@ def load_orders():
     path = DATA / "orders.json"
 
     if not path.exists():
+
         path.write_text(
             "[]",
             encoding="utf-8"
         )
+
         return []
 
     try:
-        return json.loads(
+
+        data = json.loads(
             path.read_text(
                 encoding="utf-8"
             )
         )
 
-    except Exception:
+        if isinstance(data, list):
+            return data
+
+        return []
+
+    except Exception as error:
+
+        print(
+            "❌ Orders load error:",
+            repr(error)
+        )
+
         return []
 
 
@@ -339,9 +393,6 @@ def save_orders():
 # CHAT MEMORY
 # =========================================================
 
-# Simple in-memory conversation storage.
-# Later we can move this to database.
-
 chat_sessions = {}
 
 
@@ -351,9 +402,14 @@ chat_sessions = {}
 
 def normalize(text):
 
-    text = str(text or "").lower().strip()
+    text = str(
+        text or ""
+    ).lower().strip()
 
-    text = text.replace("-", " ")
+    text = text.replace(
+        "-",
+        " "
+    )
 
     text = re.sub(
         r"\s+",
@@ -499,34 +555,34 @@ You are Virex AI Sales Agent for NOIR Fragrance.
 
 NOIR Fragrance is a Bangladesh-based perfume business.
 
-You are NOT a generic chatbot.
+Your job is to help customers discover, compare and purchase
+NOIR Fragrance products.
 
-You are a professional sales assistant whose main goal is to
-help customers discover, compare and purchase NOIR Fragrance products.
+You are NOT a generic chatbot.
 
 LANGUAGE:
 
 - If customer writes Bangla, reply in Bangla.
 - If customer writes Banglish, reply naturally in Banglish/Bangla.
 - If customer writes English, reply in English.
-- You can understand mixed Bangla + English.
+- You understand mixed Bangla + English.
 - Keep replies short and natural.
 - Do not sound robotic.
 
 SALES BEHAVIOR:
 
 1. Be friendly and helpful.
-2. Ask a useful follow-up question when needed.
-3. For recommendations, consider:
+2. Ask useful follow-up questions when appropriate.
+3. For recommendations consider:
    - occasion
    - fragrance preference
-   - gender if relevant
    - budget
    - season
+   - gender if relevant
 4. Do not recommend randomly.
-5. Explain why a product fits the customer's requirement.
+5. Explain briefly why a product fits.
 6. When customer shows buying intent, guide them toward ordering.
-7. Do not aggressively pressure the customer.
+7. Do not aggressively pressure customers.
 
 PRODUCT ACCURACY:
 
@@ -536,7 +592,7 @@ PRODUCT ACCURACY:
 - Never invent discounts.
 - Never invent longevity.
 - Never invent stock.
-- All products listed as Available are in stock.
+- All listed products are currently Available.
 - If information is unavailable, say so honestly.
 
 PRICE RULE:
@@ -599,7 +655,9 @@ def local_ai_reply(message):
 
     size = detect_size(text)
 
+    # -----------------------------------------------------
     # Greeting
+    # -----------------------------------------------------
 
     greeting_words = [
         "hi",
@@ -625,9 +683,13 @@ def local_ai_reply(message):
             "সম্পর্কে জানতে পারেন।"
         )
 
+    # -----------------------------------------------------
     # Product specific
+    # -----------------------------------------------------
 
     if product:
+
+        # Price
 
         if any(
             word in text
@@ -645,6 +707,8 @@ def local_ai_reply(message):
                 f"💜 {product['name']}-এর price:\n\n"
                 f"{price_text(product, size)}"
             )
+
+        # Longevity
 
         if any(
             word in text
@@ -664,6 +728,8 @@ def local_ai_reply(message):
                 f"{product['longevity']} পর্যন্ত "
                 "lasting দিতে পারে।"
             )
+
+        # Fragrance
 
         if any(
             word in text
@@ -685,6 +751,8 @@ def local_ai_reply(message):
                 f"Best For: {product['best_for']}\n\n"
                 f"{price_text(product, size)}"
             )
+
+        # Order
 
         if any(
             word in text
@@ -709,6 +777,8 @@ def local_ai_reply(message):
                 "5. Full address"
             )
 
+        # General product information
+
         return (
             f"💜 {product['name']}\n\n"
             f"🌿 Fragrance: {product['notes']}\n"
@@ -717,7 +787,9 @@ def local_ai_reply(message):
             f"{price_text(product, size)}"
         )
 
+    # -----------------------------------------------------
     # Recommendation
+    # -----------------------------------------------------
 
     recommendation_words = [
         "recommend",
@@ -747,7 +819,9 @@ def local_ai_reply(message):
             "বললে আমি ১টা specific perfume recommend করব।"
         )
 
+    # -----------------------------------------------------
     # Catalogue
+    # -----------------------------------------------------
 
     if any(
         word in text
@@ -776,7 +850,9 @@ def local_ai_reply(message):
             )
         )
 
+    # -----------------------------------------------------
     # Delivery
+    # -----------------------------------------------------
 
     if any(
         word in text
@@ -794,7 +870,9 @@ def local_ai_reply(message):
             "আপনার location বললে আমি help করতে পারব।"
         )
 
+    # -----------------------------------------------------
     # General order
+    # -----------------------------------------------------
 
     if any(
         word in text
@@ -813,6 +891,10 @@ def local_ai_reply(message):
             "5. Phone number\n"
             "6. Full address"
         )
+
+    # -----------------------------------------------------
+    # Default
+    # -----------------------------------------------------
 
     return (
         "জি 😊 আমি Virex AI Sales Agent।\n\n"
@@ -836,14 +918,12 @@ def openai_ai_reply(
 
     try:
 
-        # Get previous conversation
-
         history = chat_sessions.get(
             session_id,
             []
         )
 
-        # Add current user message
+        # Add user message
 
         history.append(
             {
@@ -852,12 +932,12 @@ def openai_ai_reply(
             }
         )
 
-        # Keep only latest messages
-        # to control token usage.
+        # Keep latest messages
 
         history = history[-12:]
 
         response = client.responses.create(
+
             model=OPENAI_MODEL,
 
             instructions=VIREX_SYSTEM_PROMPT,
@@ -874,7 +954,7 @@ def openai_ai_reply(
 
         reply = reply.strip()
 
-        # Save assistant response
+        # Save conversation
 
         history.append(
             {
@@ -889,10 +969,10 @@ def openai_ai_reply(
 
     except Exception as error:
 
-        print(
-            "❌ OPENAI ERROR:",
-            repr(error)
-        )
+        print("======================================")
+        print("❌ OPENAI ERROR")
+        print(repr(error))
+        print("======================================")
 
         return None
 
@@ -913,7 +993,7 @@ def ai_reply(
     if not message:
         return local_ai_reply(message)
 
-    # Try OpenAI first
+    # OpenAI first
 
     reply = openai_ai_reply(
         message,
@@ -923,7 +1003,7 @@ def ai_reply(
     if reply:
         return reply
 
-    # Fallback
+    # Local fallback
 
     return local_ai_reply(message)
 
@@ -1009,14 +1089,12 @@ def chat():
         message,
         str
     ):
-
         message = str(message)
 
     if not isinstance(
         session_id,
         str
     ):
-
         session_id = "default"
 
     reply = ai_reply(
@@ -1028,7 +1106,11 @@ def chat():
         {
             "reply": reply,
             "ai": bool(client),
-            "model": OPENAI_MODEL if client else "local",
+            "model": (
+                OPENAI_MODEL
+                if client
+                else "local fallback"
+            ),
             "agent": "Virex AI Sales Agent",
             "session_id": session_id,
         }
@@ -1063,6 +1145,7 @@ def create_order():
         quantity = 1
 
     order = {
+
         "id": len(orders) + 1,
 
         "customer_name": data.get(
@@ -1147,30 +1230,16 @@ def health():
     return jsonify(
         {
             "status": "online",
-
             "agent": "Virex AI Sales Agent",
-
             "model": (
                 OPENAI_MODEL
                 if client
                 else "local fallback"
             ),
-
-            "products": len(
-                PRODUCTS
-            ),
-
-            "orders": len(
-                orders
-            ),
-
-            "openai_connected": bool(
-                client
-            ),
-
-            "api_key_loaded": bool(
-                OPENAI_API_KEY
-            ),
+            "products": len(PRODUCTS),
+            "orders": len(orders),
+            "openai_connected": bool(client),
+            "api_key_loaded": bool(OPENAI_API_KEY),
         }
     )
 
@@ -1180,6 +1249,25 @@ def health():
 # =========================================================
 
 if __name__ == "__main__":
+
+    print("")
+    print("======================================")
+    print("🚀 VIREX AI SALES AGENT")
+    print("======================================")
+    print(f"📦 Products: {len(PRODUCTS)}")
+    print(f"🛒 Orders: {len(orders)}")
+    print(f"🤖 Model: {OPENAI_MODEL}")
+    print(
+        f"🔑 API Key Loaded: "
+        f"{bool(OPENAI_API_KEY)}"
+    )
+    print(
+        f"🧠 OpenAI Connected: "
+        f"{bool(client)}"
+    )
+    print("🌐 http://127.0.0.1:5000")
+    print("======================================")
+    print("")
 
     app.run(
         host="0.0.0.0",
