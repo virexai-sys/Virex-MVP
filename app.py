@@ -285,6 +285,7 @@ orders = load_orders()
 
 def save_orders():
     path = DATA / "orders.json"
+
     path.write_text(
         json.dumps(orders, ensure_ascii=False, indent=2),
         encoding="utf-8"
@@ -311,10 +312,15 @@ def find_product(message):
             alias_normalized = normalize(alias)
 
             if alias_normalized in text:
-                matches.append((len(alias_normalized), product))
+                matches.append(
+                    (len(alias_normalized), product)
+                )
 
     if matches:
-        matches.sort(key=lambda item: item[0], reverse=True)
+        matches.sort(
+            key=lambda item: item[0],
+            reverse=True
+        )
         return matches[0][1]
 
     return None
@@ -347,8 +353,10 @@ def price_text(product, size=None):
         )
 
     return (
-        f"15ml — Regular ৳{product['regular_15']} → Offer ৳{product['price_15']}\n"
-        f"30ml — Regular ৳{product['regular_30']} → Offer ৳{product['price_30']}"
+        f"15ml — Regular ৳{product['regular_15']} "
+        f"→ Offer ৳{product['price_15']}\n"
+        f"30ml — Regular ৳{product['regular_30']} "
+        f"→ Offer ৳{product['price_30']}"
     )
 
 
@@ -357,12 +365,14 @@ def greeting():
 
     if 5 <= hour < 12:
         return "শুভ সকাল"
-    elif 12 <= hour < 17:
+
+    if 12 <= hour < 17:
         return "শুভ অপরাহ্ন"
-    elif 17 <= hour < 21:
+
+    if 17 <= hour < 21:
         return "শুভ সন্ধ্যা"
-    else:
-        return "শুভ রাত্রি"
+
+    return "শুভ রাত্রি"
 
 
 # =========================================================
@@ -377,12 +387,17 @@ def ai_reply(message):
         return (
             f"{greeting()} 👋\n\n"
             "আমি Virex AI Sales Agent।\n"
-            "NOIR Fragrance-এর product, price, fragrance, longevity, "
-            "recommendation এবং order সম্পর্কে সাহায্য করতে পারি।"
+            "NOIR Fragrance-এর product, price, fragrance, "
+            "longevity, recommendation এবং order সম্পর্কে "
+            "সাহায্য করতে পারি।"
         )
 
     product = find_product(text)
     size = detect_size(text)
+
+    # -----------------------------------------------------
+    # GREETING
+    # -----------------------------------------------------
 
     greeting_words = [
         "hi",
@@ -390,7 +405,6 @@ def ai_reply(message):
         "hey",
         "হাই",
         "হ্যালো",
-        "হাই ভাই",
         "আসসালামু আলাইকুম",
         "assalamualaikum",
     ]
@@ -399,7 +413,8 @@ def ai_reply(message):
         return (
             f"{greeting()} 👋\n\n"
             "NOIR Fragrance-এ স্বাগতম!\n\n"
-            "আমি Virex AI Sales Agent। আপনি চাইলে আমাকে জিজ্ঞেস করতে পারেন:\n"
+            "আমি Virex AI Sales Agent। আপনি চাইলে আমাকে "
+            "জিজ্ঞেস করতে পারেন:\n\n"
             "• কোন perfume আপনার জন্য ভালো\n"
             "• Price\n"
             "• Fragrance notes\n"
@@ -408,7 +423,10 @@ def ai_reply(message):
             "• Order"
         )
 
-    # General recommendation
+    # -----------------------------------------------------
+    # GENERAL RECOMMENDATION
+    # -----------------------------------------------------
+
     recommendation_words = [
         "recommend",
         "suggest",
@@ -422,34 +440,43 @@ def ai_reply(message):
         "সাজেস্ট",
     ]
 
-    if any(word in text for word in recommendation_words) and not product:
-
+    if (
+        any(word in text for word in recommendation_words)
+        and not product
+    ):
         return (
-            "অবশ্যই! 😊 আপনার প্রয়োজন অনুযায়ী কয়েকটি ভালো option:\n\n"
-            "🔥 **HAWAS FIRE** — Date, Party, Night Out\n"
-            "🌊 **HAWAS ICE** — Fresh, Summer, Daily Wear\n"
-            "💎 **BLEU DE CHANEL** — Office, Meeting, Smart Look\n"
-            "🍍 **CREED AVENTUS** — Premium & versatile\n"
-            "🌙 **9PM** — Date Night & Evening\n\n"
-            "আপনি চাইলে আপনার budget বা কোথায় ব্যবহার করবেন সেটা বলুন—"
+            "অবশ্যই! 😊 আপনার প্রয়োজন অনুযায়ী কয়েকটি "
+            "ভালো option:\n\n"
+            "🔥 HAWAS FIRE — Date, Party, Night Out\n"
+            "🌊 HAWAS ICE — Fresh, Summer, Daily Wear\n"
+            "💎 BLEU DE CHANEL — Office, Meeting, Smart Look\n"
+            "🍍 CREED AVENTUS — Premium & versatile\n"
+            "🌙 9PM — Date Night & Evening\n\n"
+            "আপনি budget বা কোথায় ব্যবহার করবেন সেটা বললে "
             "আমি একটি specific perfume recommend করব।"
         )
 
+    # -----------------------------------------------------
+    # PRODUCT RESPONSE
+    # -----------------------------------------------------
+
     if product:
 
+        # PRICE
         if any(word in text for word in [
             "price",
             "দাম",
             "কত",
             "tk",
             "টাকা",
-            "মূল্য"
+            "মূল্য",
         ]):
             return (
-                f"💜 **{product['name']}**-এর price:\n\n"
+                f"💜 {product['name']}-এর price:\n\n"
                 f"{price_text(product, size)}"
             )
 
+        # LONGEVITY
         if any(word in text for word in [
             "longevity",
             "lasting",
@@ -460,10 +487,12 @@ def ai_reply(message):
             "টেকে",
         ]):
             return (
-                f"⏱️ **{product['name']}** সাধারণত "
-                f"**{product['longevity']}** পর্যন্ত lasting দিতে পারে।"
+                f"⏱️ {product['name']} সাধারণত "
+                f"{product['longevity']} পর্যন্ত "
+                "lasting দিতে পারে।"
             )
 
+        # FRAGRANCE
         if any(word in text for word in [
             "note",
             "notes",
@@ -474,12 +503,13 @@ def ai_reply(message):
             "স্মেল",
         ]):
             return (
-                f"🌿 **{product['name']}** fragrance profile:\n\n"
+                f"🌿 {product['name']} fragrance profile:\n\n"
                 f"{product['notes']}\n\n"
-                f"⏱️ Longevity: **{product['longevity']}**\n"
+                f"⏱️ Longevity: {product['longevity']}\n"
                 f"✨ Best For: {product['best_for']}"
             )
 
+        # ORDER
         if any(word in text for word in [
             "order",
             "অর্ডার",
@@ -489,7 +519,7 @@ def ai_reply(message):
             "কিনবো",
         ]):
             return (
-                f"অবশ্যই! 🛍️ **{product['name']}** order করা যাবে।\n\n"
+                f"অবশ্যই! 🛍️ {product['name']} order করা যাবে।\n\n"
                 f"{price_text(product, size)}\n\n"
                 "Order confirm করার জন্য লাগবে:\n"
                 "1. Product name\n"
@@ -500,15 +530,19 @@ def ai_reply(message):
                 "6. Full address"
             )
 
+        # DEFAULT PRODUCT DETAILS
         return (
-            f"💜 **{product['name']}**\n\n"
+            f"💜 {product['name']}\n\n"
             f"🌿 Fragrance: {product['notes']}\n"
             f"⏱️ Longevity: {product['longevity']}\n"
             f"✨ Best For: {product['best_for']}\n\n"
             f"{price_text(product, size)}"
         )
 
-    # Product catalogue
+    # -----------------------------------------------------
+    # CATALOGUE
+    # -----------------------------------------------------
+
     if any(word in text for word in [
         "catalogue",
         "catalog",
@@ -519,16 +553,27 @@ def ai_reply(message):
         "প্রোডাক্ট",
         "লিস্ট",
     ]):
-        names = [product["name"] for product in PRODUCTS]
+
+        names = [
+            product["name"]
+            for product in PRODUCTS
+        ]
 
         return (
             "💜 NOIR Fragrance-এর available products:\n\n"
-            + "\n".join(f"• {name}" for name in names)
+            + "\n".join(
+                f"• {name}"
+                for name in names
+            )
             + "\n\n"
-            "আপনি যেকোনো perfume-এর নাম লিখলে আমি তার details জানিয়ে দেব।"
+            "আপনি যেকোনো perfume-এর নাম লিখলে "
+            "আমি তার details জানিয়ে দেব।"
         )
 
-    # Men
+    # -----------------------------------------------------
+    # MEN
+    # -----------------------------------------------------
+
     if any(word in text for word in [
         "men",
         "male",
@@ -536,51 +581,71 @@ def ai_reply(message):
         "ছেলেদের",
         "ছেলেদের জন্য",
     ]):
+
         names = [
             product["name"]
             for product in PRODUCTS
-            if product["name"] not in ["GUCCI FLORA", "GOOD GIRL"]
+            if product["name"] not in [
+                "GUCCI FLORA",
+                "GOOD GIRL",
+            ]
         ]
 
         return (
-            "👔 Men's fragrance-এর মধ্যে কিছু জনপ্রিয় option:\n\n"
+            "👔 Men's fragrance-এর মধ্যে কিছু "
+            "জনপ্রিয় option:\n\n"
             + " • ".join(names[:12])
             + "\n\n"
-            "আপনার পছন্দ—fresh, sweet, woody নাকি strong—বললে "
-            "আমি আরও specific recommendation দিতে পারি।"
+            "আপনার পছন্দ—fresh, sweet, woody নাকি strong—"
+            "বললে আমি আরও specific recommendation দিতে পারি।"
         )
 
-    # Women
+    # -----------------------------------------------------
+    # WOMEN
+    # -----------------------------------------------------
+
     if any(word in text for word in [
         "women",
         "female",
         "মেয়েদের",
         "মহিলাদের",
     ]):
+
         return (
             "🌸 Women's fragrance-এর জন্য:\n\n"
             "• GUCCI FLORA\n"
             "• GOOD GIRL\n\n"
-            "চাইলে আমি দুটির fragrance ও price compare করে দিতে পারি।"
+            "চাইলে আমি দুটির fragrance ও price "
+            "compare করে দিতে পারি।"
         )
 
-    # Delivery
+    # -----------------------------------------------------
+    # DELIVERY
+    # -----------------------------------------------------
+
     if any(word in text for word in [
         "delivery",
         "ডেলিভারি",
         "delivery charge",
         "চার্জ",
     ]):
+
         return (
-            "🚚 Delivery charge location অনুযায়ী পরিবর্তিত হতে পারে।\n\n"
-            "আপনার location লিখলে delivery সম্পর্কে সাহায্য করতে পারি।"
+            "🚚 Delivery charge location অনুযায়ী "
+            "পরিবর্তিত হতে পারে।\n\n"
+            "আপনার location লিখলে delivery সম্পর্কে "
+            "সাহায্য করতে পারি।"
         )
 
-    # Order general
+    # -----------------------------------------------------
+    # GENERAL ORDER
+    # -----------------------------------------------------
+
     if any(word in text for word in [
         "order",
         "অর্ডার",
     ]):
+
         return (
             "🛍️ Order করতে আমাকে এই information দিন:\n\n"
             "1. Product name\n"
@@ -591,8 +656,12 @@ def ai_reply(message):
             "6. Full address"
         )
 
+    # -----------------------------------------------------
+    # FALLBACK
+    # -----------------------------------------------------
+
     return (
-        "জি 😊 আমি **Virex AI Sales Agent**।\n\n"
+        "জি 😊 আমি Virex AI Sales Agent।\n\n"
         "আমি NOIR Fragrance-এর:\n"
         "• Product\n"
         "• Price\n"
@@ -601,7 +670,8 @@ def ai_reply(message):
         "• Recommendation\n"
         "• Order\n\n"
         "সম্পর্কে সাহায্য করতে পারি।\n\n"
-        "যেমন লিখতে পারেন: **Dior Sauvage price**"
+        "যেমন লিখতে পারেন:\n"
+        "Dior Sauvage price"
     )
 
 
@@ -619,7 +689,10 @@ def get_products():
 
     result = []
 
-    for index, product in enumerate(PRODUCTS, start=1):
+    for index, product in enumerate(
+        PRODUCTS,
+        start=1
+    ):
 
         result.append({
             "id": index,
@@ -647,11 +720,16 @@ def get_orders():
 @app.post("/api/chat")
 def chat():
 
-    data = request.get_json(silent=True) or {}
-    message = data.get("message", "")
+    data = request.get_json(
+        silent=True
+    ) or {}
 
-    # Small natural delay
-    time.sleep(1.2)
+    message = data.get(
+        "message",
+        ""
+    )
+
+    time.sleep(0.7)
 
     reply = ai_reply(message)
 
@@ -663,23 +741,50 @@ def chat():
 @app.post("/api/orders")
 def create_order():
 
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(
+        silent=True
+    ) or {}
 
     try:
-        quantity = int(data.get("quantity", 1))
+        quantity = int(
+            data.get(
+                "quantity",
+                1
+            )
+        )
     except Exception:
+        quantity = 1
+
+    if quantity < 1:
         quantity = 1
 
     order = {
         "id": len(orders) + 1,
-        "customer_name": data.get("customer_name", ""),
-        "phone": data.get("phone", ""),
-        "address": data.get("address", ""),
-        "product": data.get("product", ""),
-        "size": data.get("size", ""),
+        "customer_name": data.get(
+            "customer_name",
+            ""
+        ),
+        "phone": data.get(
+            "phone",
+            ""
+        ),
+        "address": data.get(
+            "address",
+            ""
+        ),
+        "product": data.get(
+            "product",
+            ""
+        ),
+        "size": data.get(
+            "size",
+            ""
+        ),
         "quantity": quantity,
         "status": "pending",
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "created_at": datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
     }
 
     orders.append(order)
@@ -689,8 +794,27 @@ def create_order():
 
 
 # =========================================================
+# HEALTH CHECK
+# =========================================================
+
+@app.get("/api/health")
+def health():
+    return jsonify({
+        "status": "online",
+        "agent": "Virex AI Sales Agent",
+        "products": len(PRODUCTS),
+        "orders": len(orders),
+    })
+
+
+# =========================================================
 # RUN
 # =========================================================
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
+    
