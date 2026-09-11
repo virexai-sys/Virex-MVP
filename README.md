@@ -1,4 +1,4 @@
-# Bangla AI Sales Agent — MVP
+# AIMAN'S AI Sales Agent — MVP
 Zero-cost local MVP with Bangla/Banglish chat, product catalogue, sales FAQ, order storage and dashboard.
 
 ## Run
