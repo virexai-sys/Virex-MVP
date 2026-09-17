@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,10 +8,16 @@
 
     <title>Virex AI</title>
 
+    <!-- =========================================================
+         PREMIUM VIREX FAVICON
+    ========================================================== -->
+
     <link
         rel="icon"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23a855f7'/%3E%3Cstop offset='1' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='%230b0615'/%3E%3Cpath d='M22 25h56L61 75H39z' fill='url(%23g)'/%3E%3Cpath d='M32 35h36L58 65H42z' fill='%230b0615'/%3E%3C/svg%3E"
+        type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='v' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23d8b4fe'/%3E%3Cstop offset='45%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='%23090313'/%3E%3Cpath d='M20 25 L38 25 L50 62 L62 25 L80 25 L61 76 L39 76 Z' fill='url(%23v)'/%3E%3Cpath d='M25 28 L38 28 L50 65 L62 28 L75 28' fill='none' stroke='%23ffffff' stroke-opacity='.18' stroke-width='3'/%3E%3C/svg%3E"
     >
+
 
     <style>
 
@@ -33,7 +38,9 @@
             height: 100%;
         }
 
+
         :root {
+
             --purple: #8b5cf6;
             --purple2: #a855f7;
             --purple3: #c084fc;
@@ -45,6 +52,7 @@
             --border: rgba(192, 132, 252, .16);
 
             --text: #ffffff;
+
             --muted: #958da4;
 
             --sidebar-width: 255px;
@@ -66,6 +74,7 @@
             position: relative;
 
             background:
+
                 radial-gradient(
                     ellipse at 20% 15%,
                     rgba(139, 92, 246, .55) 0%,
@@ -94,6 +103,7 @@
                 );
         }
 
+
         body::before {
 
             content: "";
@@ -116,6 +126,7 @@
 
             pointer-events: none;
         }
+
 
         @keyframes atmosphere {
 
@@ -148,6 +159,7 @@
             z-index: 0;
         }
 
+
         .particle {
 
             position: absolute;
@@ -168,6 +180,7 @@
             animation:
                 floatParticle linear infinite;
         }
+
 
         @keyframes floatParticle {
 
@@ -265,6 +278,7 @@
                 5px 12px 30px;
         }
 
+
         .logo-mark {
 
             width: 36px;
@@ -296,6 +310,7 @@
             flex-shrink: 0;
         }
 
+
         @keyframes logoPulse {
 
             0%,
@@ -311,6 +326,7 @@
                     rgba(168, 85, 247, .9);
             }
         }
+
 
         .logo span {
             color: #c084fc;
@@ -329,6 +345,7 @@
 
             gap: 7px;
         }
+
 
         .menu button {
 
@@ -361,6 +378,7 @@
             overflow: hidden;
         }
 
+
         .menu button::before {
 
             content: "";
@@ -384,10 +402,13 @@
                 .5s;
         }
 
+
         .menu button:hover::before {
+
             transform:
                 translateX(100%);
         }
+
 
         .menu button:hover,
         .menu button.active {
@@ -408,6 +429,7 @@
                 0 8px 25px
                 rgba(109, 40, 217, .12);
         }
+
 
         .menu button.active {
 
@@ -472,6 +494,7 @@
             flex-shrink: 0;
         }
 
+
         .search {
 
             width: 380px;
@@ -498,9 +521,11 @@
                 .25s;
         }
 
+
         .search::placeholder {
             color: #777080;
         }
+
 
         .search:focus {
 
@@ -511,6 +536,7 @@
                 0 0 25px
                 rgba(139, 92, 246, .18);
         }
+
 
         .status {
 
@@ -551,13 +577,16 @@
                 transparent;
         }
 
+
         .content::-webkit-scrollbar {
             width: 7px;
         }
 
+
         .content::-webkit-scrollbar-track {
             background: transparent;
         }
+
 
         .content::-webkit-scrollbar-thumb {
 
@@ -582,9 +611,11 @@
                 pageIn .35s ease;
         }
 
+
         .page.active {
             display: block;
         }
+
 
         @keyframes pageIn {
 
@@ -627,6 +658,7 @@
                 transparent;
         }
 
+
         .subtitle {
 
             color: #958da4;
@@ -652,6 +684,7 @@
 
             margin-bottom: 25px;
         }
+
 
         .card {
 
@@ -685,6 +718,7 @@
                 .25s;
         }
 
+
         .card::after {
 
             content: "";
@@ -708,6 +742,7 @@
             pointer-events: none;
         }
 
+
         .card:hover {
 
             transform:
@@ -721,6 +756,7 @@
                 rgba(109,40,217,.20);
         }
 
+
         .card-label {
 
             color: #958da4;
@@ -729,6 +765,7 @@
 
             margin-bottom: 10px;
         }
+
 
         .card-value {
 
@@ -757,9 +794,11 @@
             gap: 30px;
         }
 
+
         .ai-copy {
             max-width: 650px;
         }
+
 
         .ai-badge {
 
@@ -784,12 +823,14 @@
             margin-bottom: 15px;
         }
 
+
         .ai-copy h2 {
 
             font-size: 30px;
 
             margin-bottom: 12px;
         }
+
 
         .ai-copy p {
 
@@ -819,6 +860,7 @@
             justify-content: center;
         }
 
+
         .orb-core {
 
             width: 82px;
@@ -846,6 +888,7 @@
                 orbCore 3s ease-in-out infinite;
         }
 
+
         .orb-ring {
 
             position: absolute;
@@ -857,6 +900,7 @@
             border-radius: 50%;
         }
 
+
         .ring-one {
 
             width: 120px;
@@ -865,6 +909,7 @@
             animation:
                 spin 7s linear infinite;
         }
+
 
         .ring-two {
 
@@ -876,6 +921,7 @@
             animation:
                 spinReverse 10s linear infinite;
         }
+
 
         .ring-three {
 
@@ -889,6 +935,7 @@
                 ringPulse 3s ease-in-out infinite;
         }
 
+
         @keyframes orbCore {
 
             0%,
@@ -901,6 +948,7 @@
             }
         }
 
+
         @keyframes spin {
 
             to {
@@ -908,12 +956,14 @@
             }
         }
 
+
         @keyframes spinReverse {
 
             to {
                 transform: rotate(-360deg);
             }
         }
+
 
         @keyframes ringPulse {
 
@@ -947,6 +997,7 @@
             gap: 18px;
         }
 
+
         .product {
 
             background:
@@ -971,6 +1022,7 @@
                 blur(18px);
         }
 
+
         .product:hover {
 
             transform:
@@ -983,6 +1035,7 @@
                 0 15px 45px
                 rgba(109,40,217,.20);
         }
+
 
         .product-icon {
 
@@ -1013,6 +1066,7 @@
                 iconFloat 4s ease-in-out infinite;
         }
 
+
         @keyframes iconFloat {
 
             0%,
@@ -1025,9 +1079,11 @@
             }
         }
 
+
         .product h3 {
             margin-bottom: 8px;
         }
+
 
         .product p {
 
@@ -1040,6 +1096,7 @@
             line-height: 1.5;
         }
 
+
         .price {
 
             color: #d8b4fe;
@@ -1050,6 +1107,7 @@
 
             margin-top: 15px;
         }
+
 
         .stock {
 
@@ -1097,6 +1155,7 @@
                 rgba(76,29,149,.15);
         }
 
+
         .messages {
 
             flex: 1;
@@ -1118,13 +1177,16 @@
                 transparent;
         }
 
+
         .messages::-webkit-scrollbar {
             width: 6px;
         }
 
+
         .messages::-webkit-scrollbar-track {
             background: transparent;
         }
+
 
         .messages::-webkit-scrollbar-thumb {
 
@@ -1133,6 +1195,7 @@
 
             border-radius: 20px;
         }
+
 
         .message {
 
@@ -1163,6 +1226,7 @@
                 messageIn .25s ease;
         }
 
+
         @keyframes messageIn {
 
             from {
@@ -1176,6 +1240,7 @@
             }
         }
 
+
         .bot {
 
             margin-right: auto;
@@ -1187,6 +1252,7 @@
                 1px solid
                 rgba(168,85,247,.14);
         }
+
 
         .user {
 
@@ -1202,6 +1268,167 @@
             box-shadow:
                 0 8px 25px
                 rgba(124,58,237,.25);
+        }
+
+
+        /* =========================================================
+           NEW VIREX WELCOME CARD
+        ========================================================= */
+
+        .virex-welcome {
+
+            width: min(100%, 520px);
+
+            margin:
+                25px auto;
+
+            padding:
+                30px 25px;
+
+            text-align: center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(168, 85, 247, .12),
+                    rgba(255, 255, 255, .035)
+                );
+
+            border:
+                1px solid
+                rgba(192, 132, 252, .18);
+
+            border-radius: 22px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(76, 29, 149, .20);
+
+            backdrop-filter:
+                blur(20px);
+
+            animation:
+                welcomeIn .6s ease;
+        }
+
+
+        .welcome-icon {
+
+            width: 62px;
+            height: 62px;
+
+            margin:
+                0 auto 18px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #c084fc,
+                    #7c3aed
+                );
+
+            font-size: 30px;
+
+            font-weight: 900;
+
+            box-shadow:
+                0 0 30px
+                rgba(168, 85, 247, .55);
+
+            animation:
+                welcomeIconPulse 3s ease-in-out infinite;
+        }
+
+
+        .welcome-title {
+
+            font-size: 25px;
+
+            font-weight: 800;
+
+            margin-bottom: 8px;
+        }
+
+
+        .welcome-title span {
+            color: #c084fc;
+        }
+
+
+        .welcome-subtitle {
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #d8b4fe,
+                    #a855f7
+                );
+
+            -webkit-background-clip:
+                text;
+
+            -webkit-text-fill-color:
+                transparent;
+
+            margin-bottom: 12px;
+        }
+
+
+        .welcome-description {
+
+            color: #91889e;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        @keyframes welcomeIn {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(15px)
+                    scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+        }
+
+
+        @keyframes welcomeIconPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow:
+                    0 0 25px
+                    rgba(168,85,247,.45);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow:
+                    0 0 40px
+                    rgba(168,85,247,.75);
+            }
         }
 
 
@@ -1234,6 +1461,7 @@
                 rgba(168,85,247,.14);
         }
 
+
         .typing-dot {
 
             width: 6px;
@@ -1247,13 +1475,16 @@
                 typingDot 1.2s infinite ease-in-out;
         }
 
+
         .typing-dot:nth-child(2) {
             animation-delay: .15s;
         }
 
+
         .typing-dot:nth-child(3) {
             animation-delay: .30s;
         }
+
 
         @keyframes typingDot {
 
@@ -1297,6 +1528,7 @@
                 rgba(7,3,15,.30);
         }
 
+
         .chat-input input {
 
             flex: 1;
@@ -1324,9 +1556,11 @@
             outline: none;
         }
 
+
         .chat-input input::placeholder {
             color: #777080;
         }
+
 
         .chat-input input:focus {
 
@@ -1337,6 +1571,7 @@
                 0 0 20px
                 rgba(139,92,246,.13);
         }
+
 
         .send {
 
@@ -1368,6 +1603,7 @@
             flex-shrink: 0;
         }
 
+
         .send:hover {
 
             transform:
@@ -1377,6 +1613,7 @@
                 0 8px 25px
                 rgba(139,92,246,.35);
         }
+
 
         .send:disabled {
 
@@ -1403,6 +1640,7 @@
             border-radius: 15px;
         }
 
+
         table {
 
             width: 100%;
@@ -1423,6 +1661,7 @@
             overflow: hidden;
         }
 
+
         th,
         td {
 
@@ -1435,6 +1674,7 @@
                 rgba(192,132,252,.07);
         }
 
+
         th {
 
             color: #a9a1b8;
@@ -1444,6 +1684,7 @@
             white-space: nowrap;
         }
 
+
         td {
 
             font-size: 14px;
@@ -1451,15 +1692,18 @@
             color: #ddd6e5;
         }
 
+
         tr:last-child td {
             border-bottom: none;
         }
+
 
         tr:hover td {
 
             background:
                 rgba(168,85,247,.045);
         }
+
 
         .empty {
 
@@ -1489,6 +1733,7 @@
 
             max-width: 700px;
         }
+
 
         .social-card {
 
@@ -1524,6 +1769,7 @@
                 blur(18px);
         }
 
+
         .social-card:hover {
 
             transform:
@@ -1536,6 +1782,7 @@
                 0 15px 40px
                 rgba(109,40,217,.20);
         }
+
 
         .social-icon {
 
@@ -1557,6 +1804,7 @@
 
             flex-shrink: 0;
         }
+
 
         .social-card small {
 
@@ -1596,6 +1844,7 @@
             border-radius: 17px;
         }
 
+
         .road {
 
             position: absolute;
@@ -1611,6 +1860,7 @@
                 rgba(192,132,252,.25);
         }
 
+
         .delivery-man {
 
             position: absolute;
@@ -1625,6 +1875,7 @@
                 ride 8s linear infinite;
         }
 
+
         @keyframes ride {
 
             from {
@@ -1636,6 +1887,7 @@
                     calc(100% + 80px);
             }
         }
+
 
         .delivery-text {
 
@@ -1985,12 +2237,14 @@
                 border-radius: 14px;
             }
 
+
             .messages {
 
                 padding: 15px;
 
                 min-height: 0;
             }
+
 
             .message {
 
@@ -2002,11 +2256,13 @@
                     11px 13px;
             }
 
+
             .typing-message {
 
                 padding:
                     11px 13px;
             }
+
 
             .chat-input {
 
@@ -2014,6 +2270,7 @@
 
                 gap: 7px;
             }
+
 
             .chat-input input {
 
@@ -2025,12 +2282,58 @@
                 font-size: 13px;
             }
 
+
             .send {
 
                 padding:
                     0 15px;
 
                 height: 42px;
+
+                font-size: 12px;
+            }
+
+
+            /* ---------------- WELCOME MOBILE ---------------- */
+
+            .virex-welcome {
+
+                margin:
+                    15px auto;
+
+                padding:
+                    25px 18px;
+
+                border-radius: 18px;
+            }
+
+
+            .welcome-icon {
+
+                width: 54px;
+                height: 54px;
+
+                border-radius: 16px;
+
+                font-size: 26px;
+
+                margin-bottom: 15px;
+            }
+
+
+            .welcome-title {
+
+                font-size: 21px;
+            }
+
+
+            .welcome-subtitle {
+
+                font-size: 14px;
+            }
+
+
+            .welcome-description {
 
                 font-size: 12px;
             }
@@ -2044,14 +2347,17 @@
                 gap: 12px;
             }
 
+
             .social-card {
 
                 padding: 16px;
             }
 
+
             .delivery-card {
                 height: 105px;
             }
+
 
             .delivery-text {
 
@@ -2062,12 +2368,14 @@
                 font-size: 11px;
             }
 
+
             .delivery-man {
 
                 font-size: 30px;
 
                 bottom: 19px;
             }
+
 
             .table-wrap {
                 margin-right: -2px;
@@ -2170,15 +2478,50 @@
 
     <div class="particles">
 
-        <span class="particle" style="left:5%;animation-duration:12s;"></span>
-        <span class="particle" style="left:13%;animation-duration:17s;"></span>
-        <span class="particle" style="left:24%;animation-duration:14s;"></span>
-        <span class="particle" style="left:36%;animation-duration:20s;"></span>
-        <span class="particle" style="left:48%;animation-duration:15s;"></span>
-        <span class="particle" style="left:61%;animation-duration:18s;"></span>
-        <span class="particle" style="left:73%;animation-duration:13s;"></span>
-        <span class="particle" style="left:84%;animation-duration:19s;"></span>
-        <span class="particle" style="left:94%;animation-duration:16s;"></span>
+        <span
+            class="particle"
+            style="left:5%;animation-duration:12s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:13%;animation-duration:17s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:24%;animation-duration:14s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:36%;animation-duration:20s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:48%;animation-duration:15s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:61%;animation-duration:18s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:73%;animation-duration:13s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:84%;animation-duration:19s;"
+        ></span>
+
+        <span
+            class="particle"
+            style="left:94%;animation-duration:16s;"
+        ></span>
 
     </div>
 
@@ -2196,6 +2539,7 @@
 
         <aside class="sidebar">
 
+
             <div class="logo">
 
                 <div class="logo-mark">
@@ -2211,6 +2555,7 @@
 
             <div class="menu">
 
+
                 <button
                     class="active"
                     onclick="showPage('chat', this)"
@@ -2218,11 +2563,13 @@
                     ◉ &nbsp; Virex AI Sales Agent
                 </button>
 
+
                 <button
                     onclick="showPage('dashboard', this)"
                 >
                     ◈ &nbsp; Dashboard
                 </button>
+
 
                 <button
                     onclick="showPage('products', this)"
@@ -2230,11 +2577,13 @@
                     ◇ &nbsp; Products
                 </button>
 
+
                 <button
                     onclick="showPage('orders', this)"
                 >
                     ▣ &nbsp; Orders
                 </button>
+
 
                 <button
                     onclick="showPage('customers', this)"
@@ -2242,11 +2591,13 @@
                     ◎ &nbsp; Customers
                 </button>
 
+
                 <button
                     onclick="showPage('social', this)"
                 >
                     ✦ &nbsp; Social Media
                 </button>
+
 
             </div>
 
@@ -2266,6 +2617,7 @@
 
             <header class="topbar">
 
+
                 <input
                     class="search"
                     id="globalSearch"
@@ -2273,9 +2625,11 @@
                     oninput="globalSearch()"
                 >
 
+
                 <div class="status">
                     ● Virex AI Online
                 </div>
+
 
             </header>
 
@@ -2296,9 +2650,11 @@
                     class="page active"
                 >
 
+
                     <div class="title">
                         Virex AI Sales Agent
                     </div>
+
 
                     <div class="subtitle">
                         Your intelligent sales assistant for NOIR Fragrance.
@@ -2313,26 +2669,49 @@
                             id="messages"
                         >
 
+
                             <!-- =================================================
-                                 VIREX AI WELCOME MESSAGE
-                                 Updated according to your requirement
+                                 NEW VIREX WELCOME MESSAGE
                             ================================================= -->
 
-                            <div class="message bot">
-                                <strong>Welcome to Virex AI</strong><br><br>
-                                <em>The Future of AI Agent</em>
+                            <div class="virex-welcome">
+
+
+                                <div class="welcome-icon">
+                                    V
+                                </div>
+
+
+                                <div class="welcome-title">
+                                    Welcome to <span>Virex AI</span>
+                                </div>
+
+
+                                <div class="welcome-subtitle">
+                                    The Future of AI Agents
+                                </div>
+
+
+                                <div class="welcome-description">
+                                    Your intelligent AI sales assistant is ready to help.
+                                </div>
+
+
                             </div>
+
 
                         </div>
 
 
                         <div class="chat-input">
 
+
                             <input
                                 id="chatInput"
                                 autocomplete="off"
                                 placeholder="Ask Virex AI Sales Agent..."
                             >
+
 
                             <button
                                 class="send"
@@ -2342,7 +2721,9 @@
                                 Send
                             </button>
 
+
                         </div>
+
 
                     </div>
 
@@ -2358,9 +2739,11 @@
                     class="page"
                 >
 
+
                     <div class="title">
                         Good evening 👋
                     </div>
+
 
                     <div class="subtitle">
                         Welcome to your Virex Sales Command Center.
@@ -2368,6 +2751,7 @@
 
 
                     <div class="stats">
+
 
                         <div class="card">
 
@@ -2429,20 +2813,25 @@
 
                         </div>
 
+
                     </div>
 
 
                     <div class="card ai-hero">
 
+
                         <div class="ai-copy">
+
 
                             <div class="ai-badge">
                                 ✦ VIREX INTELLIGENCE CORE
                             </div>
 
+
                             <h2>
                                 Virex AI Sales Agent
                             </h2>
+
 
                             <p>
                                 Your AI-powered sales assistant is ready
@@ -2451,35 +2840,46 @@
                                 automatically.
                             </p>
 
+
                         </div>
 
 
                         <div class="ai-orb">
 
+
                             <div class="orb-ring ring-one"></div>
+
                             <div class="orb-ring ring-two"></div>
+
                             <div class="orb-ring ring-three"></div>
 
                             <div class="orb-core"></div>
 
+
                         </div>
+
 
                     </div>
 
 
                     <div class="delivery-card">
 
+
                         <div class="delivery-text">
                             🚚 Orders moving toward your customers
                         </div>
+
 
                         <div class="delivery-man">
                             🛵
                         </div>
 
+
                         <div class="road"></div>
 
+
                     </div>
+
 
                 </div>
 
@@ -2493,18 +2893,22 @@
                     class="page"
                 >
 
+
                     <div class="title">
                         Product Catalogue
                     </div>
+
 
                     <div class="subtitle">
                         All NOIR Fragrance products available in your store.
                     </div>
 
+
                     <div
                         class="products"
                         id="productList"
                     ></div>
+
 
                 </div>
 
@@ -2518,9 +2922,11 @@
                     class="page"
                 >
 
+
                     <div class="title">
                         Orders
                     </div>
+
 
                     <div class="subtitle">
                         Customer orders collected by your Virex AI agent.
@@ -2529,44 +2935,62 @@
 
                     <div class="table-wrap">
 
+
                         <table>
 
+
                             <thead>
+
 
                                 <tr>
 
                                     <th>ID</th>
+
                                     <th>Customer</th>
+
                                     <th>Phone</th>
+
                                     <th>Product</th>
+
                                     <th>Size</th>
+
                                     <th>Qty</th>
+
                                     <th>Status</th>
 
                                 </tr>
 
+
                             </thead>
+
 
                             <tbody id="orderList"></tbody>
 
+
                         </table>
+
 
                     </div>
 
 
                     <div class="delivery-card">
 
+
                         <div class="delivery-text">
                             🚚 Virex Delivery Network
                         </div>
+
 
                         <div class="delivery-man">
                             🛵
                         </div>
 
+
                         <div class="road"></div>
 
+
                     </div>
+
 
                 </div>
 
@@ -2580,9 +3004,11 @@
                     class="page"
                 >
 
+
                     <div class="title">
                         Customers
                     </div>
+
 
                     <div class="subtitle">
                         Customer information collected through orders.
@@ -2591,11 +3017,14 @@
 
                     <div class="card">
 
+
                         <div class="empty">
                             Customer management will appear here.
                         </div>
 
+
                     </div>
+
 
                 </div>
 
@@ -2609,9 +3038,11 @@
                     class="page"
                 >
 
+
                     <div class="title">
                         Social Media
                     </div>
+
 
                     <div class="subtitle">
                         Manage and access your NOIR Fragrance online presence.
@@ -2628,9 +3059,11 @@
                             rel="noopener noreferrer"
                         >
 
+
                             <div class="social-icon">
                                 f
                             </div>
+
 
                             <div>
 
@@ -2644,6 +3077,7 @@
 
                             </div>
 
+
                         </a>
 
 
@@ -2654,9 +3088,11 @@
                             rel="noopener noreferrer"
                         >
 
+
                             <div class="social-icon">
                                 ◈
                             </div>
+
 
                             <div>
 
@@ -2670,7 +3106,9 @@
 
                             </div>
 
+
                         </a>
+
 
                     </div>
 
@@ -2680,37 +3118,45 @@
                         style="margin-top:20px;max-width:700px;"
                     >
 
+
                         <div class="card-label">
                             BRAND
                         </div>
+
 
                         <div class="card-value">
                             NOIR Fragrance
                         </div>
 
+
                     </div>
+
 
                 </div>
 
+
             </section>
 
+
         </main>
+
 
     </div>
 
 
     <!-- =========================================================
          JAVASCRIPT
-         IMPORTANT: EVERYTHING BELOW IS INSIDE SCRIPT
     ========================================================= -->
 
     <script>
+
 
         /* =========================================================
            DATA
         ========================================================= */
 
         let products = [];
+
         let orders = [];
 
         let isSending = false;
@@ -2722,10 +3168,13 @@
 
         function showPage(page, button) {
 
+
             document
                 .querySelectorAll(".page")
                 .forEach(function(p) {
+
                     p.classList.remove("active");
+
                 });
 
 
@@ -2734,19 +3183,25 @@
 
 
             if (target) {
+
                 target.classList.add("active");
+
             }
 
 
             document
                 .querySelectorAll(".menu button")
                 .forEach(function(b) {
+
                     b.classList.remove("active");
+
                 });
 
 
             if (button) {
+
                 button.classList.add("active");
+
             }
 
 
@@ -2755,22 +3210,30 @@
 
 
             if (search) {
+
                 search.value = "";
+
             }
 
 
             if (page === "products") {
+
                 renderProducts();
+
             }
 
 
             if (page === "orders") {
+
                 renderOrders();
+
             }
 
 
             if (page === "dashboard") {
+
                 updateStats();
+
             }
 
 
@@ -2778,16 +3241,23 @@
 
                 setTimeout(function() {
 
+
                     const messages =
                         document.getElementById("messages");
 
+
                     if (messages) {
+
                         messages.scrollTop =
                             messages.scrollHeight;
+
                     }
 
+
                 }, 50);
+
             }
+
         }
 
 
@@ -2797,7 +3267,9 @@
 
         async function loadData() {
 
+
             try {
+
 
                 const productRes =
                     await fetch("/api/products");
@@ -2805,15 +3277,19 @@
 
                 if (productRes.ok) {
 
+
                     const productData =
                         await productRes.json();
+
 
                     products =
                         Array.isArray(productData)
                             ? productData
                             : [];
 
+
                 } else {
+
 
                     products = [];
 
@@ -2826,15 +3302,19 @@
 
                 if (orderRes.ok) {
 
+
                     const orderData =
                         await orderRes.json();
+
 
                     orders =
                         Array.isArray(orderData)
                             ? orderData
                             : [];
 
+
                 } else {
+
 
                     orders = [];
 
@@ -2842,25 +3322,37 @@
 
 
                 renderProducts();
+
                 renderOrders();
+
                 updateStats();
+
 
             }
 
+
             catch(error) {
+
 
                 console.error(
                     "Data loading error:",
                     error
                 );
 
+
                 products = [];
+
                 orders = [];
 
+
                 renderProducts();
+
                 renderOrders();
+
                 updateStats();
+
             }
+
         }
 
 
@@ -2870,11 +3362,14 @@
 
         function updateStats() {
 
+
             const statProducts =
                 document.getElementById("statProducts");
 
+
             const statOrders =
                 document.getElementById("statOrders");
+
 
             const statPending =
                 document.getElementById("statPending");
@@ -2882,23 +3377,30 @@
 
             if (statProducts) {
 
+
                 statProducts.textContent =
                     products.length;
+
             }
 
 
             if (statOrders) {
 
+
                 statOrders.textContent =
                     orders.length;
+
             }
 
 
             if (statPending) {
 
+
                 statPending.textContent =
 
+
                     orders.filter(function(order) {
+
 
                         return String(
                             order.status || ""
@@ -2906,8 +3408,11 @@
                             .toLowerCase()
                             === "pending";
 
+
                     }).length;
+
             }
+
         }
 
 
@@ -2917,27 +3422,35 @@
 
         function renderProducts(list = products) {
 
+
             const container =
                 document.getElementById("productList");
 
 
             if (!container) {
+
                 return;
+
             }
 
 
             if (!Array.isArray(list) || !list.length) {
 
+
                 container.innerHTML =
                     '<div class="empty">No products found.</div>';
 
+
                 return;
+
             }
 
 
             container.innerHTML =
 
+
                 list.map(function(product) {
+
 
                     return `
 
@@ -2997,7 +3510,9 @@
 
                     `;
 
+
                 }).join("");
+
         }
 
 
@@ -3007,16 +3522,20 @@
 
         function renderOrders() {
 
+
             const list =
                 document.getElementById("orderList");
 
 
             if (!list) {
+
                 return;
+
             }
 
 
             if (!Array.isArray(orders) || !orders.length) {
+
 
                 list.innerHTML = `
 
@@ -3033,13 +3552,17 @@
 
                 `;
 
+
                 return;
+
             }
 
 
             list.innerHTML =
 
+
                 orders.map(function(order) {
+
 
                     return `
 
@@ -3102,7 +3625,9 @@
 
                     `;
 
+
                 }).join("");
+
         }
 
 
@@ -3112,12 +3637,15 @@
 
         function showTypingIndicator() {
 
+
             const messages =
                 document.getElementById("messages");
 
 
             if (!messages) {
+
                 return null;
+
             }
 
 
@@ -3153,6 +3681,7 @@
 
 
             return typing;
+
         }
 
 
@@ -3162,13 +3691,17 @@
 
         function removeTypingIndicator() {
 
+
             const typing =
                 document.getElementById("typing");
 
 
             if (typing) {
+
                 typing.remove();
+
             }
+
         }
 
 
@@ -3178,8 +3711,11 @@
 
         async function sendMessage() {
 
+
             if (isSending) {
+
                 return;
+
             }
 
 
@@ -3196,7 +3732,9 @@
 
 
             if (!input || !messages) {
+
                 return;
+
             }
 
 
@@ -3205,7 +3743,9 @@
 
 
             if (!message) {
+
                 return;
+
             }
 
 
@@ -3216,10 +3756,13 @@
 
             if (sendButton) {
 
+
                 sendButton.disabled = true;
+
 
                 sendButton.textContent =
                     "Sending...";
+
             }
 
 
@@ -3243,31 +3786,38 @@
 
             try {
 
+
                 const response =
                     await fetch(
                         "/api/chat",
                         {
+
                             method: "POST",
 
                             headers: {
+
                                 "Content-Type":
                                     "application/json"
+
                             },
 
                             body:
                                 JSON.stringify({
                                     message: message
                                 })
+
                         }
                     );
 
 
                 if (!response.ok) {
 
+
                     throw new Error(
                         "Chat API failed with status " +
                         response.status
                     );
+
                 }
 
 
@@ -3291,8 +3841,10 @@
                     String(reply).trim() === ""
                 ) {
 
+
                     reply =
                         "দুঃখিত, কোনো উত্তর পাওয়া যায়নি।";
+
                 }
 
 
@@ -3304,7 +3856,9 @@
 
             }
 
+
             catch(error) {
+
 
                 console.error(
                     "Chat error:",
@@ -3322,23 +3876,29 @@
 
             }
 
+
             finally {
+
 
                 isSending = false;
 
 
                 if (sendButton) {
 
+
                     sendButton.disabled = false;
+
 
                     sendButton.textContent =
                         "Send";
+
                 }
 
 
                 input.focus();
 
             }
+
         }
 
 
@@ -3348,12 +3908,15 @@
 
         function addMessage(text, type) {
 
+
             const messages =
                 document.getElementById("messages");
 
 
             if (!messages) {
+
                 return;
+
             }
 
 
@@ -3374,10 +3937,13 @@
 
             requestAnimationFrame(function() {
 
+
                 messages.scrollTop =
                     messages.scrollHeight;
 
+
             });
+
         }
 
 
@@ -3387,12 +3953,15 @@
 
         function globalSearch() {
 
+
             const search =
                 document.getElementById("globalSearch");
 
 
             if (!search) {
+
                 return;
+
             }
 
 
@@ -3408,9 +3977,12 @@
 
             if (!query) {
 
+
                 renderProducts();
 
+
                 return;
+
             }
 
 
@@ -3418,14 +3990,18 @@
                 .querySelectorAll(".page")
                 .forEach(function(p) {
 
+
                     p.classList.remove("active");
+
 
                 });
 
 
             if (productsPage) {
 
+
                 productsPage.classList.add("active");
+
             }
 
 
@@ -3433,7 +4009,9 @@
                 .querySelectorAll(".menu button")
                 .forEach(function(b) {
 
+
                     b.classList.remove("active");
+
 
                 });
 
@@ -3446,12 +4024,15 @@
 
             if (productButton) {
 
+
                 productButton.classList.add("active");
+
             }
 
 
             const filtered =
                 products.filter(function(product) {
+
 
                     const name =
                         String(
@@ -3477,6 +4058,7 @@
 
 
             renderProducts(filtered);
+
         }
 
 
@@ -3485,6 +4067,7 @@
         ========================================================= */
 
         function escapeHTML(value) {
+
 
             return String(value)
 
@@ -3512,6 +4095,7 @@
                     /'/g,
                     "&#039;"
                 );
+
         }
 
 
@@ -3523,28 +4107,35 @@
             "DOMContentLoaded",
             function() {
 
+
                 const input =
                     document.getElementById("chatInput");
 
 
                 if (input) {
 
+
                     input.addEventListener(
                         "keydown",
                         function(event) {
+
 
                             if (
                                 event.key === "Enter" &&
                                 !event.shiftKey
                             ) {
 
+
                                 event.preventDefault();
 
+
                                 sendMessage();
+
                             }
 
                         }
                     );
+
                 }
 
 
@@ -3558,5 +4149,3 @@
 </body>
 
 </html>
-```
-
