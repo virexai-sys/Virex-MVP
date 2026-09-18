@@ -1,87 +1,359 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0284C7">
-<title>EZKROY — AI Sales Assistant</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={theme:{extend:{colors:{appBg:'#F5FBFF'}}}};</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-*{scrollbar-width:thin;scrollbar-color:#bae6fd transparent}*::-webkit-scrollbar{width:6px;height:6px}*::-webkit-scrollbar-thumb{background:#bae6fd;border-radius:999px}
-html,body{margin:0;background:#f5fbff}body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.sky{background:linear-gradient(135deg,#0284c7,#0ea5e9 55%,#38bdf8)}.skyLight{background:linear-gradient(135deg,#e0f7ff,#f0f9ff)}
-.card{background:#fff;border:1px solid #d9f0fc;border-radius:18px;box-shadow:0 8px 30px rgba(14,165,233,.08)}
-.active{background:linear-gradient(135deg,#0284c7,#0ea5e9);box-shadow:0 8px 20px rgba(14,165,233,.2)}
-.msg{max-width:min(85%,620px);overflow-wrap:anywhere;word-break:break-word}
-@media(max-width:1023px){.sidebar{display:none}.mobileNav{display:flex!important}}
-@media(max-width:640px){.shell{height:100dvh}.top{height:58px;padding:0 12px}.main{padding:8px!important}.chatCard{height:calc(100dvh - 130px);border-radius:15px;padding:10px!important}.msg{max-width:90%;font-size:13px!important;padding:10px!important}.ava{width:31px!important;height:31px!important;min-width:31px!important}.input{font-size:13px!important;padding:11px!important}.send{width:44px;height:44px;padding:0!important}.mobileNav{height:64px;padding-bottom:max(6px,env(safe-area-inset-bottom))}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZKROY - AI Sales Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="text-slate-900 antialiased">
-<div class="shell flex h-screen overflow-hidden">
-<aside class="sidebar w-64 bg-white border-r border-sky-100 flex flex-col justify-between shrink-0">
-<div>
-<div class="h-16 px-6 flex items-center gap-3 border-b border-sky-100"><div class="w-10 h-10 rounded-2xl sky flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-bag-shopping"></i></div><b class="text-xl bg-gradient-to-r from-sky-700 to-cyan-400 bg-clip-text text-transparent">EZKROY</b></div>
-<nav class="p-3 space-y-2">
-<button id="nav-chat" onclick="switchTab('chat')" class="active w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-white font-semibold"><i class="fa-solid fa-comments"></i>AI Sales Chat</button>
-<button id="nav-performance" onclick="switchTab('performance')" class="nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500"><i class="fa-solid fa-chart-line"></i>Performance</button>
-<button id="nav-products" onclick="switchTab('products')" class="nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500"><i class="fa-solid fa-box"></i>Products & Sheet</button>
-<button id="nav-settings" onclick="switchTab('settings')" class="nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500"><i class="fa-solid fa-gear"></i>Settings</button>
-</nav></div>
-<div class="p-4 border-t border-sky-100 flex gap-3 items-center"><div class="w-10 h-10 rounded-full skyLight border border-sky-200 flex items-center justify-center text-sky-700 font-bold">A</div><div><b class="text-sm">Store Admin</b><p class="text-xs text-slate-400">admin@ezkroy.com</p></div></div>
-</aside>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row">
 
-<div class="flex-1 min-w-0 flex flex-col">
-<header class="top h-16 bg-white/90 backdrop-blur border-b border-sky-100 px-6 flex items-center justify-between shrink-0">
-<h1 id="title" class="text-lg font-bold truncate">AI Sales Assistant</h1>
-<div class="flex items-center gap-3"><span class="hidden sm:inline-flex text-xs px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-semibold"><i class="fa-solid fa-circle text-emerald-500 mr-1 text-[7px]"></i>Sheet Sync Active</span><button class="w-10 h-10 rounded-xl bg-white border border-sky-100"><i class="fa-regular fa-bell"></i></button></div>
-</header>
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center space-x-2">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <span class="font-bold text-lg tracking-wide">EZKROY</span>
+        </div>
+        <div class="flex items-center space-x-2 text-xs bg-emerald-600 px-2.5 py-1 rounded-full text-white">
+            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+            <span>Sheet Sync Active</span>
+        </div>
+    </div>
 
-<main class="main flex-1 overflow-y-auto p-4 lg:p-6 bg-appBg">
-<section id="view-chat" class="h-full max-w-5xl mx-auto flex flex-col">
-<div class="card chatCard p-4 flex-1 flex flex-col min-h-0">
-<div class="flex items-center justify-between pb-4 border-b border-sky-100">
-<div class="flex items-center gap-3 min-w-0"><div class="ava w-11 h-11 rounded-2xl skyLight border border-sky-200 flex items-center justify-center text-sky-600 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="min-w-0"><b class="block truncate">EZKROY AI Sales Assistant</b><span class="text-xs text-slate-400">Powered by your products & Google Sheet</span></div></div><span class="text-xs text-emerald-600 shrink-0"><i class="fa-solid fa-circle text-[8px] animate-pulse mr-1"></i>Online</span>
-</div>
-<div id="chat-messages" class="flex-1 overflow-y-auto py-5 space-y-4">
-<div class="flex items-start gap-3"><div class="ava w-9 h-9 rounded-xl sky flex items-center justify-center text-white shrink-0"><i class="fa-solid fa-robot text-xs"></i></div><div class="msg bg-sky-50 border border-sky-100 rounded-2xl rounded-tl-md p-4 text-sm text-slate-700">হ্যালো! আমি <b class="text-sky-700">EZKROY AI</b>। Product price, delivery, order বা sheet-এর তথ্য জানতে প্রশ্ন করুন।</div></div>
-</div>
-<form onsubmit="handleChatSubmit(event)" class="pt-3 border-t border-sky-100 flex gap-2"><input id="chat-input" class="input flex-1 min-w-0 bg-sky-50/50 border border-sky-100 rounded-xl px-4 py-3 outline-none" autocomplete="off" placeholder="যেমন: Dior Sauvage koto?"><button class="send sky text-white rounded-xl px-5 shadow-lg"><i class="fa-solid fa-paper-plane"></i></button></form>
-</div></section>
+    <!-- Sidebar / Navigation -->
+    <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex shrink-0">
+        <div>
+            <!-- Brand Logo -->
+            <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-bag-shopping text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-900 tracking-wide text-lg">EZKROY</h1>
+                    <p class="text-xs text-slate-500">AI Sales Chat</p>
+                </div>
+            </div>
 
-<section id="view-performance" class="hidden space-y-5">
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-3"><div class="card p-4"><small>Total Revenue</small><h2 class="text-xl font-bold mt-2">৳24,580</h2></div><div class="card p-4"><small>Sheet Queries</small><h2 class="text-xl font-bold mt-2">1,420</h2></div><div class="card p-4"><small>Customers</small><h2 class="text-xl font-bold mt-2">840</h2></div><div class="card p-4"><small>AI Accuracy</small><h2 class="text-xl font-bold mt-2">98.4%</h2></div></div>
-<div class="card p-5"><b>Revenue & Query Performance</b><div class="h-72 mt-4"><canvas id="chart"></canvas></div></div>
-</section>
+            <!-- Menu Links -->
+            <nav class="p-4 space-y-1.5">
+                <button onclick="switchTab('chat')" id="nav-chat" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all bg-blue-600 text-white shadow-md shadow-blue-500/20">
+                    <i class="fa-solid fa-comments w-5"></i>
+                    <span>AI Sales Chat</span>
+                </button>
+                <button onclick="switchTab('performance')" id="nav-performance" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span>Performance</span>
+                </button>
+                <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all">
+                    <i class="fa-solid fa-box-archive w-5"></i>
+                    <span>Products & Sheet</span>
+                </button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all">
+                    <i class="fa-solid fa-gear w-5"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </div>
 
-<section id="view-products" class="hidden space-y-5">
-<div class="card p-5"><div class="flex flex-col sm:flex-row sm:justify-between gap-3"><div><b>Connected Google Sheet</b><p id="sheet-status" class="text-xs text-slate-400 mt-1">Checking...</p></div><div class="flex gap-2"><a class="px-4 py-2 rounded-xl border border-sky-200 text-sky-700 text-xs font-semibold" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw/edit?usp=sharing">Open Sheet</a><button onclick="syncSheet()" class="sky text-white px-4 py-2 rounded-xl text-xs font-semibold">Sync</button></div></div><div class="mt-4 bg-sky-50 border border-sky-100 rounded-xl p-3 text-sm text-slate-600">EZKROY uses your public Google Sheet as a knowledge source.</div></div>
-</section>
+        <!-- Store Admin Footer -->
+        <div class="p-4 border-t border-slate-100 m-4 bg-slate-50 rounded-2xl">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">A</div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold text-slate-900 truncate">Store Admin</p>
+                    <p class="text-[11px] text-slate-500 truncate">admin@ezkroy.com</p>
+                </div>
+            </div>
+        </div>
+    </aside>
 
-<section id="view-settings" class="hidden max-w-2xl mx-auto">
-<div class="card p-5 space-y-4"><div><b>Store Settings</b><p class="text-xs text-slate-400">EZKROY configuration</p></div><input value="EZKROY Store" class="w-full bg-sky-50/50 border border-sky-100 rounded-xl p-3"><input readonly value="1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw" class="w-full bg-sky-50/50 border border-sky-100 rounded-xl p-3 text-xs"><a target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw/edit?usp=sharing" class="inline-flex sky text-white px-5 py-3 rounded-xl font-semibold">Open Google Sheet</a></div>
-</section>
-</main>
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-[calc(100vh-64px)] md:h-screen overflow-hidden bg-slate-50">
+        
+        <!-- Tab 1: AI Sales Chat -->
+        <section id="tab-chat" class="flex-1 flex flex-col h-full overflow-hidden">
+            <!-- Chat Topbar -->
+            <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-sm md:text-base">AI Sales Assistant</h2>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-xs text-slate-500">Sheet Sync Active</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="refreshKnowledge()" title="Sync Sheet" class="p-2 text-slate-600 hover:text-blue-600 transition-all rounded-lg hover:bg-slate-100">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </header>
 
-<nav class="mobileNav hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur border-t border-sky-100">
-<button onclick="switchTab('chat')" class="flex-1 py-2 text-xs text-sky-700"><i class="fa-solid fa-comments block mb-1"></i>Chat</button><button onclick="switchTab('performance')" class="flex-1 py-2 text-xs text-slate-500"><i class="fa-solid fa-chart-line block mb-1"></i>Stats</button><button onclick="switchTab('products')" class="flex-1 py-2 text-xs text-slate-500"><i class="fa-solid fa-box block mb-1"></i>Sheet</button><button onclick="switchTab('settings')" class="flex-1 py-2 text-xs text-slate-500"><i class="fa-solid fa-gear block mb-1"></i>Settings</button>
-</nav>
-</div></div>
+            <!-- Chat Messages Container -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+                <!-- Welcome Bot Message -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm max-w-[85%] md:max-w-xl text-sm leading-relaxed">
+                        হ্যালো! আমি EZKROY এআই অ্যাসিস্ট্যান্ট। আপনার শিটের ডেটা এবং প্রোডাক্ট ক্যাটালগ অনুযায়ী গ্রাহকদের যেকোনো প্রশ্নের উত্তর দিতে আমি প্রস্তুত। বলুন কি জানতে চান?
+                    </div>
+                </div>
+            </div>
 
-<script>
-const tabs=['chat','performance','products','settings'];
-function switchTab(id){tabs.forEach(t=>{document.getElementById('view-'+t).classList.toggle('hidden',t!==id);const n=document.getElementById('nav-'+t);if(n)n.className=t===id?'active w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-white font-semibold':'nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500';});document.getElementById('title').textContent={chat:'AI Sales Assistant',performance:'Performance Analytics',products:'Products & Sheet Database',settings:'Store Settings'}[id];if(id==='performance')setTimeout(drawChart,30);if(id==='products')loadSheet();}
-function esc(v){const d=document.createElement('div');d.textContent=String(v??'');return d.innerHTML}
-function fmt(v){return esc(v).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}
-function addUser(v){const b=document.getElementById('chat-messages'),e=document.createElement('div');e.className='flex items-start justify-end gap-2';e.innerHTML='<div class="msg sky text-white rounded-2xl rounded-tr-md p-3 text-sm">'+esc(v)+'</div><div class="ava w-8 h-8 rounded-full bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 text-xs font-bold">U</div>';b.appendChild(e);b.scrollTop=b.scrollHeight}
-function addBot(v,error=false){const b=document.getElementById('chat-messages'),e=document.createElement('div');e.className='flex items-start gap-3';e.innerHTML='<div class="ava w-8 h-8 rounded-xl '+(error?'bg-red-50 text-red-500':'sky text-white')+' flex items-center justify-center shrink-0"><i class="fa-solid '+(error?'fa-triangle-exclamation':'fa-robot')+' text-xs"></i></div><div class="msg '+(error?'bg-red-50 border-red-100 text-red-600':'bg-sky-50 border-sky-100 text-slate-700')+' border rounded-2xl rounded-tl-md p-3 text-sm">'+fmt(v)+'</div>';b.appendChild(e);b.scrollTop=b.scrollHeight}
-async function handleChatSubmit(e){e.preventDefault();const i=document.getElementById('chat-input'),m=i.value.trim();if(!m)return;addUser(m);i.value='';const b=document.getElementById('chat-messages'),t=document.createElement('div');t.id='typing';t.className='flex items-start gap-3';t.innerHTML='<div class="ava w-8 h-8 rounded-xl sky flex items-center justify-center text-white shrink-0"><i class="fa-solid fa-robot text-xs"></i></div><div class="msg bg-sky-50 border border-sky-100 rounded-2xl p-3 text-sm text-slate-500">EZKROY AI is thinking...</div>';b.appendChild(t);b.scrollTop=b.scrollHeight;try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})});if(!r.ok)throw new Error();const d=await r.json();t.remove();addBot(d.reply||'দুঃখিত, উত্তর পাওয়া যায়নি।')}catch(x){t.remove();addBot('AI server-এর সাথে যোগাযোগ করা যাচ্ছে না। Flask server এবং OPENAI_API_KEY check করুন।',true)}}
-async function loadSheet(){try{const r=await fetch('/api/knowledge');const d=await r.json();document.getElementById('sheet-status').textContent=d.status==='connected'?d.rows+' rows synced':'Sheet data unavailable'}catch(e){document.getElementById('sheet-status').textContent='Unable to connect'}}
-async function syncSheet(){const s=document.getElementById('sheet-status');s.textContent='Syncing...';try{const r=await fetch('/api/knowledge/refresh',{method:'POST'});const d=await r.json();s.textContent=(d.rows||0)+' rows synced'}catch(e){s.textContent='Sync failed'}}
-let chart;function drawChart(){const c=document.getElementById('chart');if(!c)return;if(chart)chart.destroy();chart=new Chart(c,{type:'line',data:{labels:['Week 1','Week 2','Week 3','Week 4'],datasets:[{data:[4200,5800,7100,8900],borderColor:'#0EA5E9',backgroundColor:'rgba(14,165,233,.1)',fill:true,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})}
-switchTab('chat');
-</script>
-</body></html>
+            <!-- Chat Input Box -->
+            <div class="bg-white border-t border-slate-200 p-3 md:p-4 shrink-0">
+                <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center space-x-2">
+                    <input type="text" id="user-input" placeholder="আপনার প্রশ্ন বা অর্ডার এখানে লিখুন..." class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium text-sm transition-all shadow-md shadow-blue-500/20 shrink-0">
+                        <i class="fa-solid fa-paper-plane md:mr-1.5"></i>
+                        <span class="hidden md:inline">Send</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tab 2: Performance -->
+        <section id="tab-performance" class="flex-1 overflow-y-auto p-4 md:p-8 hidden">
+            <h2 class="text-xl font-bold text-slate-900 mb-6">Performance & Analytics</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-semibold text-slate-500 uppercase">Total Orders</p>
+                    <h3 id="stat-orders" class="text-2xl font-bold text-slate-900 mt-2">0</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-semibold text-slate-500 uppercase">Sheet Rows Synced</p>
+                    <h3 id="stat-rows" class="text-2xl font-bold text-slate-900 mt-2">0</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-semibold text-slate-500 uppercase">Available Products</p>
+                    <h3 id="stat-products" class="text-2xl font-bold text-slate-900 mt-2">0</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: Products & Sheet -->
+        <section id="tab-products" class="flex-1 overflow-y-auto p-4 md:p-8 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-slate-900">Products & Sheet Status</h2>
+                <button onclick="refreshKnowledge()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-sm hover:bg-emerald-700 transition-all">
+                    <i class="fa-solid fa-sync mr-1.5"></i> Refresh Sheet
+                </button>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div class="p-4 border-b border-slate-100 font-semibold text-sm text-slate-700">Connected Products List</div>
+                <div id="products-list" class="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: Settings -->
+        <section id="tab-settings" class="flex-1 overflow-y-auto p-4 md:p-8 hidden">
+            <h2 class="text-xl font-bold text-slate-900 mb-6">Bot Settings</h2>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-xl space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Google Sheet CSV Link</label>
+                    <input type="text" readonly value="Connected via Backend" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Active AI Model</label>
+                    <input type="text" readonly value="GPT-4o (Optimized)" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="md:hidden bg-white border-t border-slate-200 h-16 flex justify-around items-center px-2 shrink-0 z-50">
+        <button onclick="switchTab('chat')" id="mob-nav-chat" class="flex flex-col items-center justify-center flex-1 py-1 text-blue-600">
+            <i class="fa-solid fa-comments text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Chat</span>
+        </button>
+        <button onclick="switchTab('performance')" id="mob-nav-performance" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-chart-line text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Stats</span>
+        </button>
+        <button onclick="switchTab('products')" id="mob-nav-products" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-box-archive text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Sheet</span>
+        </button>
+        <button onclick="switchTab('settings')" id="mob-nav-settings" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-gear text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Settings</span>
+        </button>
+    </nav>
+
+    <!-- JavaScript Frontend Logic -->
+    <script>
+        function switchTab(tabName) {
+            const tabs = ['chat', 'performance', 'products', 'settings'];
+            tabs.forEach(t => {
+                document.getElementById('tab-' + t).classList.add('hidden');
+                
+                // Desktop active styles
+                const desktopNav = document.getElementById('nav-' + t);
+                if (desktopNav) {
+                    desktopNav.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all";
+                }
+
+                // Mobile bottom nav active styles
+                const mobNav = document.getElementById('mob-nav-' + t);
+                if (mobNav) {
+                    mobNav.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600";
+                }
+            });
+
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+            const activeDesktop = document.getElementById('nav-' + tabName);
+            if (activeDesktop) {
+                activeDesktop.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm bg-blue-600 text-white shadow-md shadow-blue-500/20";
+            }
+
+            const activeMob = document.getElementById('mob-nav-' + tabName);
+            if (activeMob) {
+                activeMob.className = "flex flex-col items-center justify-center flex-1 py-1 text-blue-600";
+            }
+
+            if (tabName === 'performance' || tabName === 'products') {
+                loadStats();
+            }
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+            const inputField = document.getElementById('user-input');
+            const message = inputField.value.trim();
+            if (!message) return;
+
+            const chatMessages = document.getElementById('chat-messages');
+
+            // Append User Message
+            chatMessages.innerHTML += `
+                <div class="flex items-start justify-end space-x-3">
+                    <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-sm max-w-[85%] md:max-w-xl text-sm leading-relaxed">
+                        ${escapeHtml(message)}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            `;
+            inputField.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Loading state
+            const loadingId = 'loading-' + Date.now();
+            chatMessages.innerHTML += `
+                <div id="${loadingId}" class="flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm text-sm text-slate-400">
+                        টাইপ করছে...
+                    </div>
+                </div>
+            `;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+
+                document.getElementById(loadingId).remove();
+
+                chatMessages.innerHTML += `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm max-w-[85%] md:max-w-xl text-sm leading-relaxed text-slate-800">
+                            ${escapeHtml(data.reply)}
+                        </div>
+                    </div>
+                `;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                if (data.order_created) {
+                    chatMessages.innerHTML += `
+                        <div class="flex justify-center my-2">
+                            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-4 py-2 rounded-xl font-medium">
+                                <i class="fa-solid fa-check-circle mr-1"></i> আপনার অর্ডারটি সফলভাবে রেকর্ড করা হয়েছে!
+                            </div>
+                        </div>
+                    `;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                chatMessages.innerHTML += `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="bg-red-50 border border-red-100 p-4 rounded-2xl text-sm text-red-600">
+                            সার্ভারে সংযোগ করতে সমস্যা হচ্ছে।
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/health');
+                const data = await res.json();
+                document.getElementById('stat-orders').innerText = data.total_orders || 0;
+                document.getElementById('stat-rows').innerText = data.google_sheet_rows || 0;
+                document.getElementById('stat-products').innerText = data.total_products || 0;
+
+                const prodRes = await fetch('/api/products');
+                const products = await prodRes.json();
+                const listEl = document.getElementById('products-list');
+                listEl.innerHTML = '';
+                products.forEach(p => {
+                    listEl.innerHTML += `
+                        <div class="p-4 flex justify-between items-center text-sm">
+                            <div>
+                                <p class="font-bold text-slate-900">${p.name}</p>
+                                <p class="text-xs text-slate-500">15ml: ৳${p.price_15ml} | 30ml: ৳${p.price_30ml}</p>
+                            </div>
+                            <span class="bg-blue-50 text-blue-600 text-xs px-2.5 py-1 rounded-lg font-semibold">Stock: ${p.stock}</span>
+                        </div>
+                    `;
+                });
+            } catch (e) {
+                console.error("Stats load error", e);
+            }
+        }
+
+        async function refreshKnowledge() {
+            try {
+                await fetch('/api/knowledge/refresh', { method: 'POST' });
+                alert('গুগল শিট সফলভাবে রিফ্রেশ ও সিঙ্ক করা হয়েছে!');
+                loadStats();
+            } catch (e) {
+                alert('রিফ্রেশ করতে সমস্যা হয়েছে।');
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
