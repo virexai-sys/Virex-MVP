@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EZKROY - AI Sales & Analytics Dashboard</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="Gemini_Generated_Image_z5bot7z5bot7z5bo.jfif">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,10 +31,16 @@
     <!-- Sidebar (Minimalist SellzyBD Inspired, Chat First) -->
     <aside class="w-20 lg:w-64 bg-cardBg border-r border-cardBorder flex flex-col justify-between transition-all duration-300 z-20">
         <div>
-            <!-- Brand Logo -->
+            <!-- Brand Logo (SVG Vector - Never Fails) -->
             <div class="h-16 flex items-center px-4 lg:px-6 border-b border-cardBorder gap-3">
-                <img src="Gemini_Generated_Image_z5bot7z5bot7z5bo.jfif" alt="EZKROY Logo" class="w-9 h-9 object-cover rounded-lg shadow-md shrink-0">
-                <span class="hidden lg:inline font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">EZKROY</span>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0">
+                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </div>
+                <span class="hidden lg:inline font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">EZKROY</span>
             </div>
 
             <!-- Nav Links (Chat First Priority) -->
@@ -62,7 +66,7 @@
 
         <!-- User Profile Bottom -->
         <div class="p-4 border-t border-cardBorder flex items-center gap-3">
-            <img src="Gemini_Generated_Image_z5bot7z5bot7z5bo.jfif" alt="User" class="w-9 h-9 rounded-full object-cover border border-blue-500/30">
+            <div class="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold text-sm shrink-0">A</div>
             <div class="hidden lg:block truncate">
                 <p class="text-sm font-semibold text-slate-200 truncate">Store Admin</p>
                 <p class="text-xs text-slate-400 truncate">admin@ezkroy.com</p>
@@ -112,7 +116,9 @@
                     <!-- Chat Messages Box -->
                     <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-4 pr-2">
                         <div class="flex items-start gap-3">
-                            <img src="Gemini_Generated_Image_z5bot7z5bot7z5bo.jfif" class="w-8 h-8 rounded-full object-cover shrink-0 mt-1" alt="Bot">
+                            <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 mt-1 shadow-md">
+                                <i class="fa-solid fa-robot text-xs"></i>
+                            </div>
                             <div class="bg-slate-800/80 border border-cardBorder rounded-2xl p-4 text-sm text-slate-200 max-w-lg shadow-sm">
                                 হ্যালো! আমি EZKROY এআই অ্যাসিস্ট্যান্ট। আপনার শিটের ডেটা অনুযায়ী গ্রাহকদের যেকোনো প্রশ্নের উত্তর দিতে আমি প্রস্তুত বলুন কি জানতে চান?
                             </div>
@@ -268,7 +274,9 @@
                 }
                 chatMessages.innerHTML += `
                     <div class="flex items-start gap-3">
-                        <img src="Gemini_Generated_Image_z5bot7z5bot7z5bo.jfif" class="w-8 h-8 rounded-full object-cover shrink-0 mt-1" alt="Bot">
+                        <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 mt-1 shadow-md">
+                            <i class="fa-solid fa-robot text-xs"></i>
+                        </div>
                         <div class="bg-slate-800/80 border border-cardBorder rounded-2xl p-4 text-sm text-slate-200 max-w-lg shadow-sm">
                             ${botReply}
                         </div>
