@@ -1405,7 +1405,10 @@ def chat():
     message = str(data.get("message", "")).strip()
 
     if not message:
-        return jsonify({"reply": "আপনার প্রশ্নটি লিখুন।", "order_created": False})
+        return jsonify({
+            "reply": "আপনার প্রশ্নটি লিখুন।",
+            "order_created": False
+        })
 
     print("\nCUSTOMER:", message)
 
@@ -1413,21 +1416,61 @@ def chat():
     product = find_product(message)
     size = detect_size(message)
 
-    greetings = {"hi","hello","hey","হাই","হ্যালো","assalamu alaikum","salam"}
-    if text in greetings or any(text.startswith(g + " ") for g in greetings):
+    # ---------------------------------------------------------
+    # GREETINGS — never answer with unrelated sheet data
+    # ---------------------------------------------------------
+    greetings = {
+        "hi", "hello", "hey", "হাই", "হ্যালো",
+        "assalamu alaikum", "salam"
+    }
+
+    if text in greetings:
         return jsonify({
-            "reply": "হ্যালো! 👋 আমি EZKROY AI। কোন perfume-এর price বা order সম্পর্কে জানতে চান?",
+            "reply": "হ্যালো! 👋 আমি EZKROY AI। কোন perfume-এর price, details বা order সম্পর্কে জানতে চান?",
             "order_created": False
         })
 
-    if product and is_price_query(message):
+    # ---------------------------------------------------------
+    # PRODUCT QUESTIONS — ALWAYS TAKE PRIORITY OVER SHEET
+    # This prevents a generic sheet row such as delivery charge
+    # from overriding a direct product-price question.
+    # ---------------------------------------------------------
+    if product:
+        if is_price_query(message) or any(
+            word in text for word in [
+                "price", "koto", "dam", "দাম", "কত", "tk", "taka"
+            ]
+        ):
+            return jsonify({
+                "reply": build_product_answer(product, size),
+                "order_created": False,
+                "source": "product_catalog",
+                "product": product.get("name")
+            })
+
+        # If the customer asks about a product without explicitly
+        # asking price, let the AI answer from the product catalog.
+        product_context = json.dumps(
+            product,
+            ensure_ascii=False
+        )
+
         return jsonify({
-            "reply": build_product_answer(product, size),
+            "reply": ask_ai(
+                message,
+                f"Matched product from EZKROY catalog: {product_context}"
+            ),
             "order_created": False,
+            "source": "product_catalog",
             "product": product.get("name")
         })
 
+    # ---------------------------------------------------------
+    # VERIFIED GOOGLE SHEET Q&A
+    # Only use a sheet answer when it actually matches the query.
+    # ---------------------------------------------------------
     verified_answer = find_matching_sheet_answer(message)
+
     if verified_answer:
         return jsonify({
             "reply": verified_answer,
@@ -1435,19 +1478,40 @@ def chat():
             "source": "google_sheet"
         })
 
+    # ---------------------------------------------------------
+    # ORDER FLOW
+    # ---------------------------------------------------------
     if is_order_request(message):
         if not product:
-            reply = "অবশ্যই! 😊 কোন perfume নিতে চান? যেমন: Dior Sauvage, Vampire Blood, Hawas Fire ইত্যাদি।"
-        elif not size:
-            reply = f"{product.get('name')} available আছে। কোন size চান — 15ml নাকি 30ml?"
-        else:
-            reply = f"{product.get('name')} {size} order করা যাবে। আপনার নাম, ফোন নম্বর এবং delivery address দিন।"
-        return jsonify({"reply": reply, "order_created": False})
+            return jsonify({
+                "reply": "অবশ্যই! 😊 কোন perfume নিতে চান? যেমন: Dior Sauvage, Vampire Blood, Hawas Fire ইত্যাদি।",
+                "order_created": False
+            })
 
+        if not size:
+            return jsonify({
+                "reply": f"{product.get('name')} available আছে। কোন size চান — 15ml নাকি 30ml?",
+                "order_created": False
+            })
+
+        return jsonify({
+            "reply": f"{product.get('name')} {size} order করা যাবে। আপনার নাম, ফোন নম্বর এবং delivery address দিন।",
+            "order_created": False
+        })
+
+    # ---------------------------------------------------------
+    # GENERAL AI FALLBACK
+    # ---------------------------------------------------------
     return jsonify({
-        "reply": ask_ai(message, "No direct verified Google Sheet answer found."),
-        "order_created": False
+        "reply": ask_ai(
+            message,
+            "No direct product or verified Google Sheet match found."
+        ),
+        "order_created": False,
+        "source": "ai"
     })
+
+
 # =========================================================
 # HEALTH CHECK
 # =========================================================
