@@ -1,350 +1,87 @@
-/* ========================================================
-   CHAT — REAL FLASK API
-======================================================== */
-
-async function handleChatSubmit(e) {
-
-    e.preventDefault();
-
-    const input = document.getElementById('chat-input');
-    const msg = input.value.trim();
-
-    if (!msg) return;
-
-    const chatMessages = document.getElementById('chat-messages');
-
-    /* USER MESSAGE */
-
-    const userMessage = document.createElement('div');
-
-    userMessage.className =
-        'flex items-start justify-end gap-3';
-
-    userMessage.innerHTML = `
-        <div
-            class="
-                sky-gradient
-                text-white
-                rounded-2xl
-                rounded-tr-md
-                p-4
-                text-sm
-                max-w-lg
-                shadow-sm
-            "
-        >
-            ${escapeHtml(msg)}
-        </div>
-
-        <div
-            class="
-                w-9
-                h-9
-                rounded-full
-                bg-sky-50
-                border
-                border-sky-200
-                flex
-                items-center
-                justify-center
-                text-sky-600
-                shrink-0
-                mt-1
-                font-bold
-                text-xs
-            "
-        >
-            U
-        </div>
-    `;
-
-    chatMessages.appendChild(userMessage);
-
-    input.value = '';
-
-    chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-
-
-    /* TYPING INDICATOR */
-
-    const typingMessage = document.createElement('div');
-
-    typingMessage.id = 'ai-typing';
-
-    typingMessage.className =
-        'flex items-start gap-3';
-
-    typingMessage.innerHTML = `
-        <div
-            class="
-                w-9
-                h-9
-                rounded-xl
-                sky-gradient
-                flex
-                items-center
-                justify-center
-                text-white
-                shrink-0
-                mt-1
-                shadow-blue
-            "
-        >
-            <i class="fa-solid fa-robot text-xs"></i>
-        </div>
-
-        <div
-            class="
-                bg-sky-50
-                border
-                border-sky-100
-                rounded-2xl
-                rounded-tl-md
-                p-4
-                text-sm
-                text-slate-500
-                shadow-sm
-            "
-        >
-            <i class="fa-solid fa-circle-notch fa-spin mr-2"></i>
-            EZKROY AI is thinking...
-        </div>
-    `;
-
-    chatMessages.appendChild(typingMessage);
-
-    chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-
-
-    /* REAL BACKEND REQUEST */
-
-    try {
-
-        const response = await fetch('/api/chat', {
-
-            method: 'POST',
-
-            headers: {
-                'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify({
-                message: msg
-            })
-
-        });
-
-
-        if (!response.ok) {
-            throw new Error(
-                `Server error: ${response.status}`
-            );
-        }
-
-
-        const data = await response.json();
-
-
-        /* REMOVE TYPING */
-
-        const typing =
-            document.getElementById('ai-typing');
-
-        if (typing) {
-            typing.remove();
-        }
-
-
-        /* AI RESPONSE */
-
-        const botMessage =
-            document.createElement('div');
-
-        botMessage.className =
-            'flex items-start gap-3';
-
-
-        botMessage.innerHTML = `
-            <div
-                class="
-                    w-9
-                    h-9
-                    rounded-xl
-                    sky-gradient
-                    flex
-                    items-center
-                    justify-center
-                    text-white
-                    shrink-0
-                    mt-1
-                    shadow-blue
-                "
-            >
-                <i
-                    class="
-                        fa-solid
-                        fa-robot
-                        text-xs
-                    "
-                ></i>
-            </div>
-
-            <div
-                class="
-                    bg-sky-50
-                    border
-                    border-sky-100
-                    rounded-2xl
-                    rounded-tl-md
-                    p-4
-                    text-sm
-                    text-slate-700
-                    max-w-lg
-                    shadow-sm
-                "
-            >
-                ${formatAIResponse(
-                    data.reply ||
-                    'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।'
-                )}
-            </div>
-        `;
-
-
-        chatMessages.appendChild(botMessage);
-
-
-        /* ORDER CREATED */
-
-        if (data.order_created && data.order) {
-
-            const orderNotice =
-                document.createElement('div');
-
-            orderNotice.className =
-                'ml-12 text-xs text-emerald-600 font-semibold mt-1';
-
-            orderNotice.innerHTML = `
-                <i class="fa-solid fa-circle-check mr-1"></i>
-                Order #${data.order.id} saved successfully
-            `;
-
-            chatMessages.appendChild(orderNotice);
-        }
-
-
-        chatMessages.scrollTop =
-            chatMessages.scrollHeight;
-
-    }
-
-    catch (error) {
-
-        console.error(
-            'CHAT API ERROR:',
-            error
-        );
-
-
-        const typing =
-            document.getElementById('ai-typing');
-
-        if (typing) {
-            typing.remove();
-        }
-
-
-        const errorMessage =
-            document.createElement('div');
-
-        errorMessage.className =
-            'flex items-start gap-3';
-
-
-        errorMessage.innerHTML = `
-            <div
-                class="
-                    w-9
-                    h-9
-                    rounded-xl
-                    bg-red-50
-                    border
-                    border-red-100
-                    flex
-                    items-center
-                    justify-center
-                    text-red-500
-                    shrink-0
-                    mt-1
-                "
-            >
-                <i class="fa-solid fa-triangle-exclamation text-xs"></i>
-            </div>
-
-            <div
-                class="
-                    bg-red-50
-                    border
-                    border-red-100
-                    rounded-2xl
-                    rounded-tl-md
-                    p-4
-                    text-sm
-                    text-red-600
-                    max-w-lg
-                "
-            >
-                AI server-এর সাথে যোগাযোগ করা যাচ্ছে না।
-                Flask server এবং OPENAI_API_KEY check করুন।
-            </div>
-        `;
-
-
-        chatMessages.appendChild(errorMessage);
-
-        chatMessages.scrollTop =
-            chatMessages.scrollHeight;
-    }
-}
-
-
-/* ========================================================
-   SECURITY — HTML ESCAPE
-======================================================== */
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement('div');
-
-    div.textContent = text;
-
-    return div.innerHTML;
-}
-
-
-/* ========================================================
-   AI RESPONSE FORMATTER
-======================================================== */
-
-function formatAIResponse(text) {
-
-    let safeText =
-        escapeHtml(text);
-
-    safeText =
-        safeText.replace(
-            /\*\*(.*?)\*\*/g,
-            '<strong>$1</strong>'
-        );
-
-    safeText =
-        safeText.replace(
-            /\n/g,
-            '<br>'
-        );
-
-    return safeText;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0284C7">
+<title>EZKROY — AI Sales Assistant</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{appBg:'#F5FBFF'}}}};</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{scrollbar-width:thin;scrollbar-color:#bae6fd transparent}*::-webkit-scrollbar{width:6px;height:6px}*::-webkit-scrollbar-thumb{background:#bae6fd;border-radius:999px}
+html,body{margin:0;background:#f5fbff}body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.sky{background:linear-gradient(135deg,#0284c7,#0ea5e9 55%,#38bdf8)}.skyLight{background:linear-gradient(135deg,#e0f7ff,#f0f9ff)}
+.card{background:#fff;border:1px solid #d9f0fc;border-radius:18px;box-shadow:0 8px 30px rgba(14,165,233,.08)}
+.active{background:linear-gradient(135deg,#0284c7,#0ea5e9);box-shadow:0 8px 20px rgba(14,165,233,.2)}
+.msg{max-width:min(85%,620px);overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:1023px){.sidebar{display:none}.mobileNav{display:flex!important}}
+@media(max-width:640px){.shell{height:100dvh}.top{height:58px;padding:0 12px}.main{padding:8px!important}.chatCard{height:calc(100dvh - 130px);border-radius:15px;padding:10px!important}.msg{max-width:90%;font-size:13px!important;padding:10px!important}.ava{width:31px!important;height:31px!important;min-width:31px!important}.input{font-size:13px!important;padding:11px!important}.send{width:44px;height:44px;padding:0!important}.mobileNav{height:64px;padding-bottom:max(6px,env(safe-area-inset-bottom))}}
+</style>
+</head>
+<body class="text-slate-900 antialiased">
+<div class="shell flex h-screen overflow-hidden">
+<aside class="sidebar w-64 bg-white border-r border-sky-100 flex flex-col justify-between shrink-0">
+<div>
+<div class="h-16 px-6 flex items-center gap-3 border-b border-sky-100"><div class="w-10 h-10 rounded-2xl sky flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-bag-shopping"></i></div><b class="text-xl bg-gradient-to-r from-sky-700 to-cyan-400 bg-clip-text text-transparent">EZKROY</b></div>
+<nav class="p-3 space-y-2">
+<button id="nav-chat" onclick="switchTab('chat')" class="active w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-white font-semibold"><i class="fa-solid fa-comments"></i>AI Sales Chat</button>
+<button id="nav-performance" onclick="switchTab('performance')" class="nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500"><i class="fa-solid fa-chart-line"></i>Performance</button>
+<button id="nav-products" onclick="switchTab('products')" class="nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500"><i class="fa-solid fa-box"></i>Products & Sheet</button>
+<button id="nav-settings" onclick="switchTab('settings')" class="nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500"><i class="fa-solid fa-gear"></i>Settings</button>
+</nav></div>
+<div class="p-4 border-t border-sky-100 flex gap-3 items-center"><div class="w-10 h-10 rounded-full skyLight border border-sky-200 flex items-center justify-center text-sky-700 font-bold">A</div><div><b class="text-sm">Store Admin</b><p class="text-xs text-slate-400">admin@ezkroy.com</p></div></div>
+</aside>
+
+<div class="flex-1 min-w-0 flex flex-col">
+<header class="top h-16 bg-white/90 backdrop-blur border-b border-sky-100 px-6 flex items-center justify-between shrink-0">
+<h1 id="title" class="text-lg font-bold truncate">AI Sales Assistant</h1>
+<div class="flex items-center gap-3"><span class="hidden sm:inline-flex text-xs px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-semibold"><i class="fa-solid fa-circle text-emerald-500 mr-1 text-[7px]"></i>Sheet Sync Active</span><button class="w-10 h-10 rounded-xl bg-white border border-sky-100"><i class="fa-regular fa-bell"></i></button></div>
+</header>
+
+<main class="main flex-1 overflow-y-auto p-4 lg:p-6 bg-appBg">
+<section id="view-chat" class="h-full max-w-5xl mx-auto flex flex-col">
+<div class="card chatCard p-4 flex-1 flex flex-col min-h-0">
+<div class="flex items-center justify-between pb-4 border-b border-sky-100">
+<div class="flex items-center gap-3 min-w-0"><div class="ava w-11 h-11 rounded-2xl skyLight border border-sky-200 flex items-center justify-center text-sky-600 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="min-w-0"><b class="block truncate">EZKROY AI Sales Assistant</b><span class="text-xs text-slate-400">Powered by your products & Google Sheet</span></div></div><span class="text-xs text-emerald-600 shrink-0"><i class="fa-solid fa-circle text-[8px] animate-pulse mr-1"></i>Online</span>
+</div>
+<div id="chat-messages" class="flex-1 overflow-y-auto py-5 space-y-4">
+<div class="flex items-start gap-3"><div class="ava w-9 h-9 rounded-xl sky flex items-center justify-center text-white shrink-0"><i class="fa-solid fa-robot text-xs"></i></div><div class="msg bg-sky-50 border border-sky-100 rounded-2xl rounded-tl-md p-4 text-sm text-slate-700">হ্যালো! আমি <b class="text-sky-700">EZKROY AI</b>। Product price, delivery, order বা sheet-এর তথ্য জানতে প্রশ্ন করুন।</div></div>
+</div>
+<form onsubmit="handleChatSubmit(event)" class="pt-3 border-t border-sky-100 flex gap-2"><input id="chat-input" class="input flex-1 min-w-0 bg-sky-50/50 border border-sky-100 rounded-xl px-4 py-3 outline-none" autocomplete="off" placeholder="যেমন: Dior Sauvage koto?"><button class="send sky text-white rounded-xl px-5 shadow-lg"><i class="fa-solid fa-paper-plane"></i></button></form>
+</div></section>
+
+<section id="view-performance" class="hidden space-y-5">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3"><div class="card p-4"><small>Total Revenue</small><h2 class="text-xl font-bold mt-2">৳24,580</h2></div><div class="card p-4"><small>Sheet Queries</small><h2 class="text-xl font-bold mt-2">1,420</h2></div><div class="card p-4"><small>Customers</small><h2 class="text-xl font-bold mt-2">840</h2></div><div class="card p-4"><small>AI Accuracy</small><h2 class="text-xl font-bold mt-2">98.4%</h2></div></div>
+<div class="card p-5"><b>Revenue & Query Performance</b><div class="h-72 mt-4"><canvas id="chart"></canvas></div></div>
+</section>
+
+<section id="view-products" class="hidden space-y-5">
+<div class="card p-5"><div class="flex flex-col sm:flex-row sm:justify-between gap-3"><div><b>Connected Google Sheet</b><p id="sheet-status" class="text-xs text-slate-400 mt-1">Checking...</p></div><div class="flex gap-2"><a class="px-4 py-2 rounded-xl border border-sky-200 text-sky-700 text-xs font-semibold" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw/edit?usp=sharing">Open Sheet</a><button onclick="syncSheet()" class="sky text-white px-4 py-2 rounded-xl text-xs font-semibold">Sync</button></div></div><div class="mt-4 bg-sky-50 border border-sky-100 rounded-xl p-3 text-sm text-slate-600">EZKROY uses your public Google Sheet as a knowledge source.</div></div>
+</section>
+
+<section id="view-settings" class="hidden max-w-2xl mx-auto">
+<div class="card p-5 space-y-4"><div><b>Store Settings</b><p class="text-xs text-slate-400">EZKROY configuration</p></div><input value="EZKROY Store" class="w-full bg-sky-50/50 border border-sky-100 rounded-xl p-3"><input readonly value="1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw" class="w-full bg-sky-50/50 border border-sky-100 rounded-xl p-3 text-xs"><a target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw/edit?usp=sharing" class="inline-flex sky text-white px-5 py-3 rounded-xl font-semibold">Open Google Sheet</a></div>
+</section>
+</main>
+
+<nav class="mobileNav hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur border-t border-sky-100">
+<button onclick="switchTab('chat')" class="flex-1 py-2 text-xs text-sky-700"><i class="fa-solid fa-comments block mb-1"></i>Chat</button><button onclick="switchTab('performance')" class="flex-1 py-2 text-xs text-slate-500"><i class="fa-solid fa-chart-line block mb-1"></i>Stats</button><button onclick="switchTab('products')" class="flex-1 py-2 text-xs text-slate-500"><i class="fa-solid fa-box block mb-1"></i>Sheet</button><button onclick="switchTab('settings')" class="flex-1 py-2 text-xs text-slate-500"><i class="fa-solid fa-gear block mb-1"></i>Settings</button>
+</nav>
+</div></div>
+
+<script>
+const tabs=['chat','performance','products','settings'];
+function switchTab(id){tabs.forEach(t=>{document.getElementById('view-'+t).classList.toggle('hidden',t!==id);const n=document.getElementById('nav-'+t);if(n)n.className=t===id?'active w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-white font-semibold':'nav w-full flex gap-3 items-center px-3.5 py-3 rounded-xl text-slate-500';});document.getElementById('title').textContent={chat:'AI Sales Assistant',performance:'Performance Analytics',products:'Products & Sheet Database',settings:'Store Settings'}[id];if(id==='performance')setTimeout(drawChart,30);if(id==='products')loadSheet();}
+function esc(v){const d=document.createElement('div');d.textContent=String(v??'');return d.innerHTML}
+function fmt(v){return esc(v).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}
+function addUser(v){const b=document.getElementById('chat-messages'),e=document.createElement('div');e.className='flex items-start justify-end gap-2';e.innerHTML='<div class="msg sky text-white rounded-2xl rounded-tr-md p-3 text-sm">'+esc(v)+'</div><div class="ava w-8 h-8 rounded-full bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 text-xs font-bold">U</div>';b.appendChild(e);b.scrollTop=b.scrollHeight}
+function addBot(v,error=false){const b=document.getElementById('chat-messages'),e=document.createElement('div');e.className='flex items-start gap-3';e.innerHTML='<div class="ava w-8 h-8 rounded-xl '+(error?'bg-red-50 text-red-500':'sky text-white')+' flex items-center justify-center shrink-0"><i class="fa-solid '+(error?'fa-triangle-exclamation':'fa-robot')+' text-xs"></i></div><div class="msg '+(error?'bg-red-50 border-red-100 text-red-600':'bg-sky-50 border-sky-100 text-slate-700')+' border rounded-2xl rounded-tl-md p-3 text-sm">'+fmt(v)+'</div>';b.appendChild(e);b.scrollTop=b.scrollHeight}
+async function handleChatSubmit(e){e.preventDefault();const i=document.getElementById('chat-input'),m=i.value.trim();if(!m)return;addUser(m);i.value='';const b=document.getElementById('chat-messages'),t=document.createElement('div');t.id='typing';t.className='flex items-start gap-3';t.innerHTML='<div class="ava w-8 h-8 rounded-xl sky flex items-center justify-center text-white shrink-0"><i class="fa-solid fa-robot text-xs"></i></div><div class="msg bg-sky-50 border border-sky-100 rounded-2xl p-3 text-sm text-slate-500">EZKROY AI is thinking...</div>';b.appendChild(t);b.scrollTop=b.scrollHeight;try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})});if(!r.ok)throw new Error();const d=await r.json();t.remove();addBot(d.reply||'দুঃখিত, উত্তর পাওয়া যায়নি।')}catch(x){t.remove();addBot('AI server-এর সাথে যোগাযোগ করা যাচ্ছে না। Flask server এবং OPENAI_API_KEY check করুন।',true)}}
+async function loadSheet(){try{const r=await fetch('/api/knowledge');const d=await r.json();document.getElementById('sheet-status').textContent=d.status==='connected'?d.rows+' rows synced':'Sheet data unavailable'}catch(e){document.getElementById('sheet-status').textContent='Unable to connect'}}
+async function syncSheet(){const s=document.getElementById('sheet-status');s.textContent='Syncing...';try{const r=await fetch('/api/knowledge/refresh',{method:'POST'});const d=await r.json();s.textContent=(d.rows||0)+' rows synced'}catch(e){s.textContent='Sync failed'}}
+let chart;function drawChart(){const c=document.getElementById('chart');if(!c)return;if(chart)chart.destroy();chart=new Chart(c,{type:'line',data:{labels:['Week 1','Week 2','Week 3','Week 4'],datasets:[{data:[4200,5800,7100,8900],borderColor:'#0EA5E9',backgroundColor:'rgba(14,165,233,.1)',fill:true,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})}
+switchTab('chat');
+</script>
+</body></html>
