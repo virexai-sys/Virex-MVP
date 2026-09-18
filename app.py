@@ -1,4 +1,3 @@
-```python
 from flask import Flask, request, jsonify, render_template
 import os
 import json
@@ -11,16 +10,26 @@ from datetime import datetime
 
 
 # =========================================================
-# EZKROY AI — SHEET ONLY SALES AGENT
+# EZKROY AI — SHEET SALES AGENT + CREATOR PROFILE SYSTEM
 # =========================================================
 #
-# IMPORTANT:
+# FEATURES
+# ---------------------------------------------------------
+# 1. Google Sheet based sales knowledge
+# 2. Existing 22-product catalog preserved
+# 3. Product recognition
+# 4. Order detection
+# 5. Creator / Founder profile system
+# 6. Portfolio link responses
+# 7. Bangla / Banglish / English profile questions
+#
+# IMPORTANT
+# ---------------------------------------------------------
 # - NO OpenAI
-# - NO ChatGPT
-# - NO AI fallback
-# - Answers come ONLY from Google Sheet
-# - Product catalog is used only for product recognition
-# - If Sheet has no matching answer, bot says so
+# - NO external AI fallback
+# - Product answers come from Google Sheet
+# - Creator answers come from CREATOR_PROFILE
+# - Product catalog is used for product recognition
 #
 # =========================================================
 
@@ -29,10 +38,78 @@ app = Flask(__name__)
 
 
 # =========================================================
+# CREATOR PROFILE
+# =========================================================
+#
+# This information is kept separately from the product
+# catalog and Google Sheet.
+#
+# You can edit this section whenever you want.
+#
+# =========================================================
+
+CREATOR_PROFILE = {
+
+    "name": "Asad Ullah Mozumder Aiman",
+
+    "short_name": "Aiman",
+
+    "role": [
+        "Student",
+        "Entrepreneur",
+        "Founder of EZKROY"
+    ],
+
+    "organization": "EZKROY",
+
+    "position": "Founder",
+
+    "portfolio": (
+        "https://sites.google.com/view/"
+        "aiman-porfolio/home"
+    ),
+
+    "portfolio_label": "Aiman Portfolio",
+
+    "description": (
+        "Aiman is a student and entrepreneur "
+        "who founded EZKROY, an AI-powered sales "
+        "agent project for businesses."
+    ),
+
+    "creator_answer": (
+        "আমাকে EZKROY-এর Founder "
+        "Asad Ullah Mozumder Aiman (Aiman) "
+        "design ও develop করছেন।"
+    ),
+
+    "founder_answer": (
+        "EZKROY-এর Founder হলেন "
+        "Asad Ullah Mozumder Aiman, "
+        "যিনি Aiman নামেও পরিচিত।"
+    ),
+
+    "about_answer": (
+        "Aiman একজন student ও entrepreneur। "
+        "তিনি EZKROY-এর Founder এবং sales ও "
+        "technology-based projects নিয়ে কাজ করছেন।"
+    ),
+
+    "portfolio_answer": (
+        "অবশ্যই। Aiman-এর portfolio এখানে: "
+        "https://sites.google.com/view/"
+        "aiman-porfolio/home"
+    )
+}
+
+
+# =========================================================
 # GOOGLE SHEET CONFIG
 # =========================================================
 
-GOOGLE_SHEET_ID = "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
+GOOGLE_SHEET_ID = (
+    "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
+)
 
 GOOGLE_SHEET_CSV_URL = (
     f"https://docs.google.com/spreadsheets/d/"
@@ -668,7 +745,10 @@ def load_json_file(filename, default=None):
 
     except Exception as error:
 
-        print("JSON LOAD ERROR:", error)
+        print(
+            "JSON LOAD ERROR:",
+            error
+        )
 
         return default
 
@@ -694,7 +774,10 @@ def save_json_file(filename, data):
 
     except Exception as error:
 
-        print("JSON SAVE ERROR:", error)
+        print(
+            "JSON SAVE ERROR:",
+            error
+        )
 
         return False
 
@@ -705,7 +788,9 @@ def save_json_file(filename, data):
 
 def init_product_file():
 
-    if not os.path.exists(PRODUCT_FILE):
+    if not os.path.exists(
+        PRODUCT_FILE
+    ):
 
         save_json_file(
             PRODUCT_FILE,
@@ -727,7 +812,11 @@ def get_products():
         INITIAL_PRODUCTS
     )
 
-    if isinstance(products, list):
+    if isinstance(
+        products,
+        list
+    ):
+
         return products
 
     return INITIAL_PRODUCTS
@@ -744,7 +833,11 @@ def get_orders():
         []
     )
 
-    if isinstance(orders, list):
+    if isinstance(
+        orders,
+        list
+    ):
+
         return orders
 
     return []
@@ -835,16 +928,13 @@ def download_google_sheet():
                 if key is None:
                     continue
 
-                clean_key = (
-                    str(key)
-                    .strip()
-                    .lower()
-                )
+                clean_key = str(
+                    key
+                ).strip().lower()
 
-                clean_value = (
-                    str(value or "")
-                    .strip()
-                )
+                clean_value = str(
+                    value or ""
+                ).strip()
 
                 cleaned[
                     clean_key
@@ -909,7 +999,8 @@ def download_google_sheet():
     except urllib.error.URLError as error:
 
         message = (
-            f"URL ERROR: {error.reason}"
+            f"URL ERROR: "
+            f"{error.reason}"
         )
 
         sheet_cache["last_error"] = message
@@ -926,7 +1017,9 @@ def download_google_sheet():
 
     except Exception as error:
 
-        message = str(error)
+        message = str(
+            error
+        )
 
         sheet_cache["last_error"] = message
 
@@ -964,20 +1057,24 @@ def normalize_text(text):
         text or ""
     ).lower()
 
-    # Common Banglish variations
     replacements = {
 
         "tmi": "tumi",
         "tmre": "tomare",
         "tmr": "tomar",
-        "koto": "koto",
-        "dam": "dam",
-        "dite": "dite",
-        "chai": "chai",
 
         "15 ml": "15ml",
         "30 ml": "30ml",
-        "50 ml": "50ml"
+        "50 ml": "50ml",
+
+        "who created you":
+            "who created you",
+
+        "who made you":
+            "who created you",
+
+        "who is your creator":
+            "who created you"
     }
 
     for old, new in replacements.items():
@@ -1023,6 +1120,232 @@ def tokenize(text):
             r"[a-z0-9\u0980-\u09ff]+",
             normalize_text(text)
         )
+    )
+
+
+# =========================================================
+# CREATOR / PROFILE QUESTION DETECTION
+# =========================================================
+
+def is_profile_question(message):
+
+    text = normalize_text(
+        message
+    )
+
+    profile_phrases = [
+
+        # English
+        "who is aiman",
+        "who is asad",
+        "who created you",
+        "who made you",
+        "who built you",
+        "who designed you",
+        "who developed you",
+        "who is your creator",
+        "who is your founder",
+        "who owns ezkroy",
+        "who founded ezkroy",
+        "who is founder",
+        "about aiman",
+        "tell me about aiman",
+        "aiman information",
+        "aiman profile",
+        "aiman portfolio",
+        "show aiman portfolio",
+        "give me aiman portfolio",
+        "portfolio of aiman",
+        "what is aiman portfolio",
+
+        # Banglish
+        "aiman ke",
+        "asad ke",
+        "tmre ke banaise",
+        "tomake ke banaise",
+        "tomare ke banaise",
+        "ke banaise tomake",
+        "ke tomake banaise",
+        "ke design korse",
+        "ke develop korse",
+        "ke banayse",
+        "ezkroy er founder ke",
+        "ezkroy founder ke",
+        "ezkroy ke banaise",
+        "aiman er portfolio",
+        "aiman portfolio dao",
+        "portfolio dao",
+        "aiman somporke bolo",
+        "aiman somporke",
+        "aiman er information",
+
+        # Bangla
+        "আইমান কে",
+        "আসাদ কে",
+        "তোমাকে কে বানিয়েছে",
+        "তোমাকে কে তৈরি করেছে",
+        "তোমাকে কে ডিজাইন করেছে",
+        "তোমাকে কে ডেভেলপ করেছে",
+        "তোমার ক্রিয়েটর কে",
+        "তোমার প্রতিষ্ঠাতা কে",
+        "ইজক্রয়ের প্রতিষ্ঠাতা কে",
+        "আইমান সম্পর্কে বলো",
+        "আইমানের তথ্য",
+        "আইমানের পোর্টফোলিও",
+        "পোর্টফোলিও দাও"
+    ]
+
+    for phrase in profile_phrases:
+
+        if phrase in text:
+
+            return True
+
+    # Name-based detection
+    name_words = [
+        "aiman",
+        "asad ullah",
+        "asad",
+        "moz umder",
+        "mozumder"
+    ]
+
+    profile_words = [
+        "who",
+        "ke",
+        "about",
+        "information",
+        "profile",
+        "portfolio",
+        "created",
+        "made",
+        "built",
+        "design",
+        "developer",
+        "founder",
+        "owner",
+        "creator",
+        "কে",
+        "সম্পর্কে",
+        "তথ্য",
+        "পোর্টফোলিও",
+        "প্রতিষ্ঠাতা"
+    ]
+
+    has_name = any(
+        word in text
+        for word in name_words
+    )
+
+    has_profile_word = any(
+        word in text
+        for word in profile_words
+    )
+
+    return (
+        has_name
+        and
+        has_profile_word
+    )
+
+
+# =========================================================
+# PROFILE ANSWER
+# =========================================================
+
+def get_profile_answer(message):
+
+    text = normalize_text(
+        message
+    )
+
+    # -----------------------------------------------------
+    # PORTFOLIO
+    # -----------------------------------------------------
+
+    portfolio_words = [
+
+        "portfolio",
+        "পোর্টফোলিও"
+    ]
+
+    if any(
+        word in text
+        for word in portfolio_words
+    ):
+
+        return (
+            CREATOR_PROFILE[
+                "portfolio_answer"
+            ]
+        )
+
+    # -----------------------------------------------------
+    # CREATOR / WHO MADE YOU
+    # -----------------------------------------------------
+
+    creator_words = [
+
+        "created",
+        "creator",
+        "made",
+        "built",
+        "design",
+        "designed",
+        "developed",
+        "developer",
+        "বানিয়েছে",
+        "বানাইছে",
+        "বানায়ছে",
+        "তৈরি",
+        "ডিজাইন",
+        "ডেভেলপ",
+        "ক্রিয়েটর"
+    ]
+
+    if any(
+        word in text
+        for word in creator_words
+    ):
+
+        return (
+            CREATOR_PROFILE[
+                "creator_answer"
+            ]
+        )
+
+    # -----------------------------------------------------
+    # FOUNDER
+    # -----------------------------------------------------
+
+    founder_words = [
+
+        "founder",
+        "founder ke",
+        "owner",
+        "প্রতিষ্ঠাতা",
+        "মালিক"
+    ]
+
+    if any(
+        word in text
+        for word in founder_words
+    ):
+
+        return (
+            CREATOR_PROFILE[
+                "founder_answer"
+            ]
+        )
+
+    # -----------------------------------------------------
+    # DEFAULT ABOUT AIMAN
+    # -----------------------------------------------------
+
+    return (
+        CREATOR_PROFILE[
+            "about_answer"
+        ]
     )
 
 
@@ -1106,7 +1429,7 @@ def find_product(message):
 
     products = get_products()
 
-    # Exact full product name first
+    # Exact product name
     for product in products:
 
         product_name = normalize_text(
@@ -1126,7 +1449,9 @@ def find_product(message):
     # Alias
     aliases_sorted = sorted(
         PRODUCT_ALIASES.items(),
-        key=lambda item: len(item[0]),
+        key=lambda item: len(
+            item[0]
+        ),
         reverse=True
     )
 
@@ -1136,7 +1461,10 @@ def find_product(message):
             alias
         )
 
-        if alias_normalized in text:
+        if (
+            alias_normalized
+            and alias_normalized in text
+        ):
 
             target = normalize_text(
                 product_name
@@ -1215,6 +1543,30 @@ def find_matching_sheet_answer(message):
 
     candidates = []
 
+    generic_words = {
+
+        "price",
+        "dam",
+        "koto",
+        "taka",
+        "tk",
+        "cost",
+        "details",
+        "detail",
+        "good",
+        "best",
+        "ki",
+        "konta",
+        "what",
+        "how",
+        "is",
+        "the",
+        "a",
+        "ami",
+        "chai",
+        "want"
+    }
+
     for index, row in enumerate(rows):
 
         question = normalize_text(
@@ -1258,26 +1610,16 @@ def find_matching_sheet_answer(message):
         if not all_target_words:
             continue
 
-        # -------------------------------------------------
         # Exact question
-        # -------------------------------------------------
-
         if question:
 
             if user_text == question:
 
-                print(
-                    "EXACT QUESTION MATCH:",
-                    question
-                )
-
                 return answer
 
-        # -------------------------------------------------
         # Exact keyword phrase
-        # -------------------------------------------------
-
         keyword_phrases = [
+
             k.strip()
             for k in keywords.split(",")
             if k.strip()
@@ -1295,18 +1637,19 @@ def find_matching_sheet_answer(message):
             ):
 
                 candidates.append({
+
                     "score": 100,
+
                     "answer": answer,
+
                     "question": question,
+
                     "index": index
                 })
 
                 break
 
-        # -------------------------------------------------
-        # Question phrase inside message
-        # -------------------------------------------------
-
+        # Question phrase
         if (
             question
             and len(question.split()) >= 2
@@ -1314,16 +1657,17 @@ def find_matching_sheet_answer(message):
         ):
 
             candidates.append({
+
                 "score": 95,
+
                 "answer": answer,
+
                 "question": question,
+
                 "index": index
             })
 
-        # -------------------------------------------------
         # Token scoring
-        # -------------------------------------------------
-
         common = (
             user_words
             &
@@ -1333,33 +1677,8 @@ def find_matching_sheet_answer(message):
         if not common:
             continue
 
-        # Important:
-        # Don't allow one generic word like
-        # "price", "koto", "good", etc. to match.
-        generic_words = {
-            "price",
-            "dam",
-            "koto",
-            "taka",
-            "tk",
-            "cost",
-            "details",
-            "detail",
-            "good",
-            "best",
-            "ki",
-            "konta",
-            "what",
-            "how",
-            "is",
-            "the",
-            "a",
-            "ami",
-            "chai",
-            "want"
-        }
-
         meaningful_common = {
+
             word
             for word in common
             if word not in generic_words
@@ -1376,9 +1695,7 @@ def find_matching_sheet_answer(message):
             len(meaningful_common)
             /
             max(
-                len(
-                    user_words
-                ),
+                len(user_words),
                 1
             )
         )
@@ -1387,9 +1704,7 @@ def find_matching_sheet_answer(message):
             len(meaningful_common)
             /
             max(
-                len(
-                    all_target_words
-                ),
+                len(all_target_words),
                 1
             )
         )
@@ -1400,8 +1715,6 @@ def find_matching_sheet_answer(message):
             target_coverage * 40
         )
 
-        # If question contains the product,
-        # strongly prefer it.
         product = find_product(
             message
         )
@@ -1425,21 +1738,17 @@ def find_matching_sheet_answer(message):
         if score >= 45:
 
             candidates.append({
+
                 "score": score,
+
                 "answer": answer,
+
                 "question": question,
+
                 "index": index
             })
 
-    # -----------------------------------------------------
-    # Pick strongest candidate
-    # -----------------------------------------------------
-
     if not candidates:
-
-        print(
-            "SHEET MATCH: NOTHING FOUND"
-        )
 
         return None
 
@@ -1467,17 +1776,8 @@ def find_matching_sheet_answer(message):
 
 
 # =========================================================
-# PRODUCT INFORMATION FROM SHEET ONLY
+# PRODUCT SHEET ANSWER
 # =========================================================
-#
-# IMPORTANT:
-# Product catalog is NOT used to generate answers.
-# It is only used to understand which product customer means.
-#
-# The actual answer MUST come from Google Sheet.
-#
-# =========================================================
-
 
 def find_product_sheet_answer(message):
 
@@ -1506,7 +1806,11 @@ def find_product_sheet_answer(message):
 
     for alias, target in PRODUCT_ALIASES.items():
 
-        if normalize_text(target) == product_name:
+        if (
+            normalize_text(target)
+            ==
+            product_name
+        ):
 
             aliases_for_product.append(
                 normalize_text(alias)
@@ -1514,6 +1818,10 @@ def find_product_sheet_answer(message):
 
     user_text = normalize_text(
         message
+    )
+
+    user_words = tokenize(
+        user_text
     )
 
     candidates = []
@@ -1560,10 +1868,6 @@ def find_product_sheet_answer(message):
             if not product_alias_found:
                 continue
 
-        user_words = tokenize(
-            user_text
-        )
-
         target_words = tokenize(
             combined
         )
@@ -1574,9 +1878,10 @@ def find_product_sheet_answer(message):
             target_words
         )
 
-        score = len(common)
+        score = len(
+            common
+        )
 
-        # Question phrase gets priority
         if (
             question
             and question in user_text
@@ -1587,9 +1892,13 @@ def find_product_sheet_answer(message):
         if score > 0:
 
             candidates.append({
+
                 "score": score,
+
                 "answer": answer,
+
                 "question": question,
+
                 "index": index
             })
 
@@ -1757,9 +2066,10 @@ def save_order(
 
         except Exception:
 
-            next_id = len(
-                orders
-            ) + 1
+            next_id = (
+                len(orders)
+                + 1
+            )
 
     order = {
 
@@ -1839,6 +2149,41 @@ def products_api():
     return jsonify(
         get_products()
     )
+
+
+# =========================================================
+# PROFILE API
+# =========================================================
+
+@app.route(
+    "/api/profile",
+    methods=["GET"]
+)
+def profile_api():
+
+    return jsonify({
+
+        "name":
+            CREATOR_PROFILE["name"],
+
+        "short_name":
+            CREATOR_PROFILE["short_name"],
+
+        "role":
+            CREATOR_PROFILE["role"],
+
+        "organization":
+            CREATOR_PROFILE["organization"],
+
+        "position":
+            CREATOR_PROFILE["position"],
+
+        "portfolio":
+            CREATOR_PROFILE["portfolio"],
+
+        "description":
+            CREATOR_PROFILE["description"]
+    })
 
 
 # =========================================================
@@ -1947,10 +2292,16 @@ def debug_api():
             "online",
 
         "ai_mode":
-            "GOOGLE_SHEET_ONLY",
+            "GOOGLE_SHEET_PLUS_PROFILE",
 
         "openai":
             "DISABLED",
+
+        "creator":
+            CREATOR_PROFILE["name"],
+
+        "portfolio":
+            CREATOR_PROFILE["portfolio"],
 
         "google_sheet": {
 
@@ -2040,6 +2391,16 @@ def test_sheet():
                 "Use ?q=your question"
         })
 
+    profile_answer = None
+
+    if is_profile_question(
+        message
+    ):
+
+        profile_answer = get_profile_answer(
+            message
+        )
+
     answer = find_matching_sheet_answer(
         message
     )
@@ -2048,6 +2409,12 @@ def test_sheet():
         find_product_sheet_answer(
             message
         )
+    )
+
+    final_answer = (
+        profile_answer
+        or product_answer
+        or answer
     )
 
     return jsonify({
@@ -2060,6 +2427,14 @@ def test_sheet():
                 message
             ),
 
+        "profile_question":
+            is_profile_question(
+                message
+            ),
+
+        "profile_answer":
+            profile_answer,
+
         "general_sheet_answer":
             answer,
 
@@ -2067,8 +2442,7 @@ def test_sheet():
             product_answer,
 
         "final_answer":
-            product_answer
-            or answer,
+            final_answer,
 
         "sheet_rows":
             len(
@@ -2115,6 +2489,7 @@ def chat():
                 "system"
         })
 
+
     print("")
     print("=" * 60)
     print(
@@ -2122,9 +2497,45 @@ def chat():
         message
     )
 
-    # -----------------------------------------------------
-    # PRODUCT DETECTION
-    # -----------------------------------------------------
+
+    # =====================================================
+    # 1. CREATOR PROFILE QUESTIONS
+    # =====================================================
+
+    if is_profile_question(
+        message
+    ):
+
+        profile_answer = get_profile_answer(
+            message
+        )
+
+        print(
+            "FINAL SOURCE:",
+            "CREATOR_PROFILE"
+        )
+
+        return jsonify({
+
+            "reply":
+                profile_answer,
+
+            "order_created":
+                False,
+
+            "source":
+                "creator_profile",
+
+            "portfolio":
+                CREATOR_PROFILE[
+                    "portfolio"
+                ]
+        })
+
+
+    # =====================================================
+    # 2. PRODUCT DETECTION
+    # =====================================================
 
     product = find_product(
         message
@@ -2137,9 +2548,10 @@ def chat():
         else None
     )
 
-    # -----------------------------------------------------
-    # FIRST: PRODUCT-SPECIFIC SHEET ANSWER
-    # -----------------------------------------------------
+
+    # =====================================================
+    # 3. PRODUCT-SPECIFIC SHEET ANSWER
+    # =====================================================
 
     product_answer = (
         find_product_sheet_answer(
@@ -2150,7 +2562,8 @@ def chat():
     if product_answer:
 
         print(
-            "FINAL SOURCE: PRODUCT SHEET"
+            "FINAL SOURCE:",
+            "PRODUCT SHEET"
         )
 
         return jsonify({
@@ -2165,9 +2578,10 @@ def chat():
                 "google_sheet_product"
         })
 
-    # -----------------------------------------------------
-    # SECOND: GENERAL SHEET ANSWER
-    # -----------------------------------------------------
+
+    # =====================================================
+    # 4. GENERAL SHEET ANSWER
+    # =====================================================
 
     sheet_answer = (
         find_matching_sheet_answer(
@@ -2178,7 +2592,8 @@ def chat():
     if sheet_answer:
 
         print(
-            "FINAL SOURCE: GOOGLE SHEET"
+            "FINAL SOURCE:",
+            "GOOGLE SHEET"
         )
 
         return jsonify({
@@ -2193,21 +2608,22 @@ def chat():
                 "google_sheet"
         })
 
-    # -----------------------------------------------------
-    # ORDER REQUEST
-    #
-    # IMPORTANT:
-    # We DO NOT generate AI answers.
-    # We only use Sheet.
-    # -----------------------------------------------------
 
-    if is_order_request(message):
+    # =====================================================
+    # 5. ORDER REQUEST
+    # =====================================================
+
+    if is_order_request(
+        message
+    ):
 
         return jsonify({
 
             "reply":
-                "অর্ডার সংক্রান্ত তথ্য Google Sheet-এ পাওয়া যায়নি। "
-                "অনুগ্রহ করে Sheet-এ এই প্রশ্নের উত্তর যোগ করুন।",
+                "অর্ডার সংক্রান্ত তথ্য "
+                "Google Sheet-এ পাওয়া যায়নি। "
+                "অনুগ্রহ করে Sheet-এ এই "
+                "প্রশ্নের উত্তর যোগ করুন।",
 
             "order_created":
                 False,
@@ -2216,14 +2632,16 @@ def chat():
                 "google_sheet_missing"
         })
 
-    # -----------------------------------------------------
-    # NOTHING FOUND
-    # -----------------------------------------------------
+
+    # =====================================================
+    # 6. NOTHING FOUND
+    # =====================================================
 
     return jsonify({
 
         "reply":
-            "দুঃখিত, এই প্রশ্নের উত্তর আমার Google Sheet-এ পাওয়া যায়নি।",
+            "দুঃখিত, এই প্রশ্নের উত্তর "
+            "আমার Google Sheet-এ পাওয়া যায়নি।",
 
         "order_created":
             False,
@@ -2251,7 +2669,7 @@ def health():
             "online",
 
         "mode":
-            "GOOGLE_SHEET_ONLY",
+            "GOOGLE_SHEET_PLUS_PROFILE",
 
         "openai":
             False,
@@ -2266,6 +2684,19 @@ def health():
             sheet_cache.get(
                 "last_error"
             ),
+
+        "creator_profile":
+            True,
+
+        "creator":
+            CREATOR_PROFILE[
+                "name"
+            ],
+
+        "portfolio":
+            CREATOR_PROFILE[
+                "portfolio"
+            ],
 
         "total_products":
             len(
@@ -2287,12 +2718,17 @@ if __name__ == "__main__":
 
     print("")
     print("=" * 60)
-    print("           EZKROY AI SALES AGENT")
+    print(
+        "              EZKROY AI"
+    )
+    print(
+        "     SALES AGENT + CREATOR PROFILE"
+    )
     print("=" * 60)
 
     print(
         "MODE:",
-        "GOOGLE SHEET ONLY"
+        "GOOGLE SHEET + CREATOR PROFILE"
     )
 
     print(
@@ -2301,22 +2737,41 @@ if __name__ == "__main__":
     )
 
     print(
+        "CREATOR:",
+        CREATOR_PROFILE["name"]
+    )
+
+    print(
+        "PORTFOLIO:",
+        CREATOR_PROFILE["portfolio"]
+    )
+
+    print(
         "GOOGLE SHEET ID:",
         GOOGLE_SHEET_ID
     )
 
+    print(
+        "PRODUCTS:",
+        len(
+            INITIAL_PRODUCTS
+        )
+    )
+
     print("=" * 60)
+
 
     # Load Sheet immediately
     download_google_sheet()
 
+
     print(
         "SERVER STARTING..."
     )
+
 
     app.run(
         host="0.0.0.0",
         port=5000,
         debug=True
     )
-```
