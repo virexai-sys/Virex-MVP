@@ -8,6 +8,7 @@ import re
 import urllib.request
 from datetime import datetime
 
+
 try:
     from openai import OpenAI
 except ImportError:
@@ -15,15 +16,14 @@ except ImportError:
 
 
 # =========================================================
-# EZKROY AI — SALES AGENT
-# PRODUCT + GOOGLE SHEET + AI
+# EZKROY AI — SALES & ANALYTICS BACKEND
 # =========================================================
 
 app = Flask(__name__)
 
 
 # =========================================================
-# CONFIG
+# CONFIGURATION
 # =========================================================
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -44,7 +44,7 @@ GOOGLE_SHEET_CSV_URL = (
 
 
 # =========================================================
-# FILES
+# FILE PATHS
 # =========================================================
 
 DATA_DIR = "data"
@@ -59,7 +59,10 @@ ORDER_FILE = os.path.join(
     "orders.json"
 )
 
-os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(
+    DATA_DIR,
+    exist_ok=True
+)
 
 
 # =========================================================
@@ -67,7 +70,6 @@ os.makedirs(DATA_DIR, exist_ok=True)
 # =========================================================
 
 INITIAL_PRODUCTS = [
-
     {
         "id": 1,
         "name": "212 MEN NYC",
@@ -87,7 +89,6 @@ INITIAL_PRODUCTS = [
             "Casual Outings"
         ]
     },
-
     {
         "id": 2,
         "name": "DUNHILL DESIRE",
@@ -107,7 +108,6 @@ INITIAL_PRODUCTS = [
             "Casual Events"
         ]
     },
-
     {
         "id": 3,
         "name": "HAWAS FIRE",
@@ -127,7 +127,6 @@ INITIAL_PRODUCTS = [
             "Special Events"
         ]
     },
-
     {
         "id": 4,
         "name": "ONE MILLION",
@@ -147,7 +146,6 @@ INITIAL_PRODUCTS = [
             "Special Events"
         ]
     },
-
     {
         "id": 5,
         "name": "DIOR SAUVAGE",
@@ -166,7 +164,6 @@ INITIAL_PRODUCTS = [
             "Events"
         ]
     },
-
     {
         "id": 6,
         "name": "NAUTICA VOYAGE",
@@ -176,7 +173,12 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Fresh, Clean & Everyday Confidence.",
-        "notes": ["Aquatic", "Green Apple", "Fresh", "Woody"],
+        "notes": [
+            "Aquatic",
+            "Green Apple",
+            "Fresh",
+            "Woody"
+        ],
         "longevity": "5–7 Hours",
         "best_for": [
             "Daily Wear",
@@ -186,7 +188,6 @@ INITIAL_PRODUCTS = [
             "Casual Outings"
         ]
     },
-
     {
         "id": 7,
         "name": "HAWAS ICE",
@@ -196,7 +197,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Cool, Fresh & Addictive.",
-        "notes": ["Aquatic", "Citrus", "Sweet", "Musky", "Fresh Spicy"],
+        "notes": [
+            "Aquatic",
+            "Citrus",
+            "Sweet",
+            "Musky",
+            "Fresh Spicy"
+        ],
         "longevity": "7–9 Hours",
         "best_for": [
             "Daily Wear",
@@ -206,7 +213,6 @@ INITIAL_PRODUCTS = [
             "Casual Outings"
         ]
     },
-
     {
         "id": 8,
         "name": "BLEU DE CHANEL",
@@ -232,7 +238,6 @@ INITIAL_PRODUCTS = [
             "Special Events"
         ]
     },
-
     {
         "id": 9,
         "name": "VAMPIRE BLOOD",
@@ -242,7 +247,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Dark, Mysterious & Seductive.",
-        "notes": ["Sweet", "Spicy", "Smoky", "Amber", "Woody"],
+        "notes": [
+            "Sweet",
+            "Spicy",
+            "Smoky",
+            "Amber",
+            "Woody"
+        ],
         "longevity": "7–9 Hours",
         "best_for": [
             "Night Out",
@@ -252,7 +263,6 @@ INITIAL_PRODUCTS = [
             "Special Events"
         ]
     },
-
     {
         "id": 10,
         "name": "SRK (Shah Rukh Inspired)",
@@ -278,7 +288,6 @@ INITIAL_PRODUCTS = [
             "Evening Wear"
         ]
     },
-
     {
         "id": 11,
         "name": "STRONGER WITH YOU",
@@ -304,7 +313,6 @@ INITIAL_PRODUCTS = [
             "Special Moments"
         ]
     },
-
     {
         "id": 12,
         "name": "GUCCI FLORA",
@@ -330,7 +338,6 @@ INITIAL_PRODUCTS = [
             "Casual Outings"
         ]
     },
-
     {
         "id": 13,
         "name": "CK1",
@@ -356,7 +363,6 @@ INITIAL_PRODUCTS = [
             "Casual Outings"
         ]
     },
-
     {
         "id": 14,
         "name": "9PM",
@@ -382,7 +388,6 @@ INITIAL_PRODUCTS = [
             "Special Occasions"
         ]
     },
-
     {
         "id": 15,
         "name": "COOL WATER",
@@ -408,7 +413,6 @@ INITIAL_PRODUCTS = [
             "Casual Outings"
         ]
     },
-
     {
         "id": 16,
         "name": "LATTAFA KHAMRAH",
@@ -435,7 +439,6 @@ INITIAL_PRODUCTS = [
             "Evening Wear"
         ]
     },
-
     {
         "id": 17,
         "name": "CREED AVENTUS",
@@ -461,7 +464,6 @@ INITIAL_PRODUCTS = [
             "Year-Round Wear"
         ]
     },
-
     {
         "id": 18,
         "name": "BLUEBERRY",
@@ -487,7 +489,6 @@ INITIAL_PRODUCTS = [
             "Daytime Wear"
         ]
     },
-
     {
         "id": 19,
         "name": "TOBACCO VANILLE",
@@ -513,7 +514,6 @@ INITIAL_PRODUCTS = [
             "Special Occasions"
         ]
     },
-
     {
         "id": 20,
         "name": "GOOD GIRL",
@@ -539,7 +539,6 @@ INITIAL_PRODUCTS = [
             "Winter Days"
         ]
     },
-
     {
         "id": 21,
         "name": "VERSACE EROS",
@@ -566,7 +565,6 @@ INITIAL_PRODUCTS = [
             "Evening Wear"
         ]
     },
-
     {
         "id": 22,
         "name": "BAD BOY",
@@ -616,7 +614,9 @@ def load_json_file(filename, default=None):
             encoding="utf-8"
         ) as file:
 
-            return json.load(file)
+            data = json.load(file)
+
+        return data
 
     except Exception as error:
 
@@ -656,10 +656,6 @@ def save_json_file(filename, data):
 
         return False
 
-
-# =========================================================
-# PRODUCT / ORDER LOADERS
-# =========================================================
 
 def init_product_file():
 
@@ -703,7 +699,7 @@ def get_orders():
 
 
 # =========================================================
-# OPENAI
+# OPENAI CLIENT
 # =========================================================
 
 client = None
@@ -716,7 +712,9 @@ if OpenAI and OPENAI_API_KEY:
             api_key=OPENAI_API_KEY
         )
 
-        print("OPENAI CLIENT: CONNECTED")
+        print(
+            "OPENAI: Connected"
+        )
 
     except Exception as error:
 
@@ -725,6 +723,12 @@ if OpenAI and OPENAI_API_KEY:
             error
         )
 
+else:
+
+    print(
+        "OPENAI: API key not found"
+    )
+
 
 # =========================================================
 # GOOGLE SHEET CACHE
@@ -732,7 +736,8 @@ if OpenAI and OPENAI_API_KEY:
 
 sheet_cache = {
     "data": [],
-    "loaded_at": None
+    "loaded_at": None,
+    "error": None
 }
 
 
@@ -751,8 +756,7 @@ def download_google_sheet():
         request_obj = urllib.request.Request(
             GOOGLE_SHEET_CSV_URL,
             headers={
-                "User-Agent":
-                    "Mozilla/5.0"
+                "User-Agent": "Mozilla/5.0"
             }
         )
 
@@ -774,6 +778,19 @@ def download_google_sheet():
         )
 
 
+        if not reader.fieldnames:
+
+            raise Exception(
+                "Google Sheet has no headers."
+            )
+
+
+        print(
+            "Google Sheet headers:",
+            reader.fieldnames
+        )
+
+
         rows = []
 
 
@@ -781,28 +798,31 @@ def download_google_sheet():
 
             cleaned = {}
 
+
             for key, value in row.items():
 
                 if key is None:
                     continue
 
-                clean_key = (
-                    str(key)
-                    .strip()
-                    .lower()
+
+                clean_key = normalize_header(
+                    key
                 )
 
-                clean_value = (
-                    str(value or "")
-                    .strip()
-                )
+
+                clean_value = str(
+                    value or ""
+                ).strip()
+
 
                 cleaned[
                     clean_key
                 ] = clean_value
 
 
-            if any(cleaned.values()):
+            if any(
+                cleaned.values()
+            ):
 
                 rows.append(
                     cleaned
@@ -815,20 +835,12 @@ def download_google_sheet():
             datetime.now()
         )
 
+        sheet_cache["error"] = None
+
 
         print(
-            "GOOGLE SHEET CONNECTED:",
-            len(rows),
-            "rows"
+            f"Google Sheet loaded successfully: {len(rows)} rows"
         )
-
-
-        if rows:
-
-            print(
-                "SHEET COLUMNS:",
-                list(rows[0].keys())
-            )
 
 
         return rows
@@ -840,6 +852,12 @@ def download_google_sheet():
             "GOOGLE SHEET ERROR:",
             error
         )
+
+
+        sheet_cache["error"] = str(
+            error
+        )
+
 
         return sheet_cache.get(
             "data",
@@ -857,6 +875,27 @@ def get_sheet_data():
 
 
 # =========================================================
+# HEADER NORMALIZATION
+# =========================================================
+
+def normalize_header(header):
+
+    header = str(
+        header or ""
+    ).strip().lower()
+
+
+    header = re.sub(
+        r"[^a-z0-9]+",
+        "_",
+        header
+    )
+
+
+    return header.strip("_")
+
+
+# =========================================================
 # TEXT NORMALIZATION
 # =========================================================
 
@@ -867,16 +906,36 @@ def normalize_text(text):
     ).lower()
 
 
-    text = text.replace(
-        "৳",
-        " taka "
-    )
+    replacements = {
+
+        "৳": " taka ",
+
+        "tk.": " taka ",
+
+        "tk": " taka ",
+
+        "taka": " taka ",
+
+        "vempire": " vampire ",
+
+        "vampire": " vampire ",
+
+        "dior sauvage": " dior sauvage ",
+
+        "sauvage": " sauvage ",
+
+        "perfumes": " perfume ",
+
+        "fragrances": " fragrance "
+    }
 
 
-    text = text.replace(
-        "tk",
-        " taka "
-    )
+    for old, new in replacements.items():
+
+        text = text.replace(
+            old,
+            new
+        )
 
 
     text = re.sub(
@@ -912,118 +971,94 @@ def tokenize(text):
 
 PRODUCT_ALIASES = {
 
-    "dior":
-        "DIOR SAUVAGE",
+    "dior": "DIOR SAUVAGE",
 
-    "sauvage":
-        "DIOR SAUVAGE",
+    "sauvage": "DIOR SAUVAGE",
 
-    "dior sauvage":
-        "DIOR SAUVAGE",
+    "dior sauvage": "DIOR SAUVAGE",
 
-    "vampire":
-        "VAMPIRE BLOOD",
+    "vampire": "VAMPIRE BLOOD",
 
-    "vempire":
-        "VAMPIRE BLOOD",
+    "vempire": "VAMPIRE BLOOD",
 
-    "vampire blood":
-        "VAMPIRE BLOOD",
+    "vempire blood": "VAMPIRE BLOOD",
 
-    "vempire blood":
-        "VAMPIRE BLOOD",
+    "vampire blood": "VAMPIRE BLOOD",
 
-    "212":
-        "212 MEN NYC",
+    "212": "212 MEN NYC",
 
-    "dunhill":
-        "DUNHILL DESIRE",
+    "212 men": "212 MEN NYC",
 
-    "hawas":
-        "HAWAS FIRE",
+    "dunhill": "DUNHILL DESIRE",
 
-    "hawas fire":
-        "HAWAS FIRE",
+    "dunhill desire": "DUNHILL DESIRE",
 
-    "hawas ice":
-        "HAWAS ICE",
+    "hawas fire": "HAWAS FIRE",
 
-    "one million":
-        "ONE MILLION",
+    "hawas": "HAWAS FIRE",
 
-    "nautica":
-        "NAUTICA VOYAGE",
+    "hawas ice": "HAWAS ICE",
 
-    "nautica voyage":
-        "NAUTICA VOYAGE",
+    "one million": "ONE MILLION",
 
-    "bleu":
-        "BLEU DE CHANEL",
+    "1 million": "ONE MILLION",
 
-    "bleu chanel":
-        "BLEU DE CHANEL",
+    "nautica": "NAUTICA VOYAGE",
 
-    "srk":
-        "SRK (Shah Rukh Inspired)",
+    "nautica voyage": "NAUTICA VOYAGE",
 
-    "stronger with you":
-        "STRONGER WITH YOU",
+    "bleu": "BLEU DE CHANEL",
 
-    "stronger":
-        "STRONGER WITH YOU",
+    "bleu de chanel": "BLEU DE CHANEL",
 
-    "gucci":
-        "GUCCI FLORA",
+    "srk": "SRK (Shah Rukh Inspired)",
 
-    "gucci flora":
-        "GUCCI FLORA",
+    "stronger with you": "STRONGER WITH YOU",
 
-    "ck1":
-        "CK1",
+    "swy": "STRONGER WITH YOU",
 
-    "9pm":
-        "9PM",
+    "gucci": "GUCCI FLORA",
 
-    "cool water":
-        "COOL WATER",
+    "gucci flora": "GUCCI FLORA",
 
-    "khamrah":
-        "LATTAFA KHAMRAH",
+    "ck1": "CK1",
 
-    "lattafa":
-        "LATTAFA KHAMRAH",
+    "ck one": "CK1",
 
-    "aventus":
-        "CREED AVENTUS",
+    "9pm": "9PM",
 
-    "creed":
-        "CREED AVENTUS",
+    "cool water": "COOL WATER",
 
-    "blueberry":
-        "BLUEBERRY",
+    "khamrah": "LATTAFA KHAMRAH",
 
-    "tobacco vanille":
-        "TOBACCO VANILLE",
+    "lattafa": "LATTAFA KHAMRAH",
 
-    "tobacco":
-        "TOBACCO VANILLE",
+    "aventus": "CREED AVENTUS",
 
-    "good girl":
-        "GOOD GIRL",
+    "creed aventus": "CREED AVENTUS",
 
-    "eros":
-        "VERSACE EROS",
+    "creed": "CREED AVENTUS",
 
-    "versace":
-        "VERSACE EROS",
+    "blueberry": "BLUEBERRY",
 
-    "bad boy":
-        "BAD BOY"
+    "tobacco vanille": "TOBACCO VANILLE",
+
+    "tobacco": "TOBACCO VANILLE",
+
+    "good girl": "GOOD GIRL",
+
+    "eros": "VERSACE EROS",
+
+    "versace": "VERSACE EROS",
+
+    "versace eros": "VERSACE EROS",
+
+    "bad boy": "BAD BOY"
 }
 
 
 # =========================================================
-# PRODUCT MATCH
+# PRODUCT MATCHING
 # =========================================================
 
 def find_product(user_message):
@@ -1035,7 +1070,12 @@ def find_product(user_message):
     products = get_products()
 
 
-    # Exact full product name
+    # -----------------------------------------------------
+    # Exact/full product names
+    # -----------------------------------------------------
+
+    product_matches = []
+
 
     for product in products:
 
@@ -1046,42 +1086,62 @@ def find_product(user_message):
             )
         )
 
-        if (
-            name
-            and name in text
-        ):
 
-            return product
+        if not name:
+            continue
 
 
+        if name in text:
+
+            product_matches.append(
+                (
+                    len(name),
+                    product
+                )
+            )
+
+
+    if product_matches:
+
+        product_matches.sort(
+            key=lambda item: item[0],
+            reverse=True
+        )
+
+        return product_matches[0][1]
+
+
+    # -----------------------------------------------------
     # Alias matching
+    # -----------------------------------------------------
 
-    sorted_aliases = sorted(
+    aliases = sorted(
         PRODUCT_ALIASES.items(),
         key=lambda item: len(item[0]),
         reverse=True
     )
 
 
-    for alias, product_name in sorted_aliases:
+    for alias, product_name in aliases:
 
-        if alias in text:
+        if normalize_text(alias) in text:
 
             target = normalize_text(
                 product_name
             )
 
+
             for product in products:
 
-                if (
-                    normalize_text(
-                        product.get(
-                            "name",
-                            ""
-                        )
+                current_name = normalize_text(
+                    product.get(
+                        "name",
+                        ""
                     )
-                    == target
-                ):
+                )
+
+
+                if current_name == target:
 
                     return product
 
@@ -1090,7 +1150,7 @@ def find_product(user_message):
 
 
 # =========================================================
-# SIZE
+# SIZE DETECTION
 # =========================================================
 
 def detect_size(message):
@@ -1101,7 +1161,7 @@ def detect_size(message):
 
 
     match = re.search(
-        r"\b(15|30|50)\s*(?:ml|m l)?\b",
+        r"\b(15|30|50)\s*(?:ml|m\s*l)\b",
         text
     )
 
@@ -1110,16 +1170,40 @@ def detect_size(message):
 
         return (
             match.group(1)
-            +
-            "ml"
+            + "ml"
         )
+
+
+    # Bangla / normal number without ml
+    if re.search(
+        r"\b15\b",
+        text
+    ):
+
+        return "15ml"
+
+
+    if re.search(
+        r"\b30\b",
+        text
+    ):
+
+        return "30ml"
+
+
+    if re.search(
+        r"\b50\b",
+        text
+    ):
+
+        return "50ml"
 
 
     return None
 
 
 # =========================================================
-# PRICE QUERY
+# PRICE QUERY DETECTION
 # =========================================================
 
 def is_price_query(message):
@@ -1129,43 +1213,82 @@ def is_price_query(message):
     )
 
 
-    price_words = [
+    price_patterns = [
 
-        "price",
+        r"\bprice\b",
 
-        "price koto",
+        r"\bprice koto\b",
 
-        "koto",
+        r"\bkoto\b",
 
-        "dam",
+        r"\bdam\b",
 
-        "দাম",
+        r"\bdam koto\b",
 
-        "কত",
+        r"\btaka\b",
 
-        "দাম কত",
+        r"\btk\b",
 
-        "tk",
+        r"\bhow much\b",
 
-        "taka",
+        r"দাম",
 
-        "cost",
+        r"কত",
 
-        "cost koto",
+        r"মূল্য",
 
-        "how much"
+        r"কতো"
+    ]
 
+
+    return any(
+        re.search(
+            pattern,
+            text
+        )
+        for pattern in price_patterns
+    )
+
+
+# =========================================================
+# PRODUCT INFORMATION QUERY
+# =========================================================
+
+def is_product_info_query(message):
+
+    text = normalize_text(
+        message
+    )
+
+
+    words = [
+        "notes",
+        "note",
+        "longevity",
+        "long lasting",
+        "lasting",
+        "description",
+        "smell",
+        "fragrance",
+        "perfume",
+        "which",
+        "best",
+        "কেমন",
+        "ঘ্রাণ",
+        "স্মেল",
+        "কতক্ষণ",
+        "স্থায়ী"
     ]
 
 
     return any(
         word in text
-        for word in price_words
+        for word in words
     )
 
 
 # =========================================================
-# PRODUCT ANSWER
+# BUILD PRODUCT ANSWER
 # =========================================================
 
 def build_product_answer(
@@ -1179,50 +1302,268 @@ def build_product_answer(
     )
 
 
+    price_15 = product.get(
+        "price_15ml"
+    )
+
+    price_30 = product.get(
+        "price_30ml"
+    )
+
+
+    regular_15 = product.get(
+        "regular_15ml"
+    )
+
+    regular_30 = product.get(
+        "regular_30ml"
+    )
+
+
     if size == "15ml":
 
-        price = product.get(
-            "price_15ml"
-        )
-
-        regular = product.get(
-            "regular_15ml"
-        )
-
         return (
-            f"{name} 15ml-এর "
-            f"বর্তমান price ৳{price}। "
-            f"Regular price ৳{regular}।"
+            f"{name} 15ml-এর current price "
+            f"৳{price_15}। "
+            f"Regular price ৳{regular_15}।"
         )
 
 
     if size == "30ml":
 
-        price = product.get(
-            "price_30ml"
-        )
-
-        regular = product.get(
-            "regular_30ml"
-        )
-
         return (
-            f"{name} 30ml-এর "
-            f"বর্তমান price ৳{price}। "
-            f"Regular price ৳{regular}।"
+            f"{name} 30ml-এর current price "
+            f"৳{price_30}। "
+            f"Regular price ৳{regular_30}।"
         )
 
 
     return (
-        f"{name} 15ml ৳"
-        f"{product.get('price_15ml')} "
-        f"এবং 30ml ৳"
-        f"{product.get('price_30ml')}।"
+        f"{name} এর price:\n"
+        f"• 15ml — ৳{price_15}\n"
+        f"• 30ml — ৳{price_30}"
     )
 
 
 # =========================================================
-# SHEET MATCHING
+# PRODUCT DETAIL ANSWER
+# =========================================================
+
+def build_product_info_answer(
+    product
+):
+
+    name = product.get(
+        "name",
+        "Product"
+    )
+
+
+    description = product.get(
+        "description",
+        ""
+    )
+
+
+    notes = product.get(
+        "notes",
+        []
+    )
+
+
+    longevity = product.get(
+        "longevity",
+        ""
+    )
+
+
+    best_for = product.get(
+        "best_for",
+        []
+    )
+
+
+    answer_parts = [
+        f"**{name}**"
+    ]
+
+
+    if description:
+
+        answer_parts.append(
+            description
+        )
+
+
+    if notes:
+
+        answer_parts.append(
+            "Notes: "
+            + ", ".join(
+                str(note)
+                for note in notes
+            )
+        )
+
+
+    if longevity:
+
+        answer_parts.append(
+            f"Longevity: {longevity}"
+        )
+
+
+    if best_for:
+
+        answer_parts.append(
+            "Best for: "
+            + ", ".join(
+                str(item)
+                for item in best_for[:4]
+            )
+        )
+
+
+    return "\n".join(
+        answer_parts
+    )
+
+
+# =========================================================
+# GENERAL GREETING DETECTION
+# =========================================================
+
+def is_greeting(message):
+
+    text = normalize_text(
+        message
+    )
+
+
+    greetings = {
+
+        "hi",
+        "hello",
+        "hey",
+        "hii",
+        "hiii",
+        "assalamu alaikum",
+        "salam",
+        "আসসালামু আলাইকুম",
+        "হাই",
+        "হ্যালো",
+        "সালাম"
+    }
+
+
+    return text in greetings
+
+
+# =========================================================
+# ORDER DETECTION
+# =========================================================
+
+def is_order_request(message):
+
+    text = normalize_text(
+        message
+    )
+
+
+    order_patterns = [
+
+        r"\border\b",
+
+        r"\border korte chai\b",
+
+        r"\border korbo\b",
+
+        r"\bnibo\b",
+
+        r"\bnib\b",
+
+        r"\bnite chai\b",
+
+        r"\bnitte chai\b",
+
+        r"\bkinbo\b",
+
+        r"\bkinte chai\b",
+
+        r"\bbuy\b",
+
+        r"\bbook\b",
+
+        r"অর্ডার",
+
+        r"নিব",
+
+        r"নিতে চাই",
+
+        r"কিনবো",
+
+        r"কিনতে চাই"
+    ]
+
+
+    return any(
+        re.search(
+            pattern,
+            text
+        )
+        for pattern in order_patterns
+    )
+
+
+# =========================================================
+# GENERAL SHEET QUESTION DETECTION
+# =========================================================
+
+def is_general_sheet_question(
+    message
+):
+
+    text = normalize_text(
+        message
+    )
+
+
+    general_keywords = [
+
+        "delivery",
+        "delivery charge",
+        "shipping",
+        "charge",
+        "payment",
+        "cash on delivery",
+        "cod",
+        "return",
+        "exchange",
+        "refund",
+        "available",
+        "collection",
+        "perfume",
+        "fragrance",
+        "size",
+        "order",
+        "অর্ডার",
+        "ডেলিভারি",
+        "চার্জ",
+        "পেমেন্ট",
+        "রিটার্ন",
+        "এক্সচেঞ্জ",
+        "সাইজ"
+    ]
+
+
+    return any(
+        keyword in text
+        for keyword in general_keywords
+    )
+
+
+# =========================================================
+# GOOGLE SHEET Q&A MATCHING
 # =========================================================
 
 def find_matching_sheet_answer(
@@ -1231,7 +1572,9 @@ def find_matching_sheet_answer(
 
     rows = get_sheet_data()
 
+
     if not rows:
+
         return None
 
 
@@ -1239,14 +1582,20 @@ def find_matching_sheet_answer(
         user_message
     )
 
+
     user_words = tokenize(
         user_message
     )
 
 
-    # =====================================================
-    # EXACT QUESTION
-    # =====================================================
+    if not user_words:
+
+        return None
+
+
+    # -----------------------------------------------------
+    # Exact question
+    # -----------------------------------------------------
 
     for row in rows:
 
@@ -1256,6 +1605,7 @@ def find_matching_sheet_answer(
                 ""
             )
         )
+
 
         answer = str(
             row.get(
@@ -1274,12 +1624,13 @@ def find_matching_sheet_answer(
             return answer
 
 
-    # =====================================================
-    # BEST MATCH
-    # =====================================================
+    # -----------------------------------------------------
+    # Score each row
+    # -----------------------------------------------------
 
     best_answer = None
     best_score = 0
+    best_common_count = 0
 
 
     for row in rows:
@@ -1291,12 +1642,14 @@ def find_matching_sheet_answer(
             )
         )
 
+
         keywords = normalize_text(
             row.get(
                 "keywords",
                 ""
             )
         )
+
 
         answer = str(
             row.get(
@@ -1307,6 +1660,7 @@ def find_matching_sheet_answer(
 
 
         if not answer:
+
             continue
 
 
@@ -1318,6 +1672,7 @@ def find_matching_sheet_answer(
 
 
         if not target_words:
+
             continue
 
 
@@ -1329,10 +1684,12 @@ def find_matching_sheet_answer(
 
 
         if not common:
+
             continue
 
 
-        score = (
+        # User words matched
+        user_score = (
             len(common)
             /
             max(
@@ -1342,49 +1699,60 @@ def find_matching_sheet_answer(
         )
 
 
-        # Prevent weak one-word matches
+        # Target words matched
+        target_score = (
+            len(common)
+            /
+            max(
+                len(target_words),
+                1
+            )
+        )
 
+
+        score = (
+            user_score * 0.65
+            +
+            target_score * 0.35
+        )
+
+
+        # Strong boost for multiple keyword matches
+        if len(common) >= 2:
+
+            score += 0.15
+
+
+        # Weak single-word matches are dangerous
         if (
             len(common) == 1
             and len(user_words) >= 3
         ):
 
-            continue
+            score *= 0.35
 
 
-        # Question coverage
-
-        question_words = tokenize(
-            question
-        )
-
-
-        if question_words:
-
-            question_score = (
-                len(
-                    user_words
-                    &
-                    question_words
-                )
-                /
-                len(question_words)
+        if (
+            score > best_score
+            or
+            (
+                score == best_score
+                and len(common) > best_common_count
             )
-
-            score = max(
-                score,
-                question_score * 0.75
-            )
-
-
-        if score > best_score:
+        ):
 
             best_score = score
-
             best_answer = answer
+            best_common_count = len(
+                common
+            )
 
 
-    if best_score >= 0.60:
+    # -----------------------------------------------------
+    # Minimum confidence
+    # -----------------------------------------------------
+
+    if best_score >= 0.50:
 
         return best_answer
 
@@ -1399,6 +1767,7 @@ def find_matching_sheet_answer(
 def build_knowledge_base():
 
     products = get_products()
+
 
     kb = [
         "=== EZKROY PRODUCT CATALOG ==="
@@ -1415,216 +1784,33 @@ def build_knowledge_base():
         )
 
 
-    return "\n".join(kb)
+    rows = get_sheet_data()
 
 
-# =========================================================
-# ORDER DETECTION
-# =========================================================
+    if rows:
 
-def is_order_request(message):
-
-    text = normalize_text(
-        message
-    )
+        kb.append(
+            "\n=== VERIFIED GOOGLE SHEET ==="
+        )
 
 
-    order_phrases = [
+        for row in rows:
 
-        "order",
-
-        "order korte chai",
-
-        "order korbo",
-
-        "nibo",
-
-        "nib",
-
-        "nite chai",
-
-        "nitte chai",
-
-        "kinbo",
-
-        "kinte chai",
-
-        "buy",
-
-        "book",
-
-        "অর্ডার",
-
-        "অর্ডার করতে চাই",
-
-        "নিব",
-
-        "নিতে চাই",
-
-        "কিনবো",
-
-        "কিনতে চাই"
-
-    ]
+            kb.append(
+                json.dumps(
+                    row,
+                    ensure_ascii=False
+                )
+            )
 
 
-    return any(
-        phrase in text
-        for phrase in order_phrases
+    return "\n".join(
+        kb
     )
 
 
 # =========================================================
-# AI
-# =========================================================
-
-SYSTEM_PROMPT = """
-You are EZKROY AI, a professional AI sales assistant.
-
-BUSINESS:
-EZKROY is an online perfume business.
-
-LANGUAGE:
-- Understand Bangla, Banglish and English.
-- Reply naturally in the customer's language/style.
-- Keep replies short and friendly.
-
-PRODUCT RULE:
-- Product prices MUST come from the supplied product catalog.
-- Never invent product prices.
-- Never change product names.
-- If product information is available in the catalog, use it.
-
-GOOGLE SHEET RULE:
-- Google Sheet contains verified business FAQ information.
-- Use a Sheet answer ONLY when it directly matches the customer's question.
-- Never use an unrelated Sheet answer.
-- Never mention the Sheet itself unless necessary.
-
-GREETING:
-For hi, hello, hey, salam, assalamu alaikum, etc. respond with a natural greeting.
-Do not give delivery information unless asked.
-
-ORDER:
-If customer wants to order, collect:
-1. Product
-2. Size
-3. Quantity
-4. Name
-5. Phone
-6. Address
-
-STYLE:
-- Short
-- Friendly
-- Professional
-- Helpful
-- Sales-focused
-- No unnecessary explanation
-
-IMPORTANT:
-Never invent business policies, delivery charges, prices or product information.
-"""
-
-
-def ask_ai(
-    user_message,
-    context_info=""
-):
-
-    if not client:
-
-        return (
-            "EZKROY AI server-এর সাথে "
-            "connect হয়নি। "
-            "OPENAI_API_KEY check করুন।"
-        )
-
-
-    catalog = build_knowledge_base()
-
-
-    prompt = f"""
-{SYSTEM_PROMPT}
-
-=== PRODUCT CATALOG ===
-
-{catalog}
-
-=== VERIFIED CONTEXT ===
-
-{context_info}
-
-=== CUSTOMER MESSAGE ===
-
-{user_message}
-
-Answer the customer naturally.
-"""
-
-
-    try:
-
-        response = client.chat.completions.create(
-
-            model=MODEL,
-
-            messages=[
-
-                {
-                    "role":
-                        "system",
-
-                    "content":
-                        SYSTEM_PROMPT
-                },
-
-                {
-                    "role":
-                        "user",
-
-                    "content":
-                        prompt
-                }
-
-            ],
-
-            temperature=0.3
-        )
-
-
-        reply = (
-            response
-            .choices[0]
-            .message
-            .content
-        )
-
-
-        return (
-            reply.strip()
-            if reply
-            else
-            "দুঃখিত, এই মুহূর্তে উত্তর দেওয়া যাচ্ছে না।"
-        )
-
-
-    except Exception as error:
-
-        print(
-            "OPENAI ERROR:",
-            error
-        )
-
-
-        return (
-            "দুঃখিত, AI server-এর সাথে "
-            "এই মুহূর্তে যোগাযোগ করা যাচ্ছে না।"
-        )
-
-
-# =========================================================
-# SAVE ORDER
+# ORDER INFORMATION
 # =========================================================
 
 def extract_order_information(
@@ -1635,6 +1821,7 @@ def extract_order_information(
         message
     )
 
+
     size = detect_size(
         message
     )
@@ -1643,40 +1830,62 @@ def extract_order_information(
     quantity = 1
 
 
-    quantity_match = re.search(
-        r"(?:x|qty|quantity|পরিমাণ)\s*(\d+)",
-        normalize_text(message)
+    normalized = normalize_text(
+        message
     )
 
 
-    if quantity_match:
+    quantity_patterns = [
 
-        try:
+        r"(?:x|qty|quantity)\s*(\d+)",
 
-            quantity = int(
-                quantity_match.group(1)
-            )
+        r"(?:পরিমাণ)\s*(\d+)",
 
-        except:
+        r"(\d+)\s*(?:pcs|piece|pieces)"
+    ]
 
-            quantity = 1
+
+    for pattern in quantity_patterns:
+
+        match = re.search(
+            pattern,
+            normalized
+        )
+
+
+        if match:
+
+            try:
+
+                quantity = int(
+                    match.group(1)
+                )
+
+            except Exception:
+
+                quantity = 1
+
+
+            break
 
 
     return {
 
-        "product":
+        "product": (
             product.get("name")
             if product
-            else None,
+            else None
+        ),
 
-        "size":
-            size,
+        "size": size,
 
-        "quantity":
-            quantity
-
+        "quantity": quantity
     }
 
+
+# =========================================================
+# SAVE ORDER
+# =========================================================
 
 def save_order(
     message,
@@ -1719,7 +1928,7 @@ def save_order(
                 + 1
             )
 
-        except:
+        except Exception:
 
             next_id = (
                 len(orders)
@@ -1729,8 +1938,7 @@ def save_order(
 
     order = {
 
-        "id":
-            next_id,
+        "id": next_id,
 
         "customer_name":
             customer_details.get(
@@ -1784,6 +1992,192 @@ def save_order(
 
 
 # =========================================================
+# SYSTEM PROMPT
+# =========================================================
+
+SYSTEM_PROMPT = """
+You are EZKROY AI, a professional AI sales assistant for an online perfume business.
+
+LANGUAGE:
+- Understand Bangla, Banglish and English.
+- Reply naturally in the same language/style as the customer.
+- Keep replies short, friendly and useful.
+
+CRITICAL RULES:
+
+1. PRODUCT DATA
+Use ONLY the supplied product catalog for:
+- Product names
+- Prices
+- Sizes
+- Stock
+- Notes
+- Longevity
+- Product descriptions
+
+Never invent a product or price.
+
+2. PRICE
+If the backend gives you a product price answer, use that exact price.
+Do not replace it with the Google Sheet general price range.
+
+3. GOOGLE SHEET
+The Google Sheet contains verified business Q&A.
+
+Use a Sheet answer ONLY when it is clearly relevant to the customer's question.
+
+Never force an unrelated Sheet answer.
+
+For example:
+Customer: "hi"
+Do NOT reply with delivery charge.
+
+Customer: "DIOR SAUVAGE KOTO"
+Use the product catalog price.
+
+Customer: "delivery charge koto"
+Use the relevant Sheet answer if available.
+
+4. GREETING
+For simple greetings such as:
+- hi
+- hello
+- hey
+- assalamu alaikum
+- হাই
+- হ্যালো
+
+Reply naturally and briefly.
+
+5. ORDER
+If customer wants to order, collect:
+1. Product
+2. Size
+3. Quantity
+4. Name
+5. Phone
+6. Full address
+
+Do not pretend an order is confirmed unless the required information is available.
+
+6. STYLE
+- Friendly
+- Professional
+- Short
+- Natural
+- Helpful
+- No unnecessary explanations
+
+7. LANGUAGE STYLE
+For Banglish customers, Banglish is acceptable.
+For Bangla customers, Bangla is preferred.
+For English customers, English is preferred.
+
+8. SOURCE PRIORITY
+For product-specific information:
+PRODUCT CATALOG > GOOGLE SHEET
+
+For general business policies:
+GOOGLE SHEET > AI knowledge
+
+Never invent information that is not provided.
+"""
+
+
+# =========================================================
+# AI RESPONSE
+# =========================================================
+
+def ask_ai(
+    user_message,
+    context_info=""
+):
+
+    if not client:
+
+        return (
+            "EZKROY AI এখন connect হয়নি। "
+            "OPENAI_API_KEY check করুন।"
+        )
+
+
+    catalog = build_knowledge_base()
+
+
+    full_prompt = f"""
+{SYSTEM_PROMPT}
+
+=== EZKROY DATA ===
+{catalog}
+
+=== VERIFIED CONTEXT FOR THIS CUSTOMER ===
+{context_info or "No specific verified context found."}
+
+=== CUSTOMER MESSAGE ===
+{user_message}
+
+Answer ONLY the customer's actual question.
+Do not use unrelated information.
+"""
+
+
+    try:
+
+        response = client.chat.completions.create(
+
+            model=MODEL,
+
+            messages=[
+
+                {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT
+                },
+
+                {
+                    "role": "user",
+                    "content": full_prompt
+                }
+
+            ],
+
+            temperature=0.2
+        )
+
+
+        reply = (
+            response
+            .choices[0]
+            .message
+            .content
+        )
+
+
+        if reply:
+
+            return reply.strip()
+
+
+        return (
+            "দুঃখিত, এই মুহূর্তে উত্তর তৈরি করা যাচ্ছে না।"
+        )
+
+
+    except Exception as error:
+
+        print(
+            "OPENAI ERROR:",
+            error
+        )
+
+
+        return (
+            "দুঃখিত, AI server-এর সাথে "
+            "এই মুহূর্তে যোগাযোগ করা যাচ্ছে না।"
+        )
+
+
+# =========================================================
 # HOME
 # =========================================================
 
@@ -1796,7 +2190,7 @@ def home():
 
 
 # =========================================================
-# PRODUCTS
+# PRODUCTS API
 # =========================================================
 
 @app.route(
@@ -1811,7 +2205,7 @@ def products_api():
 
 
 # =========================================================
-# ORDERS
+# ORDERS API
 # =========================================================
 
 @app.route(
@@ -1826,7 +2220,7 @@ def orders_api():
 
 
 # =========================================================
-# KNOWLEDGE
+# KNOWLEDGE API
 # =========================================================
 
 @app.route(
@@ -1855,18 +2249,15 @@ def knowledge_api():
                 else None
             ),
 
-        "columns":
-            (
-                list(rows[0].keys())
-                if rows
-                else []
+        "error":
+            sheet_cache.get(
+                "error"
             )
-
     })
 
 
 # =========================================================
-# REFRESH SHEET
+# REFRESH GOOGLE SHEET
 # =========================================================
 
 @app.route(
@@ -1891,18 +2282,15 @@ def refresh_knowledge():
             if rows
             else "empty",
 
-        "columns":
-            (
-                list(rows[0].keys())
-                if rows
-                else []
+        "error":
+            sheet_cache.get(
+                "error"
             )
-
     })
 
 
 # =========================================================
-# CHAT
+# CHAT API
 # =========================================================
 
 @app.route(
@@ -1936,7 +2324,6 @@ def chat():
 
             "order_created":
                 False
-
         })
 
 
@@ -1946,22 +2333,57 @@ def chat():
     )
 
 
-    # =====================================================
-    # PRODUCT
-    # =====================================================
+    # -----------------------------------------------------
+    # GREETING
+    # -----------------------------------------------------
+
+    if is_greeting(message):
+
+        reply = (
+            "হ্যালো! 👋 "
+            "আমি EZKROY AI Assistant। "
+            "আপনি কোন perfume বা price সম্পর্কে জানতে চান?"
+        )
+
+
+        return jsonify({
+
+            "reply":
+                reply,
+
+            "order_created":
+                False
+        })
+
+
+    # -----------------------------------------------------
+    # PRODUCT DETECTION
+    # -----------------------------------------------------
 
     product = find_product(
         message
     )
+
 
     size = detect_size(
         message
     )
 
 
-    # =====================================================
-    # PRICE
-    # =====================================================
+    # -----------------------------------------------------
+    # ORDER REQUEST
+    # -----------------------------------------------------
+
+    order_requested = (
+        is_order_request(
+            message
+        )
+    )
+
+
+    # -----------------------------------------------------
+    # PRODUCT PRICE
+    # -----------------------------------------------------
 
     if (
         product
@@ -1974,249 +2396,180 @@ def chat():
         )
 
 
-        print(
-            "PRODUCT PRICE RESPONSE:",
-            reply
-        )
+        # Let AI make the answer natural,
+        # but give it the exact verified product answer.
 
+        if client:
 
-        return jsonify({
-
-            "reply":
-                reply,
-
-            "order_created":
-                False,
-
-            "product":
-                product.get("name"),
-
-            "size":
-                size
-
-        })
-
-
-    # =====================================================
-    # GREETING
-    # =====================================================
-
-    normalized = normalize_text(
-        message
-    )
-
-
-    greetings = [
-
-        "hi",
-
-        "hello",
-
-        "hey",
-
-        "হাই",
-
-        "হ্যালো",
-
-        "salam",
-
-        "assalamualaikum",
-
-        "আসসালামু আলাইকুম"
-
-    ]
-
-
-    if normalized in greetings:
-
-        return jsonify({
-
-            "reply":
-                "হ্যালো! 👋 "
-                "আমি EZKROY AI Assistant। "
-                "আপনি perfume-এর price, details "
-                "বা order সম্পর্কে জানতে পারেন।",
-
-            "order_created":
-                False
-
-        })
-
-
-    # =====================================================
-    # ORDER
-    # =====================================================
-
-    if is_order_request(
-        message
-    ):
-
-        if product:
-
-            product_name = product.get(
-                "name",
-                "এই perfume"
+            reply = ask_ai(
+                message,
+                reply
             )
 
 
-            if size:
+    # -----------------------------------------------------
+    # PRODUCT INFORMATION
+    # -----------------------------------------------------
+
+    elif (
+        product
+        and is_product_info_query(message)
+    ):
+
+        product_info = (
+            build_product_info_answer(
+                product
+            )
+        )
+
+
+        if client:
+
+            reply = ask_ai(
+                message,
+                product_info
+            )
+
+        else:
+
+            reply = product_info
+
+
+    # -----------------------------------------------------
+    # ORDER REQUEST
+    # -----------------------------------------------------
+
+    elif order_requested:
+
+        order_info = (
+            extract_order_information(
+                message
+            )
+        )
+
+
+        context = json.dumps(
+            order_info,
+            ensure_ascii=False
+        )
+
+
+        if client:
+
+            reply = ask_ai(
+                message,
+                context
+            )
+
+        else:
+
+            if order_info["product"]:
 
                 reply = (
-                    f"অবশ্যই! 😊 "
-                    f"{product_name} {size} order করতে পারবেন। "
-                    f"Order complete করতে আপনার নাম, "
-                    f"ফোন নম্বর এবং delivery address দিন।"
+                    f"{order_info['product']} order করতে "
+                    f"size, আপনার নাম, phone number এবং "
+                    f"full address দিন।"
                 )
 
             else:
 
                 reply = (
-                    f"অবশ্যই! 😊 "
-                    f"{product_name} order করতে পারবেন। "
-                    f"আপনি কোন size চান — 15ml নাকি 30ml? "
-                    f"তারপর আপনার নাম, ফোন নম্বর "
-                    f"এবং delivery address দিন।"
+                    "অর্ডার করতে perfume-এর নাম, size, "
+                    "quantity, আপনার নাম, phone number "
+                    "এবং full address দিন।"
                 )
+
+
+    # -----------------------------------------------------
+    # GOOGLE SHEET Q&A
+    # -----------------------------------------------------
+
+    else:
+
+        verified_answer = (
+            find_matching_sheet_answer(
+                message
+            )
+        )
+
+
+        if verified_answer:
+
+            # IMPORTANT:
+            # If a verified Sheet answer exists,
+            # return it directly.
+            #
+            # This prevents AI from changing
+            # business information.
+
+            reply = verified_answer
 
 
         else:
 
-            reply = (
-                "অবশ্যই! 😊 "
-                "কোন perfumeটি order করতে চান "
-                "তার নাম বলুন।"
+            # -------------------------------------------------
+            # GENERAL AI
+            # -------------------------------------------------
+
+            reply = ask_ai(
+                message,
+                "No directly verified Sheet answer found."
             )
 
 
-        return jsonify({
+    # -----------------------------------------------------
+    # SAVE ORDER
+    # -----------------------------------------------------
 
-            "reply":
-                reply,
-
-            "order_created":
-                False
-
-        })
+    order = None
 
 
-    # =====================================================
-    # PRODUCT INFORMATION
-    # =====================================================
+    # IMPORTANT:
+    # We only save an order if the message
+    # contains an order request AND a product.
+    #
+    # This prevents messages such as
+    # "ami order korte chai"
+    # from creating an empty order.
 
-    if product:
+    if (
+        order_requested
+        and product
+    ):
 
-        product_info = json.dumps(
-            product,
-            ensure_ascii=False,
-            indent=2
-        )
-
-
-        reply = ask_ai(
-
-            message,
-
-            f"""
-The customer is asking about this exact product.
-
-Use ONLY this product information:
-
-{product_info}
-
-Do not use an unrelated Google Sheet answer.
-"""
-
-        )
-
-
-        return jsonify({
-
-            "reply":
-                reply,
-
-            "order_created":
-                False,
-
-            "product":
-                product.get("name")
-
-        })
-
-
-    # =====================================================
-    # GOOGLE SHEET
-    # =====================================================
-
-    verified_answer = (
-        find_matching_sheet_answer(
+        order = save_order(
             message
         )
-    )
 
 
-    if verified_answer:
+    # -----------------------------------------------------
+    # RESPONSE
+    # -----------------------------------------------------
 
-        print(
-            "SHEET ANSWER FOUND:",
-            verified_answer
-        )
-
-
-        reply = ask_ai(
-
-            message,
-
-            f"""
-A verified business FAQ answer was found.
-
-Use this answer because it directly matches
-the customer's question.
-
-Verified answer:
-{verified_answer}
-
-Do not add unrelated information.
-"""
-
-        )
-
-
-    else:
-
-        print(
-            "NO SHEET MATCH"
-        )
-
-
-        reply = ask_ai(
-
-            message,
-
-            """
-No directly matching Google Sheet FAQ was found.
-
-Answer naturally using the EZKROY product catalog
-and general sales-assistant behavior.
-
-Do not invent prices or business policies.
-"""
-
-        )
-
-
-    return jsonify({
+    response_data = {
 
         "reply":
             reply,
 
         "order_created":
-            False
+            bool(order)
+    }
 
-    })
+
+    if order:
+
+        response_data[
+            "order"
+        ] = order
+
+
+    return jsonify(
+        response_data
+    )
 
 
 # =========================================================
-# HEALTH
+# HEALTH CHECK
 # =========================================================
 
 @app.route(
@@ -2237,7 +2590,11 @@ def health():
             len(rows),
 
         "google_sheet":
-            bool(rows),
+            (
+                "connected"
+                if rows
+                else "not connected"
+            ),
 
         "total_products":
             len(
@@ -2250,13 +2607,20 @@ def health():
             ),
 
         "openai":
-            bool(client)
+            bool(client),
 
+        "model":
+            MODEL,
+
+        "sheet_error":
+            sheet_cache.get(
+                "error"
+            )
     })
 
 
 # =========================================================
-# START
+# START SERVER
 # =========================================================
 
 if __name__ == "__main__":
@@ -2270,7 +2634,15 @@ if __name__ == "__main__":
     )
 
     print(
-        "====================================\n"
+        "===================================="
+    )
+
+    print(
+        f"Model: {MODEL}"
+    )
+
+    print(
+        f"Google Sheet ID: {GOOGLE_SHEET_ID}"
     )
 
 
@@ -2279,13 +2651,14 @@ if __name__ == "__main__":
     download_google_sheet()
 
 
+    print(
+        "\nServer starting..."
+    )
+
+
     app.run(
-
         host="0.0.0.0",
-
         port=5000,
-
         debug=True
-
     )
 ```
