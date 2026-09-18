@@ -1,4 +1,3 @@
-```python
 from flask import Flask, request, jsonify, render_template
 import os
 import json
@@ -1400,143 +1399,55 @@ def refresh_knowledge():
 # CHAT API
 # =========================================================
 
-@app.route(
-    "/api/chat",
-    methods=["POST"]
-)
+@app.route("/api/chat", methods=["POST"])
 def chat():
-
-    data = (
-        request.get_json(
-            silent=True
-        )
-        or {}
-    )
-
-
-    message = str(
-        data.get(
-            "message",
-            ""
-        )
-    ).strip()
-
+    data = request.get_json(silent=True) or {}
+    message = str(data.get("message", "")).strip()
 
     if not message:
+        return jsonify({"reply": "আপনার প্রশ্নটি লিখুন।", "order_created": False})
 
+    print("\nCUSTOMER:", message)
+
+    text = normalize_text(message)
+    product = find_product(message)
+    size = detect_size(message)
+
+    greetings = {"hi","hello","hey","হাই","হ্যালো","assalamu alaikum","salam"}
+    if text in greetings or any(text.startswith(g + " ") for g in greetings):
         return jsonify({
-
-            "reply":
-                "আপনার প্রশ্নটি লিখুন।",
-
-            "order_created":
-                False
+            "reply": "হ্যালো! 👋 আমি EZKROY AI। কোন perfume-এর price বা order সম্পর্কে জানতে চান?",
+            "order_created": False
         })
 
+    if product and is_price_query(message):
+        return jsonify({
+            "reply": build_product_answer(product, size),
+            "order_created": False,
+            "product": product.get("name")
+        })
 
-    print(
-        "\nCUSTOMER:",
-        message
-    )
+    verified_answer = find_matching_sheet_answer(message)
+    if verified_answer:
+        return jsonify({
+            "reply": verified_answer,
+            "order_created": False,
+            "source": "google_sheet"
+        })
 
+    if is_order_request(message):
+        if not product:
+            reply = "অবশ্যই! 😊 কোন perfume নিতে চান? যেমন: Dior Sauvage, Vampire Blood, Hawas Fire ইত্যাদি।"
+        elif not size:
+            reply = f"{product.get('name')} available আছে। কোন size চান — 15ml নাকি 30ml?"
+        else:
+            reply = f"{product.get('name')} {size} order করা যাবে। আপনার নাম, ফোন নম্বর এবং delivery address দিন।"
+        return jsonify({"reply": reply, "order_created": False})
 
-    # -----------------------------------------------------
-    # PRODUCT DETECTION
-    # -----------------------------------------------------
-
-    product = find_product(
-        message
-    )
-
-    size = detect_size(
-        message
-    )
-
-
-    # -----------------------------------------------------
-    # VERIFIED SHEET ANSWER
-    # -----------------------------------------------------
-
-    verified_answer = (
-        find_matching_sheet_answer(
-            message
-        )
-    )
-
-
-    # -----------------------------------------------------
-    # PRODUCT PRICE ANSWER
-    # -----------------------------------------------------
-
-    if (
-        product
-        and is_price_query(message)
-    ):
-
-        product_answer = (
-            build_product_answer(
-                product,
-                size
-            )
-        )
-
-        reply = ask_ai(
-            message,
-            product_answer
-        )
-
-
-    else:
-
-        reply = ask_ai(
-            message,
-            verified_answer
-            or
-            "No direct verified sheet answer found."
-        )
-
-
-    # -----------------------------------------------------
-    # ORDER
-    # -----------------------------------------------------
-
-    order = None
-
-    if is_order_request(
-        message
-    ):
-
-        order = save_order(
-            message
-        )
-
-
-    # -----------------------------------------------------
-    # RESPONSE
-    # -----------------------------------------------------
-
-    response_data = {
-
-        "reply":
-            reply,
-
-        "order_created":
-            bool(order)
-    }
-
-
-    if order:
-
-        response_data[
-            "order"
-        ] = order
-
-
-    return jsonify(
-        response_data
-    )
-
-
+    return jsonify({
+        "reply": ask_ai(message, "No direct verified Google Sheet answer found."),
+        "order_created": False
+    })
 # =========================================================
 # HEALTH CHECK
 # =========================================================
