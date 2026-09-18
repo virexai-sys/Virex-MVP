@@ -1,3 +1,4 @@
+```python
 from flask import Flask, request, jsonify, render_template
 import os
 import json
@@ -10,26 +11,23 @@ from datetime import datetime
 
 
 # =========================================================
-# EZKROY AI — SHEET SALES AGENT + CREATOR PROFILE SYSTEM
+# EZKROY AI — SHEET + PROFILE + SALES AGENT
 # =========================================================
 #
-# FEATURES
-# ---------------------------------------------------------
-# 1. Google Sheet based sales knowledge
-# 2. Existing 22-product catalog preserved
-# 3. Product recognition
-# 4. Order detection
-# 5. Creator / Founder profile system
-# 6. Portfolio link responses
-# 7. Bangla / Banglish / English profile questions
+# ANSWER PRIORITY
+#
+# 1. Product-specific Google Sheet answer
+# 2. General Google Sheet answer
+# 3. Personal Profile answer
+# 4. System fallback
 #
 # IMPORTANT
-# ---------------------------------------------------------
 # - NO OpenAI
-# - NO external AI fallback
-# - Product answers come from Google Sheet
-# - Creator answers come from CREATOR_PROFILE
-# - Product catalog is used for product recognition
+# - NO ChatGPT API
+# - Existing products preserved
+# - Google Sheet remains the main knowledge source
+# - Profile system handles personal questions
+# - Portfolio link can be returned
 #
 # =========================================================
 
@@ -38,83 +36,215 @@ app = Flask(__name__)
 
 
 # =========================================================
-# CREATOR PROFILE
-# =========================================================
-#
-# This information is kept separately from the product
-# catalog and Google Sheet.
-#
-# You can edit this section whenever you want.
-#
+# GOOGLE SHEET CONFIG
 # =========================================================
 
-CREATOR_PROFILE = {
+GOOGLE_SHEET_ID = "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
+
+GOOGLE_SHEET_CSV_URL = (
+    f"https://docs.google.com/spreadsheets/d/"
+    f"{GOOGLE_SHEET_ID}/export?format=csv"
+)
+
+
+# =========================================================
+# PROFILE CONFIG
+# =========================================================
+
+PROFILE = {
 
     "name": "Asad Ullah Mozumder Aiman",
 
     "short_name": "Aiman",
 
-    "role": [
-        "Student",
-        "Entrepreneur",
-        "Founder of EZKROY"
-    ],
+    "role": (
+        "Student, Entrepreneur, "
+        "Sales & Data Enthusiast"
+    ),
 
-    "organization": "EZKROY",
+    "project": "EZKROY",
 
-    "position": "Founder",
+    "business": "NOIR Fragrance",
+
+    "education": (
+        "Geography student"
+    ),
+
+    "institution": (
+        "Dhaka Central University"
+    ),
+
+    "previous_institution": (
+        "Dhaka College"
+    ),
+
+    "field": "Geography",
+
+    "hometown": "Feni, Bangladesh",
+
+    "country": "Bangladesh",
 
     "portfolio": (
         "https://sites.google.com/view/"
         "aiman-porfolio/home"
     ),
 
-    "portfolio_label": "Aiman Portfolio",
+    "portfolio_name": "Aiman's Portfolio",
 
-    "description": (
+    "about": (
         "Aiman is a student and entrepreneur "
-        "who founded EZKROY, an AI-powered sales "
-        "agent project for businesses."
+        "with interests in sales, data, technology "
+        "and AI. He is also the founder of NOIR "
+        "Fragrance and works on EZKROY, an AI-powered "
+        "sales assistant project."
     ),
 
-    "creator_answer": (
-        "আমাকে EZKROY-এর Founder "
-        "Asad Ullah Mozumder Aiman (Aiman) "
-        "design ও develop করছেন।"
+    "projects": [
+        "EZKROY",
+        "NOIR Fragrance"
+    ],
+
+    "interests": [
+        "Data Analysis",
+        "Artificial Intelligence",
+        "Sales",
+        "Entrepreneurship",
+        "Technology"
+    ],
+
+    "creator_description": (
+        "Aiman is the creator/developer of this "
+        "EZKROY project."
     ),
 
-    "founder_answer": (
-        "EZKROY-এর Founder হলেন "
-        "Asad Ullah Mozumder Aiman, "
-        "যিনি Aiman নামেও পরিচিত।"
-    ),
-
-    "about_answer": (
-        "Aiman একজন student ও entrepreneur। "
-        "তিনি EZKROY-এর Founder এবং sales ও "
-        "technology-based projects নিয়ে কাজ করছেন।"
-    ),
-
-    "portfolio_answer": (
-        "অবশ্যই। Aiman-এর portfolio এখানে: "
-        "https://sites.google.com/view/"
-        "aiman-porfolio/home"
+    "contact_note": (
+        "For direct contact information, please "
+        "refer to Aiman's portfolio."
     )
 }
 
 
 # =========================================================
-# GOOGLE SHEET CONFIG
+# PROFILE QUESTION KEYWORDS
 # =========================================================
 
-GOOGLE_SHEET_ID = (
-    "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
-)
+PROFILE_INTENTS = {
 
-GOOGLE_SHEET_CSV_URL = (
-    f"https://docs.google.com/spreadsheets/d/"
-    f"{GOOGLE_SHEET_ID}/export?format=csv"
-)
+    "identity": [
+        "who are you",
+        "who is aiman",
+        "who is asad",
+        "aiman ke",
+        "asad ke",
+        "tumi ke",
+        "tomar nam",
+        "your name",
+        "your creator",
+        "who made you",
+        "who created you",
+        "who designed you",
+        "ke banaise",
+        "ke banayse",
+        "ke banaiছে",
+        "ke design korse",
+        "creator ke",
+        "owner ke",
+        "developer ke",
+        "malik ke"
+    ],
+
+    "name": [
+        "your name",
+        "tomar nam",
+        "naam ki",
+        "nam ki",
+        "aiman ke",
+        "asad ullah aiman"
+    ],
+
+    "education": [
+        "where do you study",
+        "where are you studying",
+        "kothay poro",
+        "kothay study koro",
+        "kon university",
+        "kon varsity",
+        "university ki",
+        "college ki",
+        "what do you study",
+        "ki niye poro",
+        "ki niye study koro",
+        "subject ki",
+        "department ki",
+        "geography"
+    ],
+
+    "hometown": [
+        "where are you from",
+        "where is aiman from",
+        "aiman kothay thake",
+        "kothay thako",
+        "hometown",
+        "bari kothay",
+        "gram kothay",
+        "feni"
+    ],
+
+    "business": [
+        "what business",
+        "business ki",
+        "business koren",
+        "ki business",
+        "noir",
+        "noir fragrance",
+        "perfume business",
+        "perfume business ke kore",
+        "who owns noir"
+    ],
+
+    "project": [
+        "what is ezkroy",
+        "ezkroy ki",
+        "ezkroy",
+        "what project",
+        "project ki",
+        "ai project",
+        "sales ai",
+        "sales agent"
+    ],
+
+    "portfolio": [
+        "portfolio",
+        "portfolio link",
+        "show portfolio",
+        "give portfolio",
+        "aiman portfolio",
+        "website",
+        "personal website",
+        "profile website"
+    ],
+
+    "about": [
+        "tell me about aiman",
+        "aiman somporke bolo",
+        "asad somporke bolo",
+        "who is asad ullah aiman",
+        "aiman details",
+        "about aiman",
+        "aiman ke",
+        "tar somporke bolo"
+    ],
+
+    "interests": [
+        "interest ki",
+        "ki niye interested",
+        "what are your interests",
+        "what does aiman like",
+        "ki korte pochondo",
+        "interests",
+        "passion"
+    ]
+}
 
 
 # =========================================================
@@ -788,9 +918,7 @@ def save_json_file(filename, data):
 
 def init_product_file():
 
-    if not os.path.exists(
-        PRODUCT_FILE
-    ):
+    if not os.path.exists(PRODUCT_FILE):
 
         save_json_file(
             PRODUCT_FILE,
@@ -812,11 +940,7 @@ def get_products():
         INITIAL_PRODUCTS
     )
 
-    if isinstance(
-        products,
-        list
-    ):
-
+    if isinstance(products, list):
         return products
 
     return INITIAL_PRODUCTS
@@ -833,11 +957,7 @@ def get_orders():
         []
     )
 
-    if isinstance(
-        orders,
-        list
-    ):
-
+    if isinstance(orders, list):
         return orders
 
     return []
@@ -928,13 +1048,16 @@ def download_google_sheet():
                 if key is None:
                     continue
 
-                clean_key = str(
-                    key
-                ).strip().lower()
+                clean_key = (
+                    str(key)
+                    .strip()
+                    .lower()
+                )
 
-                clean_value = str(
-                    value or ""
-                ).strip()
+                clean_value = (
+                    str(value or "")
+                    .strip()
+                )
 
                 cleaned[
                     clean_key
@@ -999,8 +1122,7 @@ def download_google_sheet():
     except urllib.error.URLError as error:
 
         message = (
-            f"URL ERROR: "
-            f"{error.reason}"
+            f"URL ERROR: {error.reason}"
         )
 
         sheet_cache["last_error"] = message
@@ -1017,9 +1139,7 @@ def download_google_sheet():
 
     except Exception as error:
 
-        message = str(
-            error
-        )
+        message = str(error)
 
         sheet_cache["last_error"] = message
 
@@ -1063,18 +1183,15 @@ def normalize_text(text):
         "tmre": "tomare",
         "tmr": "tomar",
 
+        "ami": "ami",
+        "apni": "apni",
+
         "15 ml": "15ml",
         "30 ml": "30ml",
         "50 ml": "50ml",
 
-        "who created you":
-            "who created you",
-
-        "who made you":
-            "who created you",
-
-        "who is your creator":
-            "who created you"
+        "৳": " taka ",
+        "tk": " taka "
     }
 
     for old, new in replacements.items():
@@ -1084,18 +1201,8 @@ def normalize_text(text):
             new
         )
 
-    text = text.replace(
-        "৳",
-        " taka "
-    )
-
-    text = text.replace(
-        "tk",
-        " taka "
-    )
-
     text = re.sub(
-        r"[^a-z0-9\u0980-\u09ff\s]",
+        r"[^a-z0-9\u0980-\u09ff\s:/._-]",
         " ",
         text
     )
@@ -1124,229 +1231,168 @@ def tokenize(text):
 
 
 # =========================================================
-# CREATOR / PROFILE QUESTION DETECTION
+# PROFILE ANSWER BUILDER
 # =========================================================
 
-def is_profile_question(message):
+def get_profile_answer(intent):
 
-    text = normalize_text(
+    if intent == "identity":
+
+        return (
+            f"আমি EZKROY-এর AI sales assistant। "
+            f"এই project-এর creator/developer হলেন "
+            f"{PROFILE['name']} ({PROFILE['short_name']})।"
+        )
+
+    if intent == "name":
+
+        return (
+            f"আমার project-এর creator/developer হলেন "
+            f"{PROFILE['name']}। "
+            f"তাকে সাধারণত {PROFILE['short_name']} "
+            f"নামে ডাকা হয়।"
+        )
+
+    if intent == "education":
+
+        return (
+            f"Aiman {PROFILE['institution']}-এ "
+            f"{PROFILE['field']} নিয়ে পড়াশোনা করছেন। "
+            f"তিনি আগে {PROFILE['previous_institution']}-এর "
+            f"সাথেও যুক্ত ছিলেন।"
+        )
+
+    if intent == "hometown":
+
+        return (
+            f"Aiman-এর hometown হলো "
+            f"{PROFILE['hometown']}।"
+        )
+
+    if intent == "business":
+
+        return (
+            f"Aiman-এর business project-এর মধ্যে "
+            f"{PROFILE['business']} উল্লেখযোগ্য। "
+            f"এটি একটি fragrance/perfume business।"
+        )
+
+    if intent == "project":
+
+        return (
+            f"{PROFILE['project']} হলো Aiman-এর "
+            f"AI-powered sales assistant project। "
+            f"এর লক্ষ্য হলো business-এর customer "
+            f"questions এবং sales process সহজ করা।"
+        )
+
+    if intent == "portfolio":
+
+        return (
+            f"Aiman-এর portfolio দেখতে এখানে যেতে পারেন:\n"
+            f"{PROFILE['portfolio']}"
+        )
+
+    if intent == "about":
+
+        return PROFILE["about"]
+
+    if intent == "interests":
+
+        interests = ", ".join(
+            PROFILE["interests"]
+        )
+
+        return (
+            f"Aiman-এর প্রধান interest হলো: "
+            f"{interests}।"
+        )
+
+    return None
+
+
+# =========================================================
+# PROFILE MATCHING
+# =========================================================
+
+def find_profile_answer(message):
+
+    user_text = normalize_text(
         message
     )
 
-    profile_phrases = [
+    if not user_text:
+        return None
 
-        # English
-        "who is aiman",
-        "who is asad",
-        "who created you",
-        "who made you",
-        "who built you",
-        "who designed you",
-        "who developed you",
-        "who is your creator",
-        "who is your founder",
-        "who owns ezkroy",
-        "who founded ezkroy",
-        "who is founder",
-        "about aiman",
-        "tell me about aiman",
-        "aiman information",
-        "aiman profile",
-        "aiman portfolio",
-        "show aiman portfolio",
-        "give me aiman portfolio",
-        "portfolio of aiman",
-        "what is aiman portfolio",
-
-        # Banglish
-        "aiman ke",
-        "asad ke",
-        "tmre ke banaise",
-        "tomake ke banaise",
-        "tomare ke banaise",
-        "ke banaise tomake",
-        "ke tomake banaise",
-        "ke design korse",
-        "ke develop korse",
-        "ke banayse",
-        "ezkroy er founder ke",
-        "ezkroy founder ke",
-        "ezkroy ke banaise",
-        "aiman er portfolio",
-        "aiman portfolio dao",
-        "portfolio dao",
-        "aiman somporke bolo",
-        "aiman somporke",
-        "aiman er information",
-
-        # Bangla
-        "আইমান কে",
-        "আসাদ কে",
-        "তোমাকে কে বানিয়েছে",
-        "তোমাকে কে তৈরি করেছে",
-        "তোমাকে কে ডিজাইন করেছে",
-        "তোমাকে কে ডেভেলপ করেছে",
-        "তোমার ক্রিয়েটর কে",
-        "তোমার প্রতিষ্ঠাতা কে",
-        "ইজক্রয়ের প্রতিষ্ঠাতা কে",
-        "আইমান সম্পর্কে বলো",
-        "আইমানের তথ্য",
-        "আইমানের পোর্টফোলিও",
-        "পোর্টফোলিও দাও"
-    ]
-
-    for phrase in profile_phrases:
-
-        if phrase in text:
-
-            return True
-
-    # Name-based detection
-    name_words = [
-        "aiman",
-        "asad ullah",
-        "asad",
-        "moz umder",
-        "mozumder"
-    ]
-
-    profile_words = [
-        "who",
-        "ke",
-        "about",
-        "information",
-        "profile",
+    # Portfolio gets highest direct priority
+    portfolio_terms = [
         "portfolio",
-        "created",
-        "made",
-        "built",
-        "design",
-        "developer",
-        "founder",
-        "owner",
-        "creator",
-        "কে",
-        "সম্পর্কে",
-        "তথ্য",
-        "পোর্টফোলিও",
-        "প্রতিষ্ঠাতা"
+        "portfolio link",
+        "website",
+        "personal website",
+        "show portfolio",
+        "give portfolio",
+        "aiman portfolio"
     ]
 
-    has_name = any(
-        word in text
-        for word in name_words
-    )
+    for term in portfolio_terms:
 
-    has_profile_word = any(
-        word in text
-        for word in profile_words
-    )
+        if normalize_text(term) in user_text:
 
-    return (
-        has_name
-        and
-        has_profile_word
-    )
+            return get_profile_answer(
+                "portfolio"
+            )
 
+    best_intent = None
+    best_score = 0
 
-# =========================================================
-# PROFILE ANSWER
-# =========================================================
-
-def get_profile_answer(message):
-
-    text = normalize_text(
+    user_words = tokenize(
         message
     )
 
-    # -----------------------------------------------------
-    # PORTFOLIO
-    # -----------------------------------------------------
+    for intent, phrases in PROFILE_INTENTS.items():
 
-    portfolio_words = [
+        score = 0
 
-        "portfolio",
-        "পোর্টফোলিও"
-    ]
+        for phrase in phrases:
 
-    if any(
-        word in text
-        for word in portfolio_words
-    ):
+            phrase_normalized = normalize_text(
+                phrase
+            )
 
-        return (
-            CREATOR_PROFILE[
-                "portfolio_answer"
-            ]
+            if not phrase_normalized:
+                continue
+
+            # Exact phrase
+            if phrase_normalized in user_text:
+
+                score += 10
+
+            # Token overlap
+            phrase_words = tokenize(
+                phrase
+            )
+
+            common = (
+                user_words
+                &
+                phrase_words
+            )
+
+            score += len(common)
+
+        if score > best_score:
+
+            best_score = score
+            best_intent = intent
+
+    if best_intent and best_score >= 3:
+
+        return get_profile_answer(
+            best_intent
         )
 
-    # -----------------------------------------------------
-    # CREATOR / WHO MADE YOU
-    # -----------------------------------------------------
-
-    creator_words = [
-
-        "created",
-        "creator",
-        "made",
-        "built",
-        "design",
-        "designed",
-        "developed",
-        "developer",
-        "বানিয়েছে",
-        "বানাইছে",
-        "বানায়ছে",
-        "তৈরি",
-        "ডিজাইন",
-        "ডেভেলপ",
-        "ক্রিয়েটর"
-    ]
-
-    if any(
-        word in text
-        for word in creator_words
-    ):
-
-        return (
-            CREATOR_PROFILE[
-                "creator_answer"
-            ]
-        )
-
-    # -----------------------------------------------------
-    # FOUNDER
-    # -----------------------------------------------------
-
-    founder_words = [
-
-        "founder",
-        "founder ke",
-        "owner",
-        "প্রতিষ্ঠাতা",
-        "মালিক"
-    ]
-
-    if any(
-        word in text
-        for word in founder_words
-    ):
-
-        return (
-            CREATOR_PROFILE[
-                "founder_answer"
-            ]
-        )
-
-    # -----------------------------------------------------
-    # DEFAULT ABOUT AIMAN
-    # -----------------------------------------------------
-
-    return (
-        CREATOR_PROFILE[
-            "about_answer"
-        ]
-    )
+    return None
 
 
 # =========================================================
@@ -1429,7 +1475,7 @@ def find_product(message):
 
     products = get_products()
 
-    # Exact product name
+    # Exact full product name
     for product in products:
 
         product_name = normalize_text(
@@ -1449,9 +1495,7 @@ def find_product(message):
     # Alias
     aliases_sorted = sorted(
         PRODUCT_ALIASES.items(),
-        key=lambda item: len(
-            item[0]
-        ),
+        key=lambda item: len(item[0]),
         reverse=True
     )
 
@@ -1461,10 +1505,7 @@ def find_product(message):
             alias
         )
 
-        if (
-            alias_normalized
-            and alias_normalized in text
-        ):
+        if alias_normalized in text:
 
             target = normalize_text(
                 product_name
@@ -1543,30 +1584,6 @@ def find_matching_sheet_answer(message):
 
     candidates = []
 
-    generic_words = {
-
-        "price",
-        "dam",
-        "koto",
-        "taka",
-        "tk",
-        "cost",
-        "details",
-        "detail",
-        "good",
-        "best",
-        "ki",
-        "konta",
-        "what",
-        "how",
-        "is",
-        "the",
-        "a",
-        "ami",
-        "chai",
-        "want"
-    }
-
     for index, row in enumerate(rows):
 
         question = normalize_text(
@@ -1615,11 +1632,15 @@ def find_matching_sheet_answer(message):
 
             if user_text == question:
 
+                print(
+                    "EXACT QUESTION MATCH:",
+                    question
+                )
+
                 return answer
 
-        # Exact keyword phrase
+        # Exact keyword phrases
         keyword_phrases = [
-
             k.strip()
             for k in keywords.split(",")
             if k.strip()
@@ -1637,13 +1658,9 @@ def find_matching_sheet_answer(message):
             ):
 
                 candidates.append({
-
                     "score": 100,
-
                     "answer": answer,
-
                     "question": question,
-
                     "index": index
                 })
 
@@ -1657,13 +1674,9 @@ def find_matching_sheet_answer(message):
         ):
 
             candidates.append({
-
                 "score": 95,
-
                 "answer": answer,
-
                 "question": question,
-
                 "index": index
             })
 
@@ -1676,6 +1689,30 @@ def find_matching_sheet_answer(message):
 
         if not common:
             continue
+
+        generic_words = {
+
+            "price",
+            "dam",
+            "koto",
+            "taka",
+            "tk",
+            "cost",
+            "details",
+            "detail",
+            "good",
+            "best",
+            "ki",
+            "konta",
+            "what",
+            "how",
+            "is",
+            "the",
+            "a",
+            "ami",
+            "chai",
+            "want"
+        }
 
         meaningful_common = {
 
@@ -1738,17 +1775,17 @@ def find_matching_sheet_answer(message):
         if score >= 45:
 
             candidates.append({
-
                 "score": score,
-
                 "answer": answer,
-
                 "question": question,
-
                 "index": index
             })
 
     if not candidates:
+
+        print(
+            "SHEET MATCH: NOTHING FOUND"
+        )
 
         return None
 
@@ -1806,11 +1843,7 @@ def find_product_sheet_answer(message):
 
     for alias, target in PRODUCT_ALIASES.items():
 
-        if (
-            normalize_text(target)
-            ==
-            product_name
-        ):
+        if normalize_text(target) == product_name:
 
             aliases_for_product.append(
                 normalize_text(alias)
@@ -1878,9 +1911,7 @@ def find_product_sheet_answer(message):
             target_words
         )
 
-        score = len(
-            common
-        )
+        score = len(common)
 
         if (
             question
@@ -1889,16 +1920,17 @@ def find_product_sheet_answer(message):
 
             score += 20
 
+        # Product itself is important
+        if product_name in user_text:
+
+            score += 10
+
         if score > 0:
 
             candidates.append({
-
                 "score": score,
-
                 "answer": answer,
-
                 "question": question,
-
                 "index": index
             })
 
@@ -2066,10 +2098,9 @@ def save_order(
 
         except Exception:
 
-            next_id = (
-                len(orders)
-                + 1
-            )
+            next_id = len(
+                orders
+            ) + 1
 
     order = {
 
@@ -2152,41 +2183,6 @@ def products_api():
 
 
 # =========================================================
-# PROFILE API
-# =========================================================
-
-@app.route(
-    "/api/profile",
-    methods=["GET"]
-)
-def profile_api():
-
-    return jsonify({
-
-        "name":
-            CREATOR_PROFILE["name"],
-
-        "short_name":
-            CREATOR_PROFILE["short_name"],
-
-        "role":
-            CREATOR_PROFILE["role"],
-
-        "organization":
-            CREATOR_PROFILE["organization"],
-
-        "position":
-            CREATOR_PROFILE["position"],
-
-        "portfolio":
-            CREATOR_PROFILE["portfolio"],
-
-        "description":
-            CREATOR_PROFILE["description"]
-    })
-
-
-# =========================================================
 # ORDERS API
 # =========================================================
 
@@ -2199,6 +2195,62 @@ def orders_api():
     return jsonify(
         get_orders()
     )
+
+
+# =========================================================
+# PROFILE API
+# =========================================================
+
+@app.route(
+    "/api/profile",
+    methods=["GET"]
+)
+def profile_api():
+
+    return jsonify({
+
+        "name":
+            PROFILE["name"],
+
+        "short_name":
+            PROFILE["short_name"],
+
+        "role":
+            PROFILE["role"],
+
+        "education":
+            PROFILE["education"],
+
+        "institution":
+            PROFILE["institution"],
+
+        "field":
+            PROFILE["field"],
+
+        "hometown":
+            PROFILE["hometown"],
+
+        "business":
+            PROFILE["business"],
+
+        "project":
+            PROFILE["project"],
+
+        "portfolio":
+            PROFILE["portfolio"],
+
+        "portfolio_name":
+            PROFILE["portfolio_name"],
+
+        "about":
+            PROFILE["about"],
+
+        "interests":
+            PROFILE["interests"],
+
+        "projects":
+            PROFILE["projects"]
+    })
 
 
 # =========================================================
@@ -2297,11 +2349,21 @@ def debug_api():
         "openai":
             "DISABLED",
 
-        "creator":
-            CREATOR_PROFILE["name"],
+        "profile":
+            {
 
-        "portfolio":
-            CREATOR_PROFILE["portfolio"],
+                "name":
+                    PROFILE["name"],
+
+                "project":
+                    PROFILE["project"],
+
+                "business":
+                    PROFILE["business"],
+
+                "portfolio":
+                    PROFILE["portfolio"]
+            },
 
         "google_sheet": {
 
@@ -2391,16 +2453,6 @@ def test_sheet():
                 "Use ?q=your question"
         })
 
-    profile_answer = None
-
-    if is_profile_question(
-        message
-    ):
-
-        profile_answer = get_profile_answer(
-            message
-        )
-
     answer = find_matching_sheet_answer(
         message
     )
@@ -2411,11 +2463,33 @@ def test_sheet():
         )
     )
 
-    final_answer = (
-        profile_answer
-        or product_answer
-        or answer
+    profile_answer = (
+        find_profile_answer(
+            message
+        )
     )
+
+    final_answer = (
+        product_answer
+        or answer
+        or profile_answer
+    )
+
+    if product_answer:
+
+        source = "google_sheet_product"
+
+    elif answer:
+
+        source = "google_sheet"
+
+    elif profile_answer:
+
+        source = "profile"
+
+    else:
+
+        source = "missing"
 
     return jsonify({
 
@@ -2427,22 +2501,20 @@ def test_sheet():
                 message
             ),
 
-        "profile_question":
-            is_profile_question(
-                message
-            ),
-
-        "profile_answer":
-            profile_answer,
-
         "general_sheet_answer":
             answer,
 
         "product_sheet_answer":
             product_answer,
 
+        "profile_answer":
+            profile_answer,
+
         "final_answer":
             final_answer,
+
+        "source":
+            source,
 
         "sheet_rows":
             len(
@@ -2499,42 +2571,7 @@ def chat():
 
 
     # =====================================================
-    # 1. CREATOR PROFILE QUESTIONS
-    # =====================================================
-
-    if is_profile_question(
-        message
-    ):
-
-        profile_answer = get_profile_answer(
-            message
-        )
-
-        print(
-            "FINAL SOURCE:",
-            "CREATOR_PROFILE"
-        )
-
-        return jsonify({
-
-            "reply":
-                profile_answer,
-
-            "order_created":
-                False,
-
-            "source":
-                "creator_profile",
-
-            "portfolio":
-                CREATOR_PROFILE[
-                    "portfolio"
-                ]
-        })
-
-
-    # =====================================================
-    # 2. PRODUCT DETECTION
+    # PRODUCT DETECTION
     # =====================================================
 
     product = find_product(
@@ -2550,7 +2587,7 @@ def chat():
 
 
     # =====================================================
-    # 3. PRODUCT-SPECIFIC SHEET ANSWER
+    # 1. PRODUCT-SPECIFIC SHEET
     # =====================================================
 
     product_answer = (
@@ -2562,8 +2599,7 @@ def chat():
     if product_answer:
 
         print(
-            "FINAL SOURCE:",
-            "PRODUCT SHEET"
+            "FINAL SOURCE: PRODUCT SHEET"
         )
 
         return jsonify({
@@ -2580,7 +2616,7 @@ def chat():
 
 
     # =====================================================
-    # 4. GENERAL SHEET ANSWER
+    # 2. GENERAL GOOGLE SHEET
     # =====================================================
 
     sheet_answer = (
@@ -2592,8 +2628,7 @@ def chat():
     if sheet_answer:
 
         print(
-            "FINAL SOURCE:",
-            "GOOGLE SHEET"
+            "FINAL SOURCE: GOOGLE SHEET"
         )
 
         return jsonify({
@@ -2610,20 +2645,46 @@ def chat():
 
 
     # =====================================================
-    # 5. ORDER REQUEST
+    # 3. PROFILE SYSTEM
     # =====================================================
 
-    if is_order_request(
-        message
-    ):
+    profile_answer = (
+        find_profile_answer(
+            message
+        )
+    )
+
+    if profile_answer:
+
+        print(
+            "FINAL SOURCE: PROFILE"
+        )
 
         return jsonify({
 
             "reply":
-                "অর্ডার সংক্রান্ত তথ্য "
-                "Google Sheet-এ পাওয়া যায়নি। "
-                "অনুগ্রহ করে Sheet-এ এই "
-                "প্রশ্নের উত্তর যোগ করুন।",
+                profile_answer,
+
+            "order_created":
+                False,
+
+            "source":
+                "profile"
+        })
+
+
+    # =====================================================
+    # 4. ORDER REQUEST
+    # =====================================================
+
+    if is_order_request(message):
+
+        return jsonify({
+
+            "reply":
+                "অর্ডার সংক্রান্ত তথ্য Google Sheet-এ "
+                "পাওয়া যায়নি। অনুগ্রহ করে Sheet-এ "
+                "এই প্রশ্নের উত্তর যোগ করুন।",
 
             "order_created":
                 False,
@@ -2634,20 +2695,20 @@ def chat():
 
 
     # =====================================================
-    # 6. NOTHING FOUND
+    # 5. NOTHING FOUND
     # =====================================================
 
     return jsonify({
 
         "reply":
-            "দুঃখিত, এই প্রশ্নের উত্তর "
-            "আমার Google Sheet-এ পাওয়া যায়নি।",
+            "দুঃখিত, এই প্রশ্নের উত্তর আমার "
+            "Google Sheet বা Profile-এ পাওয়া যায়নি।",
 
         "order_created":
             False,
 
         "source":
-            "google_sheet_missing"
+            "knowledge_missing"
     })
 
 
@@ -2685,18 +2746,14 @@ def health():
                 "last_error"
             ),
 
-        "creator_profile":
+        "profile_enabled":
             True,
 
-        "creator":
-            CREATOR_PROFILE[
-                "name"
-            ],
+        "profile_name":
+            PROFILE["name"],
 
-        "portfolio":
-            CREATOR_PROFILE[
-                "portfolio"
-            ],
+        "portfolio_enabled":
+            True,
 
         "total_products":
             len(
@@ -2718,17 +2775,12 @@ if __name__ == "__main__":
 
     print("")
     print("=" * 60)
-    print(
-        "              EZKROY AI"
-    )
-    print(
-        "     SALES AGENT + CREATOR PROFILE"
-    )
+    print("             EZKROY AI")
     print("=" * 60)
 
     print(
         "MODE:",
-        "GOOGLE SHEET + CREATOR PROFILE"
+        "GOOGLE SHEET + PROFILE"
     )
 
     print(
@@ -2737,13 +2789,18 @@ if __name__ == "__main__":
     )
 
     print(
-        "CREATOR:",
-        CREATOR_PROFILE["name"]
+        "PROFILE:",
+        PROFILE["name"]
+    )
+
+    print(
+        "PROJECT:",
+        PROFILE["project"]
     )
 
     print(
         "PORTFOLIO:",
-        CREATOR_PROFILE["portfolio"]
+        PROFILE["portfolio"]
     )
 
     print(
@@ -2754,14 +2811,17 @@ if __name__ == "__main__":
     print(
         "PRODUCTS:",
         len(
-            INITIAL_PRODUCTS
+            get_products()
         )
     )
 
     print("=" * 60)
 
 
-    # Load Sheet immediately
+    # =====================================================
+    # LOAD SHEET IMMEDIATELY
+    # =====================================================
+
     download_google_sheet()
 
 
@@ -2775,3 +2835,4 @@ if __name__ == "__main__":
         port=5000,
         debug=True
     )
+```
