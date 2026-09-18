@@ -1,316 +1,2136 @@
+```html
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EZKROY - AI Sales & Analytics Dashboard</title>
-    <!-- Tailwind CSS CDN -->
+
+    <!-- =========================================================
+         TAILWIND CSS
+    ========================================================== -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: false,
+
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#0b0f19',
-                        cardBg: '#131b2e',
-                        cardBorder: '#1e293b',
-                        accentBlue: '#3b82f6',
-                        accentHover: '#2563eb'
+                        skyPrimary: '#0EA5E9',
+                        skyDark: '#0284C7',
+                        skyLight: '#38BDF8',
+                        skyPale: '#F0F9FF',
+
+                        appBg: '#F5FBFF',
+                        cardBg: '#FFFFFF',
+                        cardBorder: '#D9F0FC',
+
+                        darkText: '#0F172A',
+                        mutedText: '#64748B'
+                    },
+
+                    boxShadow: {
+                        soft: '0 8px 30px rgba(14, 165, 233, 0.08)',
+                        blue: '0 8px 25px rgba(14, 165, 233, 0.18)'
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome & Chart.js -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- =========================================================
+         FONT AWESOME
+    ========================================================== -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <!-- =========================================================
+         CHART.JS
+    ========================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- =========================================================
+         CUSTOM STYLE
+    ========================================================== -->
+    <style>
+
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #BAE6FD transparent;
+        }
+
+        *::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: #BAE6FD;
+            border-radius: 999px;
+        }
+
+        body {
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(56, 189, 248, 0.10),
+                    transparent 28%
+                ),
+                #F5FBFF;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+        }
+
+        .sidebar-gradient {
+            background:
+                linear-gradient(
+                    180deg,
+                    #FFFFFF 0%,
+                    #F8FDFF 100%
+                );
+        }
+
+        .sky-gradient {
+            background:
+                linear-gradient(
+                    135deg,
+                    #0284C7 0%,
+                    #0EA5E9 50%,
+                    #38BDF8 100%
+                );
+        }
+
+        .sky-gradient-light {
+            background:
+                linear-gradient(
+                    135deg,
+                    #E0F7FF 0%,
+                    #F0F9FF 100%
+                );
+        }
+
+        .nav-active {
+            background:
+                linear-gradient(
+                    135deg,
+                    #0284C7,
+                    #0EA5E9
+                );
+            box-shadow:
+                0 8px 20px rgba(14, 165, 233, 0.20);
+        }
+
+        .card-hover {
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 12px 35px rgba(14, 165, 233, 0.10);
+            border-color: #BAE6FD;
+        }
+
+        .input-focus:focus {
+            border-color: #38BDF8 !important;
+            box-shadow:
+                0 0 0 3px rgba(56, 189, 248, 0.12);
+        }
+
+    </style>
 </head>
-<body class="bg-darkBg text-slate-100 font-sans antialiased h-screen overflow-hidden flex">
 
-    <!-- Sidebar (Minimalist SellzyBD Inspired, Chat First) -->
-    <aside class="w-20 lg:w-64 bg-cardBg border-r border-cardBorder flex flex-col justify-between transition-all duration-300 z-20">
+
+<body class="text-slate-900 font-sans antialiased h-screen overflow-hidden flex">
+
+
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
+    <aside
+        class="
+            w-20
+            lg:w-64
+            sidebar-gradient
+            border-r
+            border-sky-100
+            flex
+            flex-col
+            justify-between
+            transition-all
+            duration-300
+            z-20
+            shrink-0
+        "
+    >
+
         <div>
-            <!-- Brand Logo (SVG Vector - Never Fails) -->
-            <div class="h-16 flex items-center px-4 lg:px-6 border-b border-cardBorder gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0">
-                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+            <!-- BRAND -->
+            <div
+                class="
+                    h-16
+                    flex
+                    items-center
+                    px-4
+                    lg:px-6
+                    border-b
+                    border-sky-100
+                    gap-3
+                "
+            >
+
+                <!-- LOGO -->
+                <div
+                    class="
+                        w-10
+                        h-10
+                        rounded-2xl
+                        sky-gradient
+                        flex
+                        items-center
+                        justify-center
+                        shadow-blue
+                        shrink-0
+                    "
+                >
+
+                    <svg
+                        class="w-5 h-5 text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+
                         <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
+
+                        <line
+                            x1="3"
+                            y1="6"
+                            x2="21"
+                            y2="6"
+                        ></line>
+
                         <path d="M16 10a4 4 0 0 1-8 0"></path>
+
                     </svg>
+
                 </div>
-                <span class="hidden lg:inline font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">EZKROY</span>
+
+
+                <!-- BRAND NAME -->
+                <span
+                    class="
+                        hidden
+                        lg:inline
+                        font-extrabold
+                        text-xl
+                        tracking-tight
+                        bg-gradient-to-r
+                        from-sky-700
+                        via-sky-500
+                        to-cyan-400
+                        bg-clip-text
+                        text-transparent
+                    "
+                >
+                    EZKROY
+                </span>
+
             </div>
 
-            <!-- Nav Links (Chat First Priority) -->
+
+            <!-- NAVIGATION -->
+
             <nav class="p-3 space-y-2">
-                <button onclick="switchTab('chat')" id="nav-chat" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-blue-600 text-white font-medium shadow-lg shadow-blue-500/20 transition-all">
+
+                <!-- CHAT -->
+
+                <button
+                    onclick="switchTab('chat')"
+                    id="nav-chat"
+                    class="
+                        nav-active
+                        w-full
+                        flex
+                        items-center
+                        gap-3
+                        px-3.5
+                        py-3
+                        rounded-xl
+                        text-white
+                        font-semibold
+                        transition-all
+                    "
+                >
+
                     <i class="fa-solid fa-comments text-lg shrink-0"></i>
-                    <span class="hidden lg:inline">AI Sales Chat</span>
+
+                    <span class="hidden lg:inline">
+                        AI Sales Chat
+                    </span>
+
                 </button>
-                <button onclick="switchTab('performance')" id="nav-performance" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all">
+
+
+                <!-- PERFORMANCE -->
+
+                <button
+                    onclick="switchTab('performance')"
+                    id="nav-performance"
+                    class="
+                        w-full
+                        flex
+                        items-center
+                        gap-3
+                        px-3.5
+                        py-3
+                        rounded-xl
+                        text-slate-500
+                        hover:text-sky-700
+                        hover:bg-sky-50
+                        font-medium
+                        transition-all
+                    "
+                >
+
                     <i class="fa-solid fa-chart-line text-lg shrink-0"></i>
-                    <span class="hidden lg:inline">Performance</span>
+
+                    <span class="hidden lg:inline">
+                        Performance
+                    </span>
+
                 </button>
-                <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all">
+
+
+                <!-- PRODUCTS -->
+
+                <button
+                    onclick="switchTab('products')"
+                    id="nav-products"
+                    class="
+                        w-full
+                        flex
+                        items-center
+                        gap-3
+                        px-3.5
+                        py-3
+                        rounded-xl
+                        text-slate-500
+                        hover:text-sky-700
+                        hover:bg-sky-50
+                        font-medium
+                        transition-all
+                    "
+                >
+
                     <i class="fa-solid fa-box-archive text-lg shrink-0"></i>
-                    <span class="hidden lg:inline">Products & Sheet</span>
+
+                    <span class="hidden lg:inline">
+                        Products & Sheet
+                    </span>
+
                 </button>
-                <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all">
+
+
+                <!-- SETTINGS -->
+
+                <button
+                    onclick="switchTab('settings')"
+                    id="nav-settings"
+                    class="
+                        w-full
+                        flex
+                        items-center
+                        gap-3
+                        px-3.5
+                        py-3
+                        rounded-xl
+                        text-slate-500
+                        hover:text-sky-700
+                        hover:bg-sky-50
+                        font-medium
+                        transition-all
+                    "
+                >
+
                     <i class="fa-solid fa-gear text-lg shrink-0"></i>
-                    <span class="hidden lg:inline">Settings</span>
+
+                    <span class="hidden lg:inline">
+                        Settings
+                    </span>
+
                 </button>
+
             </nav>
+
         </div>
 
-        <!-- User Profile Bottom -->
-        <div class="p-4 border-t border-cardBorder flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold text-sm shrink-0">A</div>
-            <div class="hidden lg:block truncate">
-                <p class="text-sm font-semibold text-slate-200 truncate">Store Admin</p>
-                <p class="text-xs text-slate-400 truncate">admin@ezkroy.com</p>
+
+        <!-- =====================================================
+             USER PROFILE
+        ====================================================== -->
+
+        <div
+            class="
+                p-4
+                border-t
+                border-sky-100
+                flex
+                items-center
+                gap-3
+            "
+        >
+
+            <div
+                class="
+                    w-10
+                    h-10
+                    rounded-full
+                    sky-gradient-light
+                    border
+                    border-sky-200
+                    flex
+                    items-center
+                    justify-center
+                    text-sky-700
+                    font-bold
+                    text-sm
+                    shrink-0
+                "
+            >
+                A
             </div>
+
+
+            <div class="hidden lg:block truncate">
+
+                <p
+                    class="
+                        text-sm
+                        font-semibold
+                        text-slate-800
+                        truncate
+                    "
+                >
+                    Store Admin
+                </p>
+
+                <p
+                    class="
+                        text-xs
+                        text-slate-400
+                        truncate
+                    "
+                >
+                    admin@ezkroy.com
+                </p>
+
+            </div>
+
         </div>
+
     </aside>
 
-    <!-- Main Content Area -->
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        <!-- Topbar -->
-        <header class="h-16 bg-cardBg border-b border-cardBorder px-6 flex items-center justify-between shrink-0">
+
+
+        <!-- =====================================================
+             TOPBAR
+        ====================================================== -->
+
+        <header
+            class="
+                h-16
+                glass
+                border-b
+                border-sky-100
+                px-4
+                lg:px-6
+                flex
+                items-center
+                justify-between
+                shrink-0
+            "
+        >
+
             <div class="flex items-center gap-3">
-                <h1 id="page-title" class="text-lg font-semibold text-slate-100">AI Sales Assistant</h1>
-                <span class="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Sheet Sync Active</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="relative hidden sm:block">
-                    <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" placeholder="Search sheet database..." class="bg-darkBg border border-cardBorder rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500 w-64 transition-all">
+
+                <div>
+
+                    <h1
+                        id="page-title"
+                        class="
+                            text-lg
+                            font-bold
+                            text-slate-800
+                        "
+                    >
+                        AI Sales Assistant
+                    </h1>
+
                 </div>
-                <button class="w-10 h-10 rounded-xl bg-darkBg border border-cardBorder flex items-center justify-center text-slate-300 hover:text-white transition-all">
-                    <i class="fa-regular fa-bell"></i>
-                </button>
+
+
+                <!-- SYNC STATUS -->
+
+                <span
+                    class="
+                        hidden
+                        sm:inline-flex
+                        items-center
+                        gap-1.5
+                        text-xs
+                        px-2.5
+                        py-1
+                        rounded-full
+                        bg-sky-50
+                        text-sky-700
+                        border
+                        border-sky-200
+                        font-semibold
+                    "
+                >
+
+                    <span
+                        class="
+                            w-1.5
+                            h-1.5
+                            rounded-full
+                            bg-emerald-500
+                        "
+                    ></span>
+
+                    Sheet Sync Active
+
+                </span>
+
             </div>
+
+
+            <!-- TOP RIGHT -->
+
+            <div class="flex items-center gap-3">
+
+
+                <!-- SEARCH -->
+
+                <div class="relative hidden md:block">
+
+                    <i
+                        class="
+                            fa-solid
+                            fa-search
+                            absolute
+                            left-3.5
+                            top-1/2
+                            -translate-y-1/2
+                            text-slate-400
+                            text-sm
+                        "
+                    ></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search sheet database..."
+                        class="
+                            bg-sky-50/50
+                            border
+                            border-sky-100
+                            rounded-xl
+                            pl-10
+                            pr-4
+                            py-2
+                            text-sm
+                            text-slate-700
+                            placeholder-slate-400
+                            focus:outline-none
+                            input-focus
+                            w-64
+                            transition-all
+                        "
+                    >
+
+                </div>
+
+
+                <!-- NOTIFICATION -->
+
+                <button
+                    class="
+                        w-10
+                        h-10
+                        rounded-xl
+                        bg-white
+                        border
+                        border-sky-100
+                        flex
+                        items-center
+                        justify-center
+                        text-slate-500
+                        hover:text-sky-600
+                        hover:bg-sky-50
+                        transition-all
+                    "
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                </button>
+
+            </div>
+
         </header>
 
-        <!-- Dynamic Views Container -->
-        <main class="flex-1 overflow-y-auto p-6 bg-darkBg relative">
 
-            <!-- TAB 1: AI SALES CHAT VIEW (Default & Priority) -->
-            <div id="view-chat" class="space-y-6 max-w-4xl mx-auto h-full flex flex-col">
-                <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 flex-1 flex flex-col shadow-xl">
-                    <!-- Chat Header Info -->
-                    <div class="flex items-center justify-between pb-4 border-b border-cardBorder">
+
+        <!-- =====================================================
+             MAIN
+        ====================================================== -->
+
+        <main
+            class="
+                flex-1
+                overflow-y-auto
+                p-4
+                lg:p-6
+                bg-appBg
+                relative
+            "
+        >
+
+
+            <!-- =================================================
+                 TAB 1 — CHAT
+            ================================================== -->
+
+            <div
+                id="view-chat"
+                class="
+                    space-y-6
+                    max-w-5xl
+                    mx-auto
+                    h-full
+                    flex
+                    flex-col
+                "
+            >
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-sky-100
+                        rounded-2xl
+                        p-4
+                        flex-1
+                        flex
+                        flex-col
+                        shadow-soft
+                        card-hover
+                    "
+                >
+
+
+                    <!-- CHAT HEADER -->
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            justify-between
+                            pb-4
+                            border-b
+                            border-sky-100
+                        "
+                    >
+
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                                <i class="fa-solid fa-robot"></i>
+
+                            <div
+                                class="
+                                    w-11
+                                    h-11
+                                    rounded-2xl
+                                    sky-gradient-light
+                                    border
+                                    border-sky-200
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-sky-600
+                                "
+                            >
+
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-robot
+                                        text-lg
+                                    "
+                                ></i>
+
                             </div>
+
+
                             <div>
-                                <h3 class="font-semibold text-slate-200">EZKROY Sheet Bot</h3>
-                                <p class="text-xs text-slate-400">Answering automatically based on your uploaded sheet data</p>
+
+                                <h3
+                                    class="
+                                        font-bold
+                                        text-slate-800
+                                    "
+                                >
+                                    EZKROY Sheet Bot
+                                </h3>
+
+                                <p
+                                    class="
+                                        text-xs
+                                        text-slate-400
+                                        mt-0.5
+                                    "
+                                >
+                                    AI assistant powered by your business data
+                                </p>
+
                             </div>
+
                         </div>
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+
+
+                        <!-- ONLINE -->
+
+                        <span
+                            class="
+                                flex
+                                items-center
+                                gap-2
+                                text-xs
+                                font-medium
+                                text-emerald-600
+                            "
+                        >
+
+                            <span
+                                class="
+                                    w-2.5
+                                    h-2.5
+                                    rounded-full
+                                    bg-emerald-500
+                                    animate-pulse
+                                "
+                            ></span>
+
+                            Online
+
+                        </span>
+
                     </div>
 
-                    <!-- Chat Messages Box -->
-                    <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-4 pr-2">
+
+
+                    <!-- CHAT MESSAGES -->
+
+                    <div
+                        id="chat-messages"
+                        class="
+                            flex-1
+                            overflow-y-auto
+                            py-5
+                            space-y-5
+                            pr-2
+                        "
+                    >
+
+                        <!-- BOT MESSAGE -->
+
                         <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 mt-1 shadow-md">
-                                <i class="fa-solid fa-robot text-xs"></i>
+
+                            <div
+                                class="
+                                    w-9
+                                    h-9
+                                    rounded-xl
+                                    sky-gradient
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-white
+                                    shrink-0
+                                    mt-1
+                                    shadow-blue
+                                "
+                            >
+
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-robot
+                                        text-xs
+                                    "
+                                ></i>
+
                             </div>
-                            <div class="bg-slate-800/80 border border-cardBorder rounded-2xl p-4 text-sm text-slate-200 max-w-lg shadow-sm">
-                                হ্যালো! আমি EZKROY এআই অ্যাসিস্ট্যান্ট। আপনার শিটের ডেটা অনুযায়ী গ্রাহকদের যেকোনো প্রশ্নের উত্তর দিতে আমি প্রস্তুত বলুন কি জানতে চান?
+
+
+                            <div
+                                class="
+                                    bg-sky-50
+                                    border
+                                    border-sky-100
+                                    rounded-2xl
+                                    rounded-tl-md
+                                    p-4
+                                    text-sm
+                                    text-slate-700
+                                    max-w-lg
+                                    shadow-sm
+                                "
+                            >
+
+                                হ্যালো! আমি <strong class="text-sky-700">EZKROY AI Assistant</strong>।
+                                আপনার business sheet-এর data অনুযায়ী customer-এর প্রশ্নের উত্তর দিতে আমি প্রস্তুত।
+                                বলুন, কী জানতে চান?
+
                             </div>
+
                         </div>
+
                     </div>
 
-                    <!-- Chat Input Area -->
-                    <div class="pt-3 border-t border-cardBorder">
-                        <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-3">
-                            <input type="text" id="chat-input" placeholder="Ask anything from your connected sheet..." class="flex-1 bg-darkBg border border-cardBorder rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center">
+
+
+                    <!-- CHAT INPUT -->
+
+                    <div
+                        class="
+                            pt-3
+                            border-t
+                            border-sky-100
+                        "
+                    >
+
+                        <form
+                            id="chat-form"
+                            onsubmit="handleChatSubmit(event)"
+                            class="
+                                flex
+                                items-center
+                                gap-3
+                            "
+                        >
+
+                            <input
+                                type="text"
+                                id="chat-input"
+                                placeholder="Ask anything from your connected sheet..."
+                                class="
+                                    flex-1
+                                    bg-sky-50/50
+                                    border
+                                    border-sky-100
+                                    rounded-xl
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    text-slate-700
+                                    placeholder-slate-400
+                                    focus:outline-none
+                                    input-focus
+                                    transition-all
+                                "
+                            >
+
+
+                            <button
+                                type="submit"
+                                class="
+                                    sky-gradient
+                                    hover:opacity-90
+                                    text-white
+                                    px-5
+                                    py-3
+                                    rounded-xl
+                                    font-semibold
+                                    transition-all
+                                    shadow-blue
+                                    flex
+                                    items-center
+                                    justify-center
+                                "
+                            >
+
                                 <i class="fa-solid fa-paper-plane"></i>
+
                             </button>
+
                         </form>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- TAB 2: PERFORMANCE VIEW -->
-            <div id="view-performance" class="space-y-6 hidden">
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
-                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Revenue</p>
-                        <h3 class="text-2xl font-bold text-slate-100 mt-2">$24,580</h3>
-                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +14.2% this month</span>
+
+
+            <!-- =================================================
+                 TAB 2 — PERFORMANCE
+            ================================================== -->
+
+            <div
+                id="view-performance"
+                class="space-y-6 hidden"
+            >
+
+                <!-- STATS -->
+
+                <div
+                    class="
+                        grid
+                        grid-cols-1
+                        sm:grid-cols-2
+                        lg:grid-cols-4
+                        gap-4
+                    "
+                >
+
+
+                    <!-- REVENUE -->
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-sky-100
+                            rounded-2xl
+                            p-5
+                            shadow-soft
+                            card-hover
+                        "
+                    >
+
+                        <div class="flex items-start justify-between">
+
+                            <div>
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-semibold
+                                        text-slate-400
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Total Revenue
+                                </p>
+
+                                <h3
+                                    class="
+                                        text-2xl
+                                        font-extrabold
+                                        text-slate-800
+                                        mt-2
+                                    "
+                                >
+                                    $24,580
+                                </h3>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-xl
+                                    bg-sky-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-sky-600
+                                "
+                            >
+
+                                <i class="fa-solid fa-dollar-sign"></i>
+
+                            </div>
+
+                        </div>
+
+                        <span
+                            class="
+                                text-xs
+                                text-emerald-600
+                                font-semibold
+                                mt-3
+                                inline-block
+                            "
+                        >
+
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                            +14.2% this month
+
+                        </span>
+
                     </div>
-                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
-                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Sheet Queries Handled</p>
-                        <h3 class="text-2xl font-bold text-slate-100 mt-2">1,420</h3>
-                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +8.5% automation</span>
+
+
+
+                    <!-- QUERIES -->
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-sky-100
+                            rounded-2xl
+                            p-5
+                            shadow-soft
+                            card-hover
+                        "
+                    >
+
+                        <div class="flex items-start justify-between">
+
+                            <div>
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-semibold
+                                        text-slate-400
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Sheet Queries
+                                </p>
+
+                                <h3
+                                    class="
+                                        text-2xl
+                                        font-extrabold
+                                        text-slate-800
+                                        mt-2
+                                    "
+                                >
+                                    1,420
+                                </h3>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-xl
+                                    bg-sky-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-sky-600
+                                "
+                            >
+
+                                <i class="fa-solid fa-message"></i>
+
+                            </div>
+
+                        </div>
+
+                        <span
+                            class="
+                                text-xs
+                                text-emerald-600
+                                font-semibold
+                                mt-3
+                                inline-block
+                            "
+                        >
+
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                            +8.5% automation
+
+                        </span>
+
                     </div>
-                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
-                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Customers</p>
-                        <h3 class="text-2xl font-bold text-slate-100 mt-2">840</h3>
-                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +5.1% growth</span>
+
+
+
+                    <!-- CUSTOMERS -->
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-sky-100
+                            rounded-2xl
+                            p-5
+                            shadow-soft
+                            card-hover
+                        "
+                    >
+
+                        <div class="flex items-start justify-between">
+
+                            <div>
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-semibold
+                                        text-slate-400
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Active Customers
+                                </p>
+
+                                <h3
+                                    class="
+                                        text-2xl
+                                        font-extrabold
+                                        text-slate-800
+                                        mt-2
+                                    "
+                                >
+                                    840
+                                </h3>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-xl
+                                    bg-sky-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-sky-600
+                                "
+                            >
+
+                                <i class="fa-solid fa-users"></i>
+
+                            </div>
+
+                        </div>
+
+                        <span
+                            class="
+                                text-xs
+                                text-emerald-600
+                                font-semibold
+                                mt-3
+                                inline-block
+                            "
+                        >
+
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                            +5.1% growth
+
+                        </span>
+
                     </div>
-                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
-                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">AI Accuracy Rate</p>
-                        <h3 class="text-2xl font-bold text-slate-100 mt-2">98.4%</h3>
-                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-check"></i> Optimized</span>
+
+
+
+                    <!-- AI ACCURACY -->
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-sky-100
+                            rounded-2xl
+                            p-5
+                            shadow-soft
+                            card-hover
+                        "
+                    >
+
+                        <div class="flex items-start justify-between">
+
+                            <div>
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-semibold
+                                        text-slate-400
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    AI Accuracy
+                                </p>
+
+                                <h3
+                                    class="
+                                        text-2xl
+                                        font-extrabold
+                                        text-slate-800
+                                        mt-2
+                                    "
+                                >
+                                    98.4%
+                                </h3>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-xl
+                                    bg-sky-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-sky-600
+                                "
+                            >
+
+                                <i class="fa-solid fa-brain"></i>
+
+                            </div>
+
+                        </div>
+
+                        <span
+                            class="
+                                text-xs
+                                text-emerald-600
+                                font-semibold
+                                mt-3
+                                inline-block
+                            "
+                        >
+
+                            <i class="fa-solid fa-check"></i>
+                            Optimized
+
+                        </span>
+
                     </div>
+
                 </div>
 
-                <!-- Chart Card -->
-                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm">
-                    <h3 class="text-base font-semibold text-slate-200 mb-4">Revenue & Query Performance Trend</h3>
+
+
+                <!-- CHART -->
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-sky-100
+                        rounded-2xl
+                        p-6
+                        shadow-soft
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            justify-between
+                            mb-5
+                        "
+                    >
+
+                        <div>
+
+                            <h3
+                                class="
+                                    text-base
+                                    font-bold
+                                    text-slate-800
+                                "
+                            >
+                                Revenue & Query Performance
+                            </h3>
+
+                            <p
+                                class="
+                                    text-xs
+                                    text-slate-400
+                                    mt-1
+                                "
+                            >
+                                Your business activity overview
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
                     <div class="h-72 w-full">
+
                         <canvas id="performanceChart"></canvas>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- TAB 3: PRODUCTS & SHEET SYNC VIEW -->
-            <div id="view-products" class="space-y-6 hidden">
-                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-base font-semibold text-slate-200">Connected Sheet & Products Data</h3>
-                        <button class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-medium transition-all">Sync Sheet</button>
+
+
+            <!-- =================================================
+                 TAB 3 — PRODUCTS & SHEET
+            ================================================== -->
+
+            <div
+                id="view-products"
+                class="space-y-6 hidden"
+            >
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-sky-100
+                        rounded-2xl
+                        p-6
+                        shadow-soft
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            flex-col
+                            sm:flex-row
+                            sm:items-center
+                            justify-between
+                            gap-3
+                            mb-4
+                        "
+                    >
+
+                        <div>
+
+                            <h3
+                                class="
+                                    text-base
+                                    font-bold
+                                    text-slate-800
+                                "
+                            >
+                                Connected Sheet & Products Data
+                            </h3>
+
+                            <p
+                                class="
+                                    text-xs
+                                    text-slate-400
+                                    mt-1
+                                "
+                            >
+                                Manage your AI knowledge source
+                            </p>
+
+                        </div>
+
+
+                        <button
+                            class="
+                                sky-gradient
+                                hover:opacity-90
+                                text-white
+                                text-xs
+                                px-4
+                                py-2.5
+                                rounded-xl
+                                font-semibold
+                                transition-all
+                                shadow-blue
+                            "
+                        >
+
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i>
+
+                            Sync Sheet
+
+                        </button>
+
                     </div>
-                    <p class="text-sm text-slate-400 mb-6">Your AI bot reads answers directly from your active Google Sheet / CSV database.</p>
+
+
+                    <p
+                        class="
+                            text-sm
+                            text-slate-500
+                            mb-6
+                            bg-sky-50
+                            border
+                            border-sky-100
+                            rounded-xl
+                            p-3
+                        "
+                    >
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-circle-info
+                                text-sky-500
+                                mr-2
+                            "
+                        ></i>
+
+                        Your AI bot reads answers directly from your active
+                        Google Sheet / CSV database.
+
+                    </p>
+
+
+                    <!-- TABLE -->
+
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-300">
-                            <thead class="bg-darkBg text-xs uppercase text-slate-400 border-b border-cardBorder">
+
+                        <table
+                            class="
+                                w-full
+                                text-left
+                                text-sm
+                                text-slate-600
+                            "
+                        >
+
+                            <thead
+                                class="
+                                    bg-sky-50
+                                    text-xs
+                                    uppercase
+                                    text-slate-500
+                                    border-b
+                                    border-sky-100
+                                "
+                            >
+
                                 <tr>
-                                    <th class="p-3 rounded-l-xl">Question Key</th>
-                                    <th class="p-3">Automated Answer</th>
-                                    <th class="p-3 rounded-r-xl">Status</th>
+
+                                    <th class="p-3 rounded-l-xl">
+                                        Question Key
+                                    </th>
+
+                                    <th class="p-3">
+                                        Automated Answer
+                                    </th>
+
+                                    <th class="p-3 rounded-r-xl">
+                                        Status
+                                    </th>
+
                                 </tr>
+
                             </thead>
-                            <tbody class="divide-y divide-cardBorder">
-                                <tr>
-                                    <td class="p-3 font-medium text-slate-200">Delivery charge koto?</td>
-                                    <td class="p-3 text-slate-400">Inside Dhaka 60 TK, Outside Dhaka 120 TK.</td>
-                                    <td class="p-3"><span class="px-2 py-1 text-xs bg-emerald-500/10 text-emerald-400 rounded-md border border-emerald-500/20">Synced</span></td>
+
+
+                            <tbody
+                                class="
+                                    divide-y
+                                    divide-sky-100
+                                "
+                            >
+
+                                <tr
+                                    class="
+                                        hover:bg-sky-50/40
+                                        transition
+                                    "
+                                >
+
+                                    <td
+                                        class="
+                                            p-3
+                                            font-semibold
+                                            text-slate-700
+                                        "
+                                    >
+                                        Delivery charge koto?
+                                    </td>
+
+                                    <td class="p-3 text-slate-500">
+                                        Inside Dhaka 60 TK, Outside Dhaka 120 TK.
+                                    </td>
+
+                                    <td class="p-3">
+
+                                        <span
+                                            class="
+                                                inline-flex
+                                                items-center
+                                                gap-1.5
+                                                px-2.5
+                                                py-1
+                                                text-xs
+                                                bg-emerald-50
+                                                text-emerald-600
+                                                rounded-md
+                                                border
+                                                border-emerald-100
+                                                font-medium
+                                            "
+                                        >
+
+                                            <span
+                                                class="
+                                                    w-1.5
+                                                    h-1.5
+                                                    rounded-full
+                                                    bg-emerald-500
+                                                "
+                                            ></span>
+
+                                            Synced
+
+                                        </span>
+
+                                    </td>
+
                                 </tr>
-                                <tr>
-                                    <td class="p-3 font-medium text-slate-200">Order kivabe korbo?</td>
-                                    <td class="p-3 text-slate-400">Order button-e click kore form fillup korun.</td>
-                                    <td class="p-3"><span class="px-2 py-1 text-xs bg-emerald-500/10 text-emerald-400 rounded-md border border-emerald-500/20">Synced</span></td>
+
+
+                                <tr
+                                    class="
+                                        hover:bg-sky-50/40
+                                        transition
+                                    "
+                                >
+
+                                    <td
+                                        class="
+                                            p-3
+                                            font-semibold
+                                            text-slate-700
+                                        "
+                                    >
+                                        Order kivabe korbo?
+                                    </td>
+
+                                    <td class="p-3 text-slate-500">
+                                        Order button-e click kore form fillup korun.
+                                    </td>
+
+                                    <td class="p-3">
+
+                                        <span
+                                            class="
+                                                inline-flex
+                                                items-center
+                                                gap-1.5
+                                                px-2.5
+                                                py-1
+                                                text-xs
+                                                bg-emerald-50
+                                                text-emerald-600
+                                                rounded-md
+                                                border
+                                                border-emerald-100
+                                                font-medium
+                                            "
+                                        >
+
+                                            <span
+                                                class="
+                                                    w-1.5
+                                                    h-1.5
+                                                    rounded-full
+                                                    bg-emerald-500
+                                                "
+                                            ></span>
+
+                                            Synced
+
+                                        </span>
+
+                                    </td>
+
                                 </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- TAB 4: SETTINGS VIEW -->
-            <div id="view-settings" class="space-y-6 hidden max-w-2xl mx-auto">
-                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm space-y-4">
-                    <h3 class="text-base font-semibold text-slate-200">Store Settings</h3>
+
+
+            <!-- =================================================
+                 TAB 4 — SETTINGS
+            ================================================== -->
+
+            <div
+                id="view-settings"
+                class="
+                    space-y-6
+                    hidden
+                    max-w-2xl
+                    mx-auto
+                "
+            >
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-sky-100
+                        rounded-2xl
+                        p-6
+                        shadow-soft
+                        space-y-5
+                    "
+                >
+
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Store Name</label>
-                        <input type="text" value="EZKROY Store" class="w-full bg-darkBg border border-cardBorder rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+
+                        <h3
+                            class="
+                                text-base
+                                font-bold
+                                text-slate-800
+                            "
+                        >
+                            Store Settings
+                        </h3>
+
+                        <p
+                            class="
+                                text-xs
+                                text-slate-400
+                                mt-1
+                            "
+                        >
+                            Configure your EZKROY sales assistant
+                        </p>
+
                     </div>
+
+
+                    <!-- STORE NAME -->
+
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Google Sheet / CSV Link</label>
-                        <input type="text" value="https://docs.google.com/spreadsheets/d/your-sheet-id" class="w-full bg-darkBg border border-cardBorder rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+
+                        <label
+                            class="
+                                block
+                                text-xs
+                                font-semibold
+                                text-slate-500
+                                mb-2
+                            "
+                        >
+                            Store Name
+                        </label>
+
+                        <input
+                            type="text"
+                            value="EZKROY Store"
+                            class="
+                                w-full
+                                bg-sky-50/40
+                                border
+                                border-sky-100
+                                rounded-xl
+                                px-4
+                                py-3
+                                text-sm
+                                text-slate-700
+                                focus:outline-none
+                                input-focus
+                            "
+                        >
+
                     </div>
-                    <button class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20">Save Changes</button>
+
+
+                    <!-- GOOGLE SHEET -->
+
+                    <div>
+
+                        <label
+                            class="
+                                block
+                                text-xs
+                                font-semibold
+                                text-slate-500
+                                mb-2
+                            "
+                        >
+                            Google Sheet / CSV Link
+                        </label>
+
+                        <input
+                            type="text"
+                            value="https://docs.google.com/spreadsheets/d/your-sheet-id"
+                            class="
+                                w-full
+                                bg-sky-50/40
+                                border
+                                border-sky-100
+                                rounded-xl
+                                px-4
+                                py-3
+                                text-sm
+                                text-slate-700
+                                focus:outline-none
+                                input-focus
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- SAVE -->
+
+                    <button
+                        class="
+                            sky-gradient
+                            hover:opacity-90
+                            text-white
+                            text-sm
+                            px-5
+                            py-3
+                            rounded-xl
+                            font-semibold
+                            transition-all
+                            shadow-blue
+                        "
+                    >
+
+                        <i class="fa-solid fa-floppy-disk mr-2"></i>
+
+                        Save Changes
+
+                    </button>
+
                 </div>
+
             </div>
 
         </main>
+
     </div>
 
-    <!-- JavaScript Logic -->
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================== -->
+
     <script>
+
+        /* ========================================================
+           TAB SWITCHING
+        ========================================================= */
+
         function switchTab(tabId) {
-            const tabs = ['chat', 'performance', 'products', 'settings'];
+
+            const tabs = [
+                'chat',
+                'performance',
+                'products',
+                'settings'
+            ];
+
+
             tabs.forEach(t => {
-                document.getElementById('view-' + t).classList.add('hidden');
-                document.getElementById('nav-' + t).className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all";
+
+                document
+                    .getElementById('view-' + t)
+                    .classList
+                    .add('hidden');
+
+
+                document
+                    .getElementById('nav-' + t)
+                    .className =
+                    `
+                    w-full
+                    flex
+                    items-center
+                    gap-3
+                    px-3.5
+                    py-3
+                    rounded-xl
+                    text-slate-500
+                    hover:text-sky-700
+                    hover:bg-sky-50
+                    font-medium
+                    transition-all
+                    `;
+
             });
-            document.getElementById('view-' + tabId).classList.remove('hidden');
-            document.getElementById('nav-' + tabId).className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-blue-600 text-white font-medium shadow-lg shadow-blue-500/20 transition-all";
+
+
+            document
+                .getElementById('view-' + tabId)
+                .classList
+                .remove('hidden');
+
+
+            document
+                .getElementById('nav-' + tabId)
+                .className =
+                `
+                nav-active
+                w-full
+                flex
+                items-center
+                gap-3
+                px-3.5
+                py-3
+                rounded-xl
+                text-white
+                font-semibold
+                transition-all
+                `;
+
 
             const titles = {
-                'chat': 'AI Sales Assistant',
-                'performance': 'Performance Analytics',
-                'products': 'Products & Sheet Database',
-                'settings': 'Store Settings'
+
+                chat: 'AI Sales Assistant',
+
+                performance: 'Performance Analytics',
+
+                products: 'Products & Sheet Database',
+
+                settings: 'Store Settings'
+
             };
-            document.getElementById('page-title').innerText = titles[tabId];
+
+
+            document
+                .getElementById('page-title')
+                .innerText = titles[tabId];
+
         }
 
-        // Chat Simulation with Sheet Context
+
+
+        /* ========================================================
+           CHAT — CURRENT DEMO LOGIC
+           NOTE:
+           This is still simulation.
+           Google Sheet will be connected later.
+        ======================================================== */
+
         function handleChatSubmit(e) {
+
             e.preventDefault();
-            const input = document.getElementById('chat-input');
-            const msg = input.value.trim();
-            if(!msg) return;
 
-            const chatMessages = document.getElementById('chat-messages');
 
-            // User Message
+            const input =
+                document.getElementById('chat-input');
+
+
+            const msg =
+                input.value.trim();
+
+
+            if (!msg) return;
+
+
+            const chatMessages =
+                document.getElementById('chat-messages');
+
+
+            /* USER MESSAGE */
+
             chatMessages.innerHTML += `
+
                 <div class="flex items-start justify-end gap-3">
-                    <div class="bg-blue-600 text-white rounded-2xl p-4 text-sm max-w-lg shadow-sm">
+
+                    <div
+                        class="
+                            sky-gradient
+                            text-white
+                            rounded-2xl
+                            rounded-tr-md
+                            p-4
+                            text-sm
+                            max-w-lg
+                            shadow-sm
+                        "
+                    >
                         ${msg}
                     </div>
-                    <div class="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-1 font-bold text-xs">U</div>
-                </div>
-            `;
-            input.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Simulated AI Response based on Sheet
-            setTimeout(() => {
-                let botReply = "আপনার শিট অনুযায়ী এই প্রশ্নের উত্তর: আমাদের ডেলিভারি চার্জ ঢাকার মধ্যে ৬০ টাকা এবং ঢাকার বাইরে ১২০ টাকা।";
-                if(msg.toLowerCase().includes('order')) {
-                    botReply = "শিট ডেটা অনুযায়ী: অর্ডার করতে আমাদের ওয়েবসাইটে প্রোডাক্ট সিলেক্ট করে অর্ডার বাটন প্রেস করুন।";
-                }
-                chatMessages.innerHTML += `
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 mt-1 shadow-md">
-                            <i class="fa-solid fa-robot text-xs"></i>
-                        </div>
-                        <div class="bg-slate-800/80 border border-cardBorder rounded-2xl p-4 text-sm text-slate-200 max-w-lg shadow-sm">
-                            ${botReply}
-                        </div>
+
+                    <div
+                        class="
+                            w-9
+                            h-9
+                            rounded-full
+                            bg-sky-50
+                            border
+                            border-sky-200
+                            flex
+                            items-center
+                            justify-center
+                            text-sky-600
+                            shrink-0
+                            mt-1
+                            font-bold
+                            text-xs
+                        "
+                    >
+                        U
                     </div>
+
+                </div>
+
+            `;
+
+
+            input.value = '';
+
+
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
+
+
+
+            /* DEMO AI RESPONSE */
+
+            setTimeout(() => {
+
+                let botReply =
+                    "আপনার শিট অনুযায়ী এই প্রশ্নের উত্তর: আমাদের ডেলিভারি চার্জ ঢাকার মধ্যে ৬০ টাকা এবং ঢাকার বাইরে ১২০ টাকা।";
+
+
+                if (
+                    msg
+                        .toLowerCase()
+                        .includes('order')
+                ) {
+
+                    botReply =
+                        "শিট ডেটা অনুযায়ী: অর্ডার করতে আমাদের ওয়েবসাইটে প্রোডাক্ট সিলেক্ট করে অর্ডার বাটন প্রেস করুন।";
+
+                }
+
+
+                chatMessages.innerHTML += `
+
+                    <div class="flex items-start gap-3">
+
+                        <div
+                            class="
+                                w-9
+                                h-9
+                                rounded-xl
+                                sky-gradient
+                                flex
+                                items-center
+                                justify-center
+                                text-white
+                                shrink-0
+                                mt-1
+                                shadow-blue
+                            "
+                        >
+
+                            <i
+                                class="
+                                    fa-solid
+                                    fa-robot
+                                    text-xs
+                                "
+                            ></i>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                bg-sky-50
+                                border
+                                border-sky-100
+                                rounded-2xl
+                                rounded-tl-md
+                                p-4
+                                text-sm
+                                text-slate-700
+                                max-w-lg
+                                shadow-sm
+                            "
+                        >
+
+                            ${botReply}
+
+                        </div>
+
+                    </div>
+
                 `;
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+
+                chatMessages.scrollTop =
+                    chatMessages.scrollHeight;
+
             }, 700);
+
         }
 
-        // Initialize Chart.js
-        const ctx = document.getElementById('performanceChart').getContext('2d');
+
+
+        /* ========================================================
+           CHART.JS
+        ======================================================== */
+
+        const ctx =
+            document
+                .getElementById('performanceChart')
+                .getContext('2d');
+
+
         new Chart(ctx, {
+
             type: 'line',
+
             data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+
+                labels: [
+                    'Week 1',
+                    'Week 2',
+                    'Week 3',
+                    'Week 4'
+                ],
+
                 datasets: [{
+
                     label: 'Revenue ($)',
-                    data: [4200, 5800, 7100, 8900],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+
+                    data: [
+                        4200,
+                        5800,
+                        7100,
+                        8900
+                    ],
+
+                    borderColor: '#0EA5E9',
+
+                    backgroundColor:
+                        'rgba(14, 165, 233, 0.10)',
+
                     fill: true,
-                    tension: 0.4
+
+                    tension: 0.4,
+
+                    borderWidth: 2,
+
+                    pointRadius: 4,
+
+                    pointHoverRadius: 6,
+
+                    pointBackgroundColor: '#FFFFFF',
+
+                    pointBorderColor: '#0EA5E9',
+
+                    pointBorderWidth: 2
+
                 }]
+
             },
+
+
             options: {
+
                 responsive: true,
+
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+
                 scales: {
-                    x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
-                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+
+                    x: {
+
+                        grid: {
+                            color: '#E0F2FE'
+                        },
+
+                        ticks: {
+                            color: '#64748B'
+                        }
+
+                    },
+
+
+                    y: {
+
+                        grid: {
+                            color: '#E0F2FE'
+                        },
+
+                        ticks: {
+                            color: '#64748B'
+                        }
+
+                    }
+
                 }
+
             }
+
         });
+
     </script>
+
 </body>
+
 </html>
+```
