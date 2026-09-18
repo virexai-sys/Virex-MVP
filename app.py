@@ -1,3 +1,4 @@
+```python
 from flask import Flask, request, jsonify, render_template
 import os
 import json
@@ -10,53 +11,32 @@ from datetime import datetime
 
 
 # =========================================================
-# OPTIONAL OPENAI
+# EZKROY AI — SHEET ONLY SALES AGENT
+# =========================================================
+#
+# IMPORTANT:
+# - NO OpenAI
+# - NO ChatGPT
+# - NO AI fallback
+# - Answers come ONLY from Google Sheet
+# - Product catalog is used only for product recognition
+# - If Sheet has no matching answer, bot says so
+#
 # =========================================================
 
-try:
-    from openai import OpenAI
-except ImportError:
-    OpenAI = None
-
-
-# =========================================================
-# EZKROY AI — SALES AGENT
-# FIXED VERSION
-# =========================================================
 
 app = Flask(__name__)
 
 
 # =========================================================
-# CONFIGURATION
+# GOOGLE SHEET CONFIG
 # =========================================================
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+GOOGLE_SHEET_ID = "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
 
-MODEL = os.getenv(
-    "OPENAI_MODEL",
-    "gpt-4o-mini"
-).strip()
-
-
-# =========================================================
-# GOOGLE SHEET CONFIGURATION
-# =========================================================
-
-GOOGLE_SHEET_ID = (
-    "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
-)
-
-# Main CSV export URL
 GOOGLE_SHEET_CSV_URL = (
     f"https://docs.google.com/spreadsheets/d/"
     f"{GOOGLE_SHEET_ID}/export?format=csv"
-)
-
-# Fallback Google Visualization URL
-GOOGLE_SHEET_GVIZ_URL = (
-    f"https://docs.google.com/spreadsheets/d/"
-    f"{GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv"
 )
 
 
@@ -64,14 +44,7 @@ GOOGLE_SHEET_GVIZ_URL = (
 # FILE PATHS
 # =========================================================
 
-BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
-
-DATA_DIR = os.path.join(
-    BASE_DIR,
-    "data"
-)
+DATA_DIR = "data"
 
 PRODUCT_FILE = os.path.join(
     DATA_DIR,
@@ -90,12 +63,7 @@ os.makedirs(
 
 
 # =========================================================
-# INITIAL PRODUCT CATALOG
-#
-# IMPORTANT:
-# If data/products.json already exists,
-# that file will be used.
-#
+# PRODUCT CATALOG
 # =========================================================
 
 INITIAL_PRODUCTS = [
@@ -109,7 +77,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 799,
         "stock": 20,
         "description": "Fresh, Urban & Confident.",
-        "notes": ["Citrus", "Green", "Woody", "Spicy", "Musky"],
+        "notes": [
+            "Citrus",
+            "Green",
+            "Woody",
+            "Spicy",
+            "Musky"
+        ],
         "longevity": "6–8 Hours",
         "best_for": [
             "Daily Wear",
@@ -129,7 +103,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Warm, Elegant & Seductive.",
-        "notes": ["Apple", "Orange", "Spicy", "Vanilla", "Woody"],
+        "notes": [
+            "Apple",
+            "Orange",
+            "Spicy",
+            "Vanilla",
+            "Woody"
+        ],
         "longevity": "6–8 Hours",
         "best_for": [
             "Office",
@@ -149,7 +129,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Bold, Addictive & Magnetic.",
-        "notes": ["Sweet", "Spicy", "Aquatic", "Smoky", "Amber"],
+        "notes": [
+            "Sweet",
+            "Spicy",
+            "Aquatic",
+            "Smoky",
+            "Amber"
+        ],
         "longevity": "7–9 Hours",
         "best_for": [
             "Dates",
@@ -169,7 +155,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Bold, Luxurious & Attention-Grabbing.",
-        "notes": ["Sweet", "Spicy", "Citrus", "Leather", "Woody"],
+        "notes": [
+            "Sweet",
+            "Spicy",
+            "Citrus",
+            "Leather",
+            "Woody"
+        ],
         "longevity": "7–10 Hours",
         "best_for": [
             "Parties",
@@ -189,7 +181,12 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Fresh, Masculine & Long-lasting.",
-        "notes": ["Woody", "Spicy", "Sweet", "Smoky"],
+        "notes": [
+            "Woody",
+            "Spicy",
+            "Sweet",
+            "Smoky"
+        ],
         "longevity": "6–8 Hours",
         "best_for": [
             "Daily Wear",
@@ -208,7 +205,12 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Fresh, Clean & Everyday Confidence.",
-        "notes": ["Aquatic", "Green Apple", "Fresh", "Woody"],
+        "notes": [
+            "Aquatic",
+            "Green Apple",
+            "Fresh",
+            "Woody"
+        ],
         "longevity": "5–7 Hours",
         "best_for": [
             "Daily Wear",
@@ -228,7 +230,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Cool, Fresh & Addictive.",
-        "notes": ["Aquatic", "Citrus", "Sweet", "Musky", "Fresh Spicy"],
+        "notes": [
+            "Aquatic",
+            "Citrus",
+            "Sweet",
+            "Musky",
+            "Fresh Spicy"
+        ],
         "longevity": "7–9 Hours",
         "best_for": [
             "Daily Wear",
@@ -245,7 +253,7 @@ INITIAL_PRODUCTS = [
         "price_15ml": 349,
         "regular_15ml": 999,
         "price_30ml": 549,
-        "regular_30ml": 1499,
+        "regular_30ml": 999,
         "stock": 20,
         "description": "Elegant, Fresh & Sophisticated.",
         "notes": [
@@ -274,7 +282,13 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Dark, Mysterious & Seductive.",
-        "notes": ["Sweet", "Spicy", "Smoky", "Amber", "Woody"],
+        "notes": [
+            "Sweet",
+            "Spicy",
+            "Smoky",
+            "Amber",
+            "Woody"
+        ],
         "longevity": "7–9 Hours",
         "best_for": [
             "Night Out",
@@ -654,10 +668,7 @@ def load_json_file(filename, default=None):
 
     except Exception as error:
 
-        print(
-            "JSON LOAD ERROR:",
-            repr(error)
-        )
+        print("JSON LOAD ERROR:", error)
 
         return default
 
@@ -683,10 +694,7 @@ def save_json_file(filename, data):
 
     except Exception as error:
 
-        print(
-            "JSON SAVE ERROR:",
-            repr(error)
-        )
+        print("JSON SAVE ERROR:", error)
 
         return False
 
@@ -704,11 +712,6 @@ def init_product_file():
             INITIAL_PRODUCTS
         )
 
-        print(
-            "PRODUCT FILE CREATED:",
-            PRODUCT_FILE
-        )
-
 
 init_product_file()
 
@@ -724,8 +727,7 @@ def get_products():
         INITIAL_PRODUCTS
     )
 
-    if isinstance(products, list) and products:
-
+    if isinstance(products, list):
         return products
 
     return INITIAL_PRODUCTS
@@ -743,54 +745,9 @@ def get_orders():
     )
 
     if isinstance(orders, list):
-
         return orders
 
     return []
-
-
-# =========================================================
-# OPENAI
-# =========================================================
-
-client = None
-
-if OpenAI and OPENAI_API_KEY:
-
-    try:
-
-        client = OpenAI(
-            api_key=OPENAI_API_KEY
-        )
-
-        print(
-            "OPENAI CLIENT: CONNECTED"
-        )
-
-    except Exception as error:
-
-        print(
-            "OPENAI CLIENT ERROR:",
-            repr(error)
-        )
-
-else:
-
-    print(
-        "OPENAI CLIENT: NOT CONNECTED"
-    )
-
-    if not OpenAI:
-
-        print(
-            "REASON: openai package not installed"
-        )
-
-    elif not OPENAI_API_KEY:
-
-        print(
-            "REASON: OPENAI_API_KEY not found"
-        )
 
 
 # =========================================================
@@ -805,25 +762,8 @@ sheet_cache = {
 
     "last_error": None,
 
-    "last_url": GOOGLE_SHEET_CSV_URL,
-
-    "source": None
+    "last_url": GOOGLE_SHEET_CSV_URL
 }
-
-
-# =========================================================
-# GOOGLE SHEET URLS
-# =========================================================
-
-def get_sheet_urls():
-
-    return [
-
-        GOOGLE_SHEET_CSV_URL,
-
-        GOOGLE_SHEET_GVIZ_URL
-
-    ]
 
 
 # =========================================================
@@ -837,365 +777,168 @@ def download_google_sheet():
     print("GOOGLE SHEET: STARTING DOWNLOAD")
     print("=" * 60)
 
-    old_data = sheet_cache.get(
-        "data",
-        []
-    )
+    try:
 
-    errors = []
+        request_object = urllib.request.Request(
+            GOOGLE_SHEET_CSV_URL,
+            headers={
+                "User-Agent": "Mozilla/5.0"
+            }
+        )
 
-    for url in get_sheet_urls():
+        with urllib.request.urlopen(
+            request_object,
+            timeout=20
+        ) as response:
 
-        try:
+            raw_data = response.read()
 
-            print(
-                "TRYING URL:",
-                url
+            status_code = response.getcode()
+
+        print(
+            "GOOGLE SHEET HTTP STATUS:",
+            status_code
+        )
+
+        text = raw_data.decode(
+            "utf-8-sig"
+        )
+
+        print(
+            "GOOGLE SHEET RAW LENGTH:",
+            len(text)
+        )
+
+        reader = csv.DictReader(
+            io.StringIO(text)
+        )
+
+        print(
+            "GOOGLE SHEET HEADERS:",
+            reader.fieldnames
+        )
+
+        if not reader.fieldnames:
+
+            raise Exception(
+                "Google Sheet CSV has no headers."
             )
 
-            request = urllib.request.Request(
+        rows = []
 
-                url,
+        for row in reader:
 
-                headers={
-                    "User-Agent":
-                        "Mozilla/5.0 "
-                        "(Windows NT 10.0; Win64; x64) "
-                        "AppleWebKit/537.36 "
-                        "Chrome/153.0 Safari/537.36"
-                }
-            )
+            cleaned = {}
 
-            with urllib.request.urlopen(
-                request,
-                timeout=20
-            ) as response:
+            for key, value in row.items():
 
-                raw_data = response.read()
+                if key is None:
+                    continue
 
-                status_code = response.getcode()
-
-                content_type = response.headers.get(
-                    "Content-Type",
-                    ""
+                clean_key = (
+                    str(key)
+                    .strip()
+                    .lower()
                 )
 
-
-            print(
-                "HTTP STATUS:",
-                status_code
-            )
-
-            print(
-                "CONTENT TYPE:",
-                content_type
-            )
-
-            print(
-                "RAW BYTES:",
-                len(raw_data)
-            )
-
-
-            # ---------------------------------------------
-            # Decode
-            # ---------------------------------------------
-
-            text = raw_data.decode(
-                "utf-8-sig",
-                errors="replace"
-            )
-
-
-            text = text.strip()
-
-
-            if not text:
-
-                raise Exception(
-                    "Google Sheet returned empty content."
+                clean_value = (
+                    str(value or "")
+                    .strip()
                 )
 
+                cleaned[
+                    clean_key
+                ] = clean_value
 
-            # ---------------------------------------------
-            # Detect HTML instead of CSV
-            # ---------------------------------------------
-
-            lower_text = text.lower()
-
-            if (
-                "<html" in lower_text
-                or "<!doctype html" in lower_text
+            if any(
+                value.strip()
+                for value in cleaned.values()
             ):
 
-                raise Exception(
-                    "Google Sheet returned HTML instead of CSV. "
-                    "Check Sheet sharing/public access."
+                rows.append(
+                    cleaned
                 )
 
+        sheet_cache["data"] = rows
 
-            # ---------------------------------------------
-            # CSV parsing
-            # ---------------------------------------------
+        sheet_cache["loaded_at"] = (
+            datetime.now().isoformat()
+        )
 
-            reader = csv.DictReader(
-                io.StringIO(text)
-            )
+        sheet_cache["last_error"] = None
 
-            fieldnames = (
-                reader.fieldnames
-                or []
-            )
+        print(
+            "GOOGLE SHEET ROWS:",
+            len(rows)
+        )
 
-
-            print(
-                "SHEET HEADERS:",
-                fieldnames
-            )
-
-
-            if not fieldnames:
-
-                raise Exception(
-                    "Google Sheet CSV has no headers."
-                )
-
-
-            rows = []
-
-
-            for raw_row in reader:
-
-                cleaned = {}
-
-
-                for key, value in raw_row.items():
-
-                    if key is None:
-
-                        continue
-
-
-                    clean_key = (
-                        str(key)
-                        .replace(
-                            "\ufeff",
-                            ""
-                        )
-                        .strip()
-                        .lower()
-                    )
-
-
-                    clean_value = str(
-                        value or ""
-                    ).strip()
-
-
-                    cleaned[
-                        clean_key
-                    ] = clean_value
-
-
-                if any(
-                    str(value).strip()
-                    for value in cleaned.values()
-                ):
-
-                    rows.append(
-                        cleaned
-                    )
-
-
-            # ---------------------------------------------
-            # Validate useful columns
-            # ---------------------------------------------
-
-            available_headers = set(
-                rows[0].keys()
-            ) if rows else set()
-
-
-            has_answer = (
-                "answer"
-                in available_headers
-            )
-
-
-            has_question = (
-                "question"
-                in available_headers
-            )
-
-
-            has_keywords = (
-                "keywords"
-                in available_headers
-            )
-
+        if rows:
 
             print(
-                "ROWS:",
-                len(rows)
+                "FIRST SHEET ROW:",
+                rows[0]
             )
 
-            print(
-                "HAS QUESTION:",
-                has_question
-            )
+        print(
+            "GOOGLE SHEET: SUCCESS"
+        )
 
-            print(
-                "HAS KEYWORDS:",
-                has_keywords
-            )
+        print("=" * 60)
 
-            print(
-                "HAS ANSWER:",
-                has_answer
-            )
+        return rows
 
+    except urllib.error.HTTPError as error:
 
-            if rows and not has_answer:
+        message = (
+            f"HTTP {error.code}: "
+            f"{error.reason}"
+        )
 
-                raise Exception(
-                    "Google Sheet connected, "
-                    "but 'answer' column was not found."
-                )
+        sheet_cache["last_error"] = message
 
+        print(
+            "GOOGLE SHEET HTTP ERROR:",
+            message
+        )
 
-            # ---------------------------------------------
-            # SUCCESS
-            # ---------------------------------------------
+        return sheet_cache.get(
+            "data",
+            []
+        )
 
-            sheet_cache["data"] = rows
+    except urllib.error.URLError as error:
 
-            sheet_cache["loaded_at"] = (
-                datetime.now().isoformat()
-            )
+        message = (
+            f"URL ERROR: {error.reason}"
+        )
 
-            sheet_cache["last_error"] = None
+        sheet_cache["last_error"] = message
 
-            sheet_cache["last_url"] = url
+        print(
+            "GOOGLE SHEET URL ERROR:",
+            message
+        )
 
-            sheet_cache["source"] = (
-                "csv"
-                if "export?format=csv" in url
-                else "gviz"
-            )
+        return sheet_cache.get(
+            "data",
+            []
+        )
 
+    except Exception as error:
 
-            print(
-                "GOOGLE SHEET: SUCCESS"
-            )
+        message = str(error)
 
-            print(
-                "SOURCE:",
-                sheet_cache["source"]
-            )
+        sheet_cache["last_error"] = message
 
-            print(
-                "ROWS:",
-                len(rows)
-            )
+        print(
+            "GOOGLE SHEET ERROR:",
+            message
+        )
 
-
-            if rows:
-
-                print(
-                    "FIRST ROW:",
-                    rows[0]
-                )
-
-
-            print("=" * 60)
-
-
-            return rows
-
-
-        except urllib.error.HTTPError as error:
-
-            message = (
-                f"HTTP {error.code}: "
-                f"{error.reason}"
-            )
-
-            print(
-                "HTTP ERROR:",
-                message
-            )
-
-            errors.append(
-                message
-            )
-
-
-        except urllib.error.URLError as error:
-
-            message = (
-                f"URL ERROR: "
-                f"{error.reason}"
-            )
-
-            print(
-                "URL ERROR:",
-                message
-            )
-
-            errors.append(
-                message
-            )
-
-
-        except Exception as error:
-
-            message = str(
-                error
-            )
-
-            print(
-                "SHEET ERROR:",
-                message
-            )
-
-            errors.append(
-                message
-            )
-
-
-    # =====================================================
-    # ALL SOURCES FAILED
-    # =====================================================
-
-    final_error = (
-        " | ".join(errors)
-        if errors
-        else "Unknown Google Sheet error"
-    )
-
-
-    sheet_cache["last_error"] = final_error
-
-
-    print(
-        "GOOGLE SHEET: FAILED"
-    )
-
-    print(
-        "ERROR:",
-        final_error
-    )
-
-
-    # IMPORTANT:
-    # Never destroy previously working cache.
-    sheet_cache["data"] = old_data
-
-
-    print("=" * 60)
-
-
-    return old_data
+        return sheet_cache.get(
+            "data",
+            []
+        )
 
 
 # =========================================================
@@ -1204,15 +947,11 @@ def download_google_sheet():
 
 def get_sheet_data():
 
-    # If cache already contains rows,
-    # use cache.
-    if sheet_cache.get("data"):
+    if not sheet_cache["data"]:
 
-        return sheet_cache["data"]
+        return download_google_sheet()
 
-
-    # Otherwise attempt connection.
-    return download_google_sheet()
+    return sheet_cache["data"]
 
 
 # =========================================================
@@ -1225,18 +964,38 @@ def normalize_text(text):
         text or ""
     ).lower()
 
+    # Common Banglish variations
+    replacements = {
+
+        "tmi": "tumi",
+        "tmre": "tomare",
+        "tmr": "tomar",
+        "koto": "koto",
+        "dam": "dam",
+        "dite": "dite",
+        "chai": "chai",
+
+        "15 ml": "15ml",
+        "30 ml": "30ml",
+        "50 ml": "50ml"
+    }
+
+    for old, new in replacements.items():
+
+        text = text.replace(
+            old,
+            new
+        )
 
     text = text.replace(
         "৳",
         " taka "
     )
 
-
     text = text.replace(
         "tk",
         " taka "
     )
-
 
     text = re.sub(
         r"[^a-z0-9\u0980-\u09ff\s]",
@@ -1244,16 +1003,18 @@ def normalize_text(text):
         text
     )
 
-
     text = re.sub(
         r"\s+",
         " ",
         text
     )
 
-
     return text.strip()
 
+
+# =========================================================
+# TOKENIZE
+# =========================================================
 
 def tokenize(text):
 
@@ -1277,6 +1038,7 @@ PRODUCT_ALIASES = {
 
     "vampire": "VAMPIRE BLOOD",
     "vempire": "VAMPIRE BLOOD",
+    "vempire blood": "VAMPIRE BLOOD",
     "vampire blood": "VAMPIRE BLOOD",
 
     "212": "212 MEN NYC",
@@ -1285,8 +1047,9 @@ PRODUCT_ALIASES = {
     "dunhill": "DUNHILL DESIRE",
 
     "hawas fire": "HAWAS FIRE",
-    "hawas": "HAWAS FIRE",
     "hawas ice": "HAWAS ICE",
+
+    "hawas": "HAWAS FIRE",
 
     "one million": "ONE MILLION",
 
@@ -1298,8 +1061,8 @@ PRODUCT_ALIASES = {
 
     "srk": "SRK (Shah Rukh Inspired)",
 
-    "stronger with you": "STRONGER WITH YOU",
     "stronger": "STRONGER WITH YOU",
+    "stronger with you": "STRONGER WITH YOU",
 
     "gucci": "GUCCI FLORA",
     "gucci flora": "GUCCI FLORA",
@@ -1335,47 +1098,43 @@ PRODUCT_ALIASES = {
 # FIND PRODUCT
 # =========================================================
 
-def find_product(user_message):
+def find_product(message):
 
     text = normalize_text(
-        user_message
+        message
     )
 
     products = get_products()
 
-
-    # Exact full product name first.
+    # Exact full product name first
     for product in products:
 
-        name = normalize_text(
+        product_name = normalize_text(
             product.get(
                 "name",
                 ""
             )
         )
 
-
-        if name and name in text:
+        if (
+            product_name
+            and product_name in text
+        ):
 
             return product
 
-
-    # Alias matching.
-    # Long aliases first prevents "hawas"
-    # from catching "hawas ice".
-    aliases = sorted(
+    # Alias
+    aliases_sorted = sorted(
         PRODUCT_ALIASES.items(),
         key=lambda item: len(item[0]),
         reverse=True
     )
 
-
-    for alias, product_name in aliases:
+    for alias, product_name in aliases_sorted:
 
         alias_normalized = normalize_text(
             alias
         )
-
 
         if alias_normalized in text:
 
@@ -1383,21 +1142,18 @@ def find_product(user_message):
                 product_name
             )
 
-
             for product in products:
 
-                current_name = normalize_text(
+                current = normalize_text(
                     product.get(
                         "name",
                         ""
                     )
                 )
 
-
-                if current_name == target:
+                if current == target:
 
                     return product
-
 
     return None
 
@@ -1412,12 +1168,10 @@ def detect_size(message):
         message
     )
 
-
     match = re.search(
-        r"\b(15|30|50)\s*(?:ml|m l)\b",
+        r"\b(15|30|50)\s*ml\b",
         text
     )
-
 
     if match:
 
@@ -1426,375 +1180,393 @@ def detect_size(message):
             + "ml"
         )
 
-
-    if re.search(
-        r"\b15\b",
-        text
-    ):
-
-        return "15ml"
-
-
-    if re.search(
-        r"\b30\b",
-        text
-    ):
-
-        return "30ml"
-
-
-    if re.search(
-        r"\b50\b",
-        text
-    ):
-
-        return "50ml"
-
-
     return None
 
 
 # =========================================================
-# PRICE QUERY
+# STRICT SHEET MATCHING
 # =========================================================
 
-def is_price_query(message):
-
-    text = normalize_text(
-        message
-    )
-
-
-    price_words = [
-
-        "price",
-        "price koto",
-        "koto",
-        "dam",
-        "দাম",
-        "কত",
-        "দাম কত",
-        "taka",
-        "tk",
-        "cost",
-        "how much",
-        "how much is"
-    ]
-
-
-    return any(
-        word in text
-        for word in price_words
-    )
-
-
-# =========================================================
-# PRODUCT PRICE ANSWER
-# =========================================================
-
-def build_product_answer(
-    product,
-    size=None
-):
-
-    name = product.get(
-        "name",
-        "Product"
-    )
-
-
-    if size == "15ml":
-
-        price = product.get(
-            "price_15ml"
-        )
-
-        regular = product.get(
-            "regular_15ml"
-        )
-
-
-        if price is None:
-
-            return (
-                f"{name}-এর 15ml price "
-                f"বর্তমানে available নেই।"
-            )
-
-
-        answer = (
-            f"{name} 15ml-এর current price "
-            f"৳{price}"
-        )
-
-
-        if regular is not None:
-
-            answer += (
-                f"। Regular price ৳{regular}"
-            )
-
-
-        return answer + "।"
-
-
-    if size == "30ml":
-
-        price = product.get(
-            "price_30ml"
-        )
-
-        regular = product.get(
-            "regular_30ml"
-        )
-
-
-        if price is None:
-
-            return (
-                f"{name}-এর 30ml price "
-                f"বর্তমানে available নেই।"
-            )
-
-
-        answer = (
-            f"{name} 30ml-এর current price "
-            f"৳{price}"
-        )
-
-
-        if regular is not None:
-
-            answer += (
-                f"। Regular price ৳{regular}"
-            )
-
-
-        return answer + "।"
-
-
-    if size == "50ml":
-
-        return (
-            f"{name}-এর 50ml option "
-            f"আমাদের current catalog-এ নেই। "
-            f"15ml এবং 30ml available আছে।"
-        )
-
-
-    price_15 = product.get(
-        "price_15ml"
-    )
-
-    price_30 = product.get(
-        "price_30ml"
-    )
-
-
-    return (
-        f"{name} 15ml ৳{price_15} "
-        f"এবং 30ml ৳{price_30}।"
-    )
-
-
-# =========================================================
-# PRODUCT DETAIL
-# =========================================================
-
-def build_product_detail_answer(
-    product
-):
-
-    name = product.get(
-        "name",
-        "Product"
-    )
-
-
-    description = product.get(
-        "description",
-        ""
-    )
-
-
-    notes = product.get(
-        "notes",
-        []
-    )
-
-
-    longevity = product.get(
-        "longevity",
-        ""
-    )
-
-
-    best_for = product.get(
-        "best_for",
-        []
-    )
-
-
-    notes_text = ", ".join(
-        str(x)
-        for x in notes
-    )
-
-
-    best_for_text = ", ".join(
-        str(x)
-        for x in best_for
-    )
-
-
-    return (
-        f"{name} — {description}\n"
-        f"Price: 15ml ৳{product.get('price_15ml')} | "
-        f"30ml ৳{product.get('price_30ml')}\n"
-        f"Longevity: {longevity}\n"
-        f"Notes: {notes_text}\n"
-        f"Best for: {best_for_text}"
-    )
-
-
-# =========================================================
-# SHEET COLUMN HELPER
-# =========================================================
-
-def get_sheet_value(
-    row,
-    possible_names
-):
-
-    for name in possible_names:
-
-        value = row.get(
-            name
-        )
-
-
-        if value is not None:
-
-            value = str(
-                value
-            ).strip()
-
-
-            if value:
-
-                return value
-
-
-    return ""
-
-
-# =========================================================
-# SHEET FAQ MATCHING
-# =========================================================
-
-def find_matching_sheet_answer(
-    user_message
-):
+def find_matching_sheet_answer(message):
 
     rows = get_sheet_data()
-
 
     if not rows:
 
         print(
-            "SHEET MATCH: No rows"
+            "SHEET MATCH: NO DATA"
         )
 
         return None
 
-
     user_text = normalize_text(
-        user_message
+        message
     )
-
 
     user_words = tokenize(
-        user_message
+        message
     )
 
-
+    print("")
     print(
-        "SHEET MATCH USER:",
+        "SHEET SEARCH:",
         user_text
     )
 
+    candidates = []
 
-    best_answer = None
-
-    best_score = 0
-
-    best_question = None
-
-
-    for row in rows:
+    for index, row in enumerate(rows):
 
         question = normalize_text(
-            get_sheet_value(
-                row,
-                [
-                    "question",
-                    "questions",
-                    "q"
-                ]
+            row.get(
+                "question",
+                ""
             )
         )
-
 
         keywords = normalize_text(
-            get_sheet_value(
-                row,
-                [
-                    "keywords",
-                    "keyword",
-                    "key words"
-                ]
+            row.get(
+                "keywords",
+                ""
             )
         )
 
-
-        answer = get_sheet_value(
-            row,
-            [
+        answer = str(
+            row.get(
                 "answer",
-                "answers",
-                "response",
-                "reply"
-            ]
-        )
-
+                ""
+            )
+        ).strip()
 
         if not answer:
-
             continue
 
-
-        target_words = (
-            tokenize(question)
-            |
-            tokenize(keywords)
+        question_words = tokenize(
+            question
         )
 
+        keyword_words = tokenize(
+            keywords
+        )
 
-        if not target_words:
+        all_target_words = (
+            question_words
+            |
+            keyword_words
+        )
+
+        if not all_target_words:
+            continue
+
+        # -------------------------------------------------
+        # Exact question
+        # -------------------------------------------------
+
+        if question:
+
+            if user_text == question:
+
+                print(
+                    "EXACT QUESTION MATCH:",
+                    question
+                )
+
+                return answer
+
+        # -------------------------------------------------
+        # Exact keyword phrase
+        # -------------------------------------------------
+
+        keyword_phrases = [
+            k.strip()
+            for k in keywords.split(",")
+            if k.strip()
+        ]
+
+        for phrase in keyword_phrases:
+
+            phrase_normalized = normalize_text(
+                phrase
+            )
+
+            if (
+                phrase_normalized
+                and phrase_normalized in user_text
+            ):
+
+                candidates.append({
+                    "score": 100,
+                    "answer": answer,
+                    "question": question,
+                    "index": index
+                })
+
+                break
+
+        # -------------------------------------------------
+        # Question phrase inside message
+        # -------------------------------------------------
+
+        if (
+            question
+            and len(question.split()) >= 2
+            and question in user_text
+        ):
+
+            candidates.append({
+                "score": 95,
+                "answer": answer,
+                "question": question,
+                "index": index
+            })
+
+        # -------------------------------------------------
+        # Token scoring
+        # -------------------------------------------------
+
+        common = (
+            user_words
+            &
+            all_target_words
+        )
+
+        if not common:
+            continue
+
+        # Important:
+        # Don't allow one generic word like
+        # "price", "koto", "good", etc. to match.
+        generic_words = {
+            "price",
+            "dam",
+            "koto",
+            "taka",
+            "tk",
+            "cost",
+            "details",
+            "detail",
+            "good",
+            "best",
+            "ki",
+            "konta",
+            "what",
+            "how",
+            "is",
+            "the",
+            "a",
+            "ami",
+            "chai",
+            "want"
+        }
+
+        meaningful_common = {
+            word
+            for word in common
+            if word not in generic_words
+        }
+
+        if (
+            not meaningful_common
+            and len(user_words) > 1
+        ):
 
             continue
 
+        coverage = (
+            len(meaningful_common)
+            /
+            max(
+                len(
+                    user_words
+                ),
+                1
+            )
+        )
 
-        # Exact normalized question match.
-        if question and question == user_text:
+        target_coverage = (
+            len(meaningful_common)
+            /
+            max(
+                len(
+                    all_target_words
+                ),
+                1
+            )
+        )
 
-            print(
-                "SHEET EXACT MATCH:",
-                question
+        score = (
+            coverage * 60
+            +
+            target_coverage * 40
+        )
+
+        # If question contains the product,
+        # strongly prefer it.
+        product = find_product(
+            message
+        )
+
+        if product:
+
+            product_name = normalize_text(
+                product.get(
+                    "name",
+                    ""
+                )
             )
 
-            return answer
+            if (
+                product_name
+                and product_name in question
+            ):
 
+                score += 50
+
+        if score >= 45:
+
+            candidates.append({
+                "score": score,
+                "answer": answer,
+                "question": question,
+                "index": index
+            })
+
+    # -----------------------------------------------------
+    # Pick strongest candidate
+    # -----------------------------------------------------
+
+    if not candidates:
+
+        print(
+            "SHEET MATCH: NOTHING FOUND"
+        )
+
+        return None
+
+    candidates.sort(
+        key=lambda item: (
+            item["score"],
+            -item["index"]
+        ),
+        reverse=True
+    )
+
+    best = candidates[0]
+
+    print(
+        "SHEET MATCH FOUND:",
+        best["question"],
+        "| SCORE:",
+        round(
+            best["score"],
+            2
+        )
+    )
+
+    return best["answer"]
+
+
+# =========================================================
+# PRODUCT INFORMATION FROM SHEET ONLY
+# =========================================================
+#
+# IMPORTANT:
+# Product catalog is NOT used to generate answers.
+# It is only used to understand which product customer means.
+#
+# The actual answer MUST come from Google Sheet.
+#
+# =========================================================
+
+
+def find_product_sheet_answer(message):
+
+    product = find_product(
+        message
+    )
+
+    if not product:
+
+        return None
+
+    rows = get_sheet_data()
+
+    if not rows:
+
+        return None
+
+    product_name = normalize_text(
+        product.get(
+            "name",
+            ""
+        )
+    )
+
+    aliases_for_product = []
+
+    for alias, target in PRODUCT_ALIASES.items():
+
+        if normalize_text(target) == product_name:
+
+            aliases_for_product.append(
+                normalize_text(alias)
+            )
+
+    user_text = normalize_text(
+        message
+    )
+
+    candidates = []
+
+    for index, row in enumerate(rows):
+
+        question = normalize_text(
+            row.get(
+                "question",
+                ""
+            )
+        )
+
+        keywords = normalize_text(
+            row.get(
+                "keywords",
+                ""
+            )
+        )
+
+        answer = str(
+            row.get(
+                "answer",
+                ""
+            )
+        ).strip()
+
+        if not answer:
+            continue
+
+        combined = (
+            question
+            + " "
+            + keywords
+        )
+
+        if product_name not in combined:
+
+            product_alias_found = any(
+                alias in combined
+                for alias in aliases_for_product
+            )
+
+            if not product_alias_found:
+                continue
+
+        user_words = tokenize(
+            user_text
+        )
+
+        target_words = tokenize(
+            combined
+        )
 
         common = (
             user_words
@@ -1802,134 +1574,49 @@ def find_matching_sheet_answer(
             target_words
         )
 
+        score = len(common)
 
-        if not common:
-
-            continue
-
-
-        score = (
-            len(common)
-            /
-            max(
-                len(user_words),
-                1
-            )
-        )
-
-
-        # Prevent generic one-word matches.
+        # Question phrase gets priority
         if (
-            len(common) == 1
-            and len(user_words) >= 3
+            question
+            and question in user_text
         ):
 
-            score *= 0.20
+            score += 20
 
+        if score > 0:
 
-        # Question itself gets additional weight.
-        question_words = tokenize(
-            question
-        )
+            candidates.append({
+                "score": score,
+                "answer": answer,
+                "question": question,
+                "index": index
+            })
 
+    if not candidates:
 
-        question_common = (
-            user_words
-            &
-            question_words
-        )
+        return None
 
+    candidates.sort(
+        key=lambda item: (
+            item["score"],
+            -item["index"]
+        ),
+        reverse=True
+    )
 
-        if question_common:
-
-            score += (
-                0.15
-                *
-                (
-                    len(question_common)
-                    /
-                    max(
-                        len(question_words),
-                        1
-                    )
-                )
-            )
-
-
-        print(
-            "SHEET CANDIDATE:",
-            question,
-            "| common:",
-            common,
-            "| score:",
-            round(
-                score,
-                3
-            )
-        )
-
-
-        if score > best_score:
-
-            best_score = score
-
-            best_answer = answer
-
-            best_question = question
-
-
-    # Strong threshold.
-    if best_score >= 0.60:
-
-        print(
-            "SHEET MATCH FOUND:",
-            best_question,
-            "| score:",
-            round(
-                best_score,
-                3
-            )
-        )
-
-        return best_answer
-
+    best = candidates[0]
 
     print(
-        "SHEET MATCH: NO STRONG MATCH"
+        "PRODUCT SHEET MATCH:",
+        product.get("name"),
+        "|",
+        best["question"],
+        "| SCORE:",
+        best["score"]
     )
 
-
-    return None
-
-
-# =========================================================
-# GREETING
-# =========================================================
-
-def is_greeting(message):
-
-    text = normalize_text(
-        message
-    )
-
-
-    greetings = [
-
-        "hi",
-        "hello",
-        "hey",
-        "hii",
-        "hiii",
-        "assalamualaikum",
-        "assalamu alaikum",
-        "salam",
-        "হাই",
-        "হ্যালো",
-        "আসসালামু আলাইকুম"
-    ]
-
-
-    return text in greetings
+    return best["answer"]
 
 
 # =========================================================
@@ -1942,60 +1629,65 @@ def is_order_request(message):
         message
     )
 
-
-    order_phrases = [
+    phrases = [
 
         "order",
+
         "order korte chai",
+
         "order korbo",
+
         "order dibo",
+
         "nibo",
+
         "nite chai",
+
         "kinbo",
+
         "kinte chai",
+
         "buy",
+
         "book",
+
         "অর্ডার",
-        "অর্ডার করতে চাই",
+
         "নিব",
+
         "নিতে চাই",
+
         "কিনবো",
+
         "কিনতে চাই"
     ]
 
-
     return any(
         phrase in text
-        for phrase in order_phrases
+        for phrase in phrases
     )
 
 
 # =========================================================
-# ORDER INFORMATION
+# EXTRACT ORDER INFO
 # =========================================================
 
-def extract_order_information(
-    message
-):
+def extract_order_information(message):
 
     product = find_product(
         message
     )
 
-
     size = detect_size(
         message
     )
 
-
     quantity = 1
-
 
     quantity_match = re.search(
         r"(?:x|qty|quantity|পরিমাণ)\s*(\d+)",
         normalize_text(message)
     )
-
 
     if quantity_match:
 
@@ -2008,7 +1700,6 @@ def extract_order_information(
         except Exception:
 
             quantity = 1
-
 
     return {
 
@@ -2039,19 +1730,13 @@ def save_order(
         or {}
     )
 
-
-    order_info = (
-        extract_order_information(
-            message
-        )
+    order_info = extract_order_information(
+        message
     )
-
 
     orders = get_orders()
 
-
     next_id = 1
-
 
     if orders:
 
@@ -2072,11 +1757,9 @@ def save_order(
 
         except Exception:
 
-            next_id = (
-                len(orders)
-                + 1
-            )
-
+            next_id = len(
+                orders
+            ) + 1
 
     order = {
 
@@ -2119,232 +1802,16 @@ def save_order(
             datetime.now().isoformat()
     }
 
-
     orders.append(
         order
     )
 
-
-    success = save_json_file(
+    save_json_file(
         ORDER_FILE,
         orders
     )
 
-
-    if not success:
-
-        print(
-            "ORDER SAVE FAILED"
-        )
-
-
     return order
-
-
-# =========================================================
-# SYSTEM PROMPT
-# =========================================================
-
-SYSTEM_PROMPT = """
-
-You are EZKROY AI, a professional AI sales assistant.
-
-BUSINESS:
-EZKROY is an online perfume business.
-
-LANGUAGE:
-- Understand Bangla, Banglish and English.
-- Reply in the same language/style as the customer.
-- Keep replies short, natural and friendly.
-
-PRODUCT RULE:
-- Use ONLY the supplied product catalog.
-- Never invent product prices.
-- Never invent stock.
-- Never invent sizes.
-- Never invent product information.
-- Never claim a size is available unless it exists in the catalog.
-
-GOOGLE SHEET:
-- The verified Google Sheet contains business FAQ information.
-- Use sheet information only when it clearly matches the customer's question.
-- Never use an unrelated sheet answer.
-- Never force delivery information into a product question.
-
-GREETING:
-If customer says hi/hello/hey:
-Reply naturally.
-Do not give delivery information unless asked.
-
-PRODUCT:
-If customer asks about a specific perfume:
-Answer about that perfume.
-If asking price, provide exact price from catalog.
-If asking size, provide available sizes.
-If asking notes/longevity/occasion, use catalog.
-
-ORDER:
-If customer wants to order:
-Guide them to provide:
-1. Product
-2. Size
-3. Quantity
-4. Name
-5. Phone
-6. Address
-
-Do not claim an order is completed unless the required information has actually been collected.
-
-STYLE:
-Friendly.
-Professional.
-Short.
-Natural.
-Helpful.
-
-Do not make up business policies.
-Do not make up delivery fees.
-Do not make up payment methods.
-"""
-
-
-# =========================================================
-# KNOWLEDGE BASE
-# =========================================================
-
-def build_knowledge_base():
-
-    products = get_products()
-
-
-    kb = [
-        "=== EZKROY PRODUCT CATALOG ==="
-    ]
-
-
-    for product in products:
-
-        kb.append(
-            json.dumps(
-                product,
-                ensure_ascii=False
-            )
-        )
-
-
-    return "\n".join(
-        kb
-    )
-
-
-# =========================================================
-# ASK OPENAI
-# =========================================================
-
-def ask_ai(
-    user_message,
-    context_info=""
-):
-
-    if not client:
-
-        return (
-            "EZKROY AI চালু আছে, কিন্তু OpenAI API connection পাওয়া যাচ্ছে না। "
-            "OPENAI_API_KEY check করুন।"
-        )
-
-
-    catalog = build_knowledge_base()
-
-
-    user_prompt = f"""
-PRODUCT CATALOG:
-{catalog}
-
-VERIFIED SHEET INFORMATION:
-{context_info or "No directly matched sheet information."}
-
-CUSTOMER MESSAGE:
-{user_message}
-
-Answer the customer's message directly.
-"""
-
-
-    try:
-
-        print(
-            "OPENAI REQUEST START"
-        )
-
-        print(
-            "MODEL:",
-            MODEL
-        )
-
-
-        response = client.chat.completions.create(
-
-            model=MODEL,
-
-            messages=[
-
-                {
-                    "role":
-                        "system",
-
-                    "content":
-                        SYSTEM_PROMPT
-                },
-
-                {
-                    "role":
-                        "user",
-
-                    "content":
-                        user_prompt
-                }
-
-            ],
-
-            temperature=0.2
-        )
-
-
-        reply = (
-            response
-            .choices[0]
-            .message
-            .content
-        )
-
-
-        if reply:
-
-            print(
-                "OPENAI RESPONSE SUCCESS"
-            )
-
-            return reply.strip()
-
-
-        return (
-            "দুঃখিত, কোনো উত্তর পাওয়া যায়নি।"
-        )
-
-
-    except Exception as error:
-
-        print(
-            "OPENAI ERROR:",
-            repr(error)
-        )
-
-
-        return (
-            "AI response তৈরি করতে সমস্যা হচ্ছে। "
-            "Debug page থেকে OpenAI status check করুন।"
-        )
 
 
 # =========================================================
@@ -2401,7 +1868,6 @@ def knowledge_api():
 
     rows = get_sheet_data()
 
-
     return jsonify({
 
         "rows":
@@ -2417,20 +1883,17 @@ def knowledge_api():
                 "loaded_at"
             ),
 
-        "source":
-            sheet_cache.get(
-                "source"
-            ),
-
-        "last_url":
-            sheet_cache.get(
-                "last_url"
-            ),
-
         "last_error":
             sheet_cache.get(
                 "last_error"
+            ),
+
+        "headers":
+            list(
+                rows[0].keys()
             )
+            if rows
+            else []
     })
 
 
@@ -2446,7 +1909,6 @@ def refresh_knowledge():
 
     rows = download_google_sheet()
 
-
     return jsonify({
 
         "success":
@@ -2458,11 +1920,6 @@ def refresh_knowledge():
         "loaded_at":
             sheet_cache.get(
                 "loaded_at"
-            ),
-
-        "source":
-            sheet_cache.get(
-                "source"
             ),
 
         "error":
@@ -2484,33 +1941,16 @@ def debug_api():
 
     rows = get_sheet_data()
 
-    products = get_products()
-
-    orders = get_orders()
-
-
     return jsonify({
 
         "ezkroy":
             "online",
 
-        "timestamp":
-            datetime.now().isoformat(),
+        "ai_mode":
+            "GOOGLE_SHEET_ONLY",
 
-        "openai": {
-
-            "installed":
-                bool(OpenAI),
-
-            "api_key_found":
-                bool(OPENAI_API_KEY),
-
-            "client_connected":
-                bool(client),
-
-            "model":
-                MODEL
-        },
+        "openai":
+            "DISABLED",
 
         "google_sheet": {
 
@@ -2520,25 +1960,12 @@ def debug_api():
             "csv_url":
                 GOOGLE_SHEET_CSV_URL,
 
-            "gviz_url":
-                GOOGLE_SHEET_GVIZ_URL,
-
             "rows":
                 len(rows),
 
             "loaded_at":
                 sheet_cache.get(
                     "loaded_at"
-                ),
-
-            "source":
-                sheet_cache.get(
-                    "source"
-                ),
-
-            "last_url":
-                sheet_cache.get(
-                    "last_url"
                 ),
 
             "last_error":
@@ -2562,7 +1989,9 @@ def debug_api():
         "products": {
 
             "total":
-                len(products),
+                len(
+                    get_products()
+                ),
 
             "dior":
                 find_product(
@@ -2572,95 +2001,17 @@ def debug_api():
             "vampire":
                 find_product(
                     "vempire blood"
-                ),
-
-            "hawas":
-                find_product(
-                    "hawas"
-                ),
-
-            "hawas_ice":
-                find_product(
-                    "hawas ice"
                 )
         },
 
         "orders": {
 
             "total":
-                len(orders)
+                len(
+                    get_orders()
+                )
         }
     })
-
-
-# =========================================================
-# TEST PRODUCT API
-# =========================================================
-
-@app.route(
-    "/api/test/product",
-    methods=["GET"]
-)
-def test_product():
-
-    message = request.args.get(
-        "q",
-        "dior sauvage koto"
-    )
-
-
-    product = find_product(
-        message
-    )
-
-
-    size = detect_size(
-        message
-    )
-
-
-    price_query = is_price_query(
-        message
-    )
-
-
-    result = {
-
-        "message":
-            message,
-
-        "normalized":
-            normalize_text(
-                message
-            ),
-
-        "product_found":
-            bool(product),
-
-        "product":
-            product,
-
-        "size":
-            size,
-
-        "price_query":
-            price_query
-    }
-
-
-    if product and price_query:
-
-        result[
-            "direct_answer"
-        ] = build_product_answer(
-            product,
-            size
-        )
-
-
-    return jsonify(
-        result
-    )
 
 
 # =========================================================
@@ -2675,48 +2026,53 @@ def test_sheet():
 
     message = request.args.get(
         "q",
-        "delivery charge koto"
-    )
+        ""
+    ).strip()
 
+    if not message:
 
-    rows = get_sheet_data()
+        return jsonify({
 
+            "success":
+                False,
+
+            "message":
+                "Use ?q=your question"
+        })
 
     answer = find_matching_sheet_answer(
         message
     )
 
+    product_answer = (
+        find_product_sheet_answer(
+            message
+        )
+    )
 
     return jsonify({
 
         "message":
             message,
 
-        "sheet_rows":
-            len(rows),
+        "normalized":
+            normalize_text(
+                message
+            ),
 
-        "sheet_connected":
-            bool(rows),
-
-        "answer_found":
-            bool(answer),
-
-        "answer":
+        "general_sheet_answer":
             answer,
 
-        "last_error":
-            sheet_cache.get(
-                "last_error"
-            ),
+        "product_sheet_answer":
+            product_answer,
 
-        "loaded_at":
-            sheet_cache.get(
-                "loaded_at"
-            ),
+        "final_answer":
+            product_answer
+            or answer,
 
-        "source":
-            sheet_cache.get(
-                "source"
+        "sheet_rows":
+            len(
+                get_sheet_data()
             )
     })
 
@@ -2738,14 +2094,12 @@ def chat():
         or {}
     )
 
-
     message = str(
         data.get(
             "message",
             ""
         )
     ).strip()
-
 
     if not message:
 
@@ -2755,32 +2109,26 @@ def chat():
                 "আপনার প্রশ্নটি লিখুন।",
 
             "order_created":
-                False
-        })
+                False,
 
+            "source":
+                "system"
+        })
 
     print("")
     print("=" * 60)
-
     print(
         "CUSTOMER:",
         message
     )
 
-
-    # =====================================================
-    # PRODUCT
-    # =====================================================
+    # -----------------------------------------------------
+    # PRODUCT DETECTION
+    # -----------------------------------------------------
 
     product = find_product(
         message
     )
-
-
-    size = detect_size(
-        message
-    )
-
 
     print(
         "PRODUCT:",
@@ -2789,217 +2137,99 @@ def chat():
         else None
     )
 
+    # -----------------------------------------------------
+    # FIRST: PRODUCT-SPECIFIC SHEET ANSWER
+    # -----------------------------------------------------
 
-    print(
-        "SIZE:",
-        size
+    product_answer = (
+        find_product_sheet_answer(
+            message
+        )
     )
 
+    if product_answer:
 
-    # =====================================================
-    # GREETING
-    # =====================================================
-
-    if is_greeting(message):
+        print(
+            "FINAL SOURCE: PRODUCT SHEET"
+        )
 
         return jsonify({
 
             "reply":
-                "হ্যালো! 👋 আমি EZKROY AI Assistant। "
-                "কোন perfume সম্পর্কে জানতে চান?",
+                product_answer,
 
             "order_created":
-                False
+                False,
+
+            "source":
+                "google_sheet_product"
         })
 
+    # -----------------------------------------------------
+    # SECOND: GENERAL SHEET ANSWER
+    # -----------------------------------------------------
 
-    # =====================================================
-    # PRODUCT PRICE
-    # =====================================================
-
-    if (
-        product
-        and is_price_query(message)
-    ):
-
-        answer = build_product_answer(
-            product,
-            size
-        )
-
-
-        return jsonify({
-
-            "reply":
-                answer,
-
-            "order_created":
-                False
-        })
-
-
-    # =====================================================
-    # PRODUCT DETAIL
-    # =====================================================
-
-    normalized_message = normalize_text(
-        message
-    )
-
-
-    product_detail_words = [
-
-        "details",
-        "detail",
-        "notes",
-        "note",
-        "longevity",
-        "lasting",
-        "কেমন",
-        "নোট",
-        "লাস্টিং"
-    ]
-
-
-    if (
-        product
-        and any(
-            word in normalized_message
-            for word in product_detail_words
-        )
-    ):
-
-        answer = build_product_detail_answer(
-            product
-        )
-
-
-        return jsonify({
-
-            "reply":
-                answer,
-
-            "order_created":
-                False
-        })
-
-
-    # =====================================================
-    # ORDER REQUEST
-    # =====================================================
-
-    if is_order_request(message):
-
-        order_info = (
-            extract_order_information(
-                message
-            )
-        )
-
-
-        product_name = (
-            order_info["product"]
-        )
-
-
-        detected_size = (
-            order_info["size"]
-        )
-
-
-        if not product_name:
-
-            return jsonify({
-
-                "reply":
-                    "অবশ্যই! 😊 কোন perfume টি নিতে চান? "
-                    "যেমন: Dior Sauvage, Vampire Blood, "
-                    "Hawas Fire ইত্যাদি।",
-
-                "order_created":
-                    False
-            })
-
-
-        if detected_size == "50ml":
-
-            return jsonify({
-
-                "reply":
-                    f"{product_name}-এর 50ml option "
-                    f"এখন available নেই। "
-                    f"15ml অথবা 30ml নিতে পারবেন।",
-
-                "order_created":
-                    False
-            })
-
-
-        if not detected_size:
-
-            return jsonify({
-
-                "reply":
-                    f"{product_name} নিতে পারবেন। "
-                    f"15ml নাকি 30ml চান?",
-
-                "order_created":
-                    False
-            })
-
-
-        return jsonify({
-
-            "reply":
-                f"ঠিক আছে! {product_name} {detected_size}। "
-                f"এখন আপনার নাম, phone number এবং "
-                f"full address দিন।",
-
-            "order_created":
-                False
-        })
-
-
-    # =====================================================
-    # SHEET FAQ
-    # =====================================================
-
-    verified_answer = (
+    sheet_answer = (
         find_matching_sheet_answer(
             message
         )
     )
 
+    if sheet_answer:
 
-    if verified_answer:
+        print(
+            "FINAL SOURCE: GOOGLE SHEET"
+        )
 
         return jsonify({
 
             "reply":
-                verified_answer,
+                sheet_answer,
 
             "order_created":
-                False
+                False,
+
+            "source":
+                "google_sheet"
         })
 
+    # -----------------------------------------------------
+    # ORDER REQUEST
+    #
+    # IMPORTANT:
+    # We DO NOT generate AI answers.
+    # We only use Sheet.
+    # -----------------------------------------------------
 
-    # =====================================================
-    # AI FALLBACK
-    # =====================================================
+    if is_order_request(message):
 
-    reply = ask_ai(
-        message,
-        ""
-    )
+        return jsonify({
 
+            "reply":
+                "অর্ডার সংক্রান্ত তথ্য Google Sheet-এ পাওয়া যায়নি। "
+                "অনুগ্রহ করে Sheet-এ এই প্রশ্নের উত্তর যোগ করুন।",
+
+            "order_created":
+                False,
+
+            "source":
+                "google_sheet_missing"
+        })
+
+    # -----------------------------------------------------
+    # NOTHING FOUND
+    # -----------------------------------------------------
 
     return jsonify({
 
         "reply":
-            reply,
+            "দুঃখিত, এই প্রশ্নের উত্তর আমার Google Sheet-এ পাওয়া যায়নি।",
 
         "order_created":
-            False
+            False,
+
+        "source":
+            "google_sheet_missing"
     })
 
 
@@ -3015,11 +2245,16 @@ def health():
 
     rows = get_sheet_data()
 
-
     return jsonify({
 
         "status":
             "online",
+
+        "mode":
+            "GOOGLE_SHEET_ONLY",
+
+        "openai":
+            False,
 
         "google_sheet_rows":
             len(rows),
@@ -3032,11 +2267,6 @@ def health():
                 "last_error"
             ),
 
-        "google_sheet_source":
-            sheet_cache.get(
-                "source"
-            ),
-
         "total_products":
             len(
                 get_products()
@@ -3045,16 +2275,7 @@ def health():
         "total_orders":
             len(
                 get_orders()
-            ),
-
-        "openai":
-            bool(client),
-
-        "openai_key":
-            bool(OPENAI_API_KEY),
-
-        "model":
-            MODEL
+            )
     })
 
 
@@ -3066,61 +2287,36 @@ if __name__ == "__main__":
 
     print("")
     print("=" * 60)
-    print("          EZKROY AI SALES AGENT")
+    print("           EZKROY AI SALES AGENT")
     print("=" * 60)
 
-
     print(
-        "OPENAI KEY:",
-        "FOUND"
-        if OPENAI_API_KEY
-        else "NOT FOUND"
+        "MODE:",
+        "GOOGLE SHEET ONLY"
     )
 
-
     print(
-        "OPENAI CLIENT:",
-        "CONNECTED"
-        if client
-        else "NOT CONNECTED"
+        "OPENAI:",
+        "DISABLED"
     )
-
-
-    print(
-        "MODEL:",
-        MODEL
-    )
-
 
     print(
         "GOOGLE SHEET ID:",
         GOOGLE_SHEET_ID
     )
 
-
-    print(
-        "GOOGLE SHEET CSV:",
-        GOOGLE_SHEET_CSV_URL
-    )
-
-
     print("=" * 60)
 
-
-    # =====================================================
-    # INITIAL GOOGLE SHEET LOAD
-    # =====================================================
-
+    # Load Sheet immediately
     download_google_sheet()
-
 
     print(
         "SERVER STARTING..."
     )
-
 
     app.run(
         host="0.0.0.0",
         port=5000,
         debug=True
     )
+```
