@@ -1,4 +1,3 @@
-```python
 from flask import Flask, request, jsonify, render_template
 import os
 import json
@@ -2835,4 +2834,3 @@ if __name__ == "__main__":
         port=5000,
         debug=True
     )
-```
