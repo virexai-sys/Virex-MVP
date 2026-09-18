@@ -15,7 +15,7 @@ except ImportError:
 
 
 # =========================================================
-# EZKROY AI - SALES & ANALYTICS AGENT
+# EZKROY AI — SALES & ANALYTICS BACKEND
 # =========================================================
 
 app = Flask(__name__)
@@ -32,11 +32,6 @@ MODEL = os.getenv(
     "gpt-4o"
 )
 
-
-# =========================================================
-# GOOGLE SHEET
-# =========================================================
-
 GOOGLE_SHEET_ID = (
     "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
 )
@@ -48,7 +43,7 @@ GOOGLE_SHEET_CSV_URL = (
 
 
 # =========================================================
-# DATA FILES
+# FILE PATHS
 # =========================================================
 
 DATA_DIR = "data"
@@ -63,10 +58,7 @@ ORDER_FILE = os.path.join(
     "orders.json"
 )
 
-os.makedirs(
-    DATA_DIR,
-    exist_ok=True
-)
+os.makedirs(DATA_DIR, exist_ok=True)
 
 
 # =========================================================
@@ -85,13 +77,7 @@ INITIAL_PRODUCTS = [
         "description": "Fresh, Urban & Confident.",
         "notes": ["Citrus", "Green", "Woody", "Spicy", "Musky"],
         "longevity": "6–8 Hours",
-        "best_for": [
-            "Daily Wear",
-            "Office",
-            "College",
-            "Dates",
-            "Casual Outings"
-        ]
+        "best_for": ["Daily Wear", "Office", "College", "Dates", "Casual Outings"]
     },
     {
         "id": 2,
@@ -104,13 +90,7 @@ INITIAL_PRODUCTS = [
         "description": "Warm, Elegant & Seductive.",
         "notes": ["Apple", "Orange", "Spicy", "Vanilla", "Woody"],
         "longevity": "6–8 Hours",
-        "best_for": [
-            "Office",
-            "Dates",
-            "Evening Wear",
-            "Winter",
-            "Casual Events"
-        ]
+        "best_for": ["Office", "Dates", "Evening Wear", "Winter", "Casual Events"]
     },
     {
         "id": 3,
@@ -123,13 +103,7 @@ INITIAL_PRODUCTS = [
         "description": "Bold, Addictive & Magnetic.",
         "notes": ["Sweet", "Spicy", "Aquatic", "Smoky", "Amber"],
         "longevity": "7–9 Hours",
-        "best_for": [
-            "Dates",
-            "Night Out",
-            "Parties",
-            "Winter",
-            "Special Events"
-        ]
+        "best_for": ["Dates", "Night Out", "Parties", "Winter", "Special Events"]
     },
     {
         "id": 4,
@@ -142,13 +116,7 @@ INITIAL_PRODUCTS = [
         "description": "Bold, Luxurious & Attention-Grabbing.",
         "notes": ["Sweet", "Spicy", "Citrus", "Leather", "Woody"],
         "longevity": "7–10 Hours",
-        "best_for": [
-            "Parties",
-            "Night Out",
-            "Dates",
-            "Winter",
-            "Special Events"
-        ]
+        "best_for": ["Parties", "Night Out", "Dates", "Winter", "Special Events"]
     },
     {
         "id": 5,
@@ -161,12 +129,7 @@ INITIAL_PRODUCTS = [
         "description": "Fresh, Masculine & Long-lasting.",
         "notes": ["Woody", "Spicy", "Sweet", "Smoky"],
         "longevity": "6–8 Hours",
-        "best_for": [
-            "Daily Wear",
-            "Office",
-            "Dates",
-            "Events"
-        ]
+        "best_for": ["Daily Wear", "Office", "Dates", "Events"]
     },
     {
         "id": 6,
@@ -179,13 +142,7 @@ INITIAL_PRODUCTS = [
         "description": "Fresh, Clean & Everyday Confidence.",
         "notes": ["Aquatic", "Green Apple", "Fresh", "Woody"],
         "longevity": "5–7 Hours",
-        "best_for": [
-            "Daily Wear",
-            "Summer Days",
-            "College",
-            "Office",
-            "Casual Outings"
-        ]
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"]
     },
     {
         "id": 7,
@@ -198,13 +155,7 @@ INITIAL_PRODUCTS = [
         "description": "Cool, Fresh & Addictive.",
         "notes": ["Aquatic", "Citrus", "Sweet", "Musky", "Fresh Spicy"],
         "longevity": "7–9 Hours",
-        "best_for": [
-            "Daily Wear",
-            "Summer Days",
-            "College",
-            "Office",
-            "Casual Outings"
-        ]
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"]
     },
     {
         "id": 8,
@@ -215,21 +166,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Elegant, Fresh & Sophisticated.",
-        "notes": [
-            "Citrus",
-            "Woody",
-            "Aromatic",
-            "Fresh Spicy",
-            "Incense"
-        ],
+        "notes": ["Citrus", "Woody", "Aromatic", "Fresh Spicy", "Incense"],
         "longevity": "7–10 Hours",
-        "best_for": [
-            "Office",
-            "Daily Wear",
-            "Meetings",
-            "Dates",
-            "Special Events"
-        ]
+        "best_for": ["Office", "Daily Wear", "Meetings", "Dates", "Special Events"]
     },
     {
         "id": 9,
@@ -242,13 +181,7 @@ INITIAL_PRODUCTS = [
         "description": "Dark, Mysterious & Seductive.",
         "notes": ["Sweet", "Spicy", "Smoky", "Amber", "Woody"],
         "longevity": "7–9 Hours",
-        "best_for": [
-            "Night Out",
-            "Parties",
-            "Winter",
-            "Dates",
-            "Special Events"
-        ]
+        "best_for": ["Night Out", "Parties", "Winter", "Dates", "Special Events"]
     },
     {
         "id": 10,
@@ -261,13 +194,7 @@ INITIAL_PRODUCTS = [
         "description": "Classy, Romantic & Royal.",
         "notes": ["Fresh", "Woody", "Spicy", "Soft Floral", "Amber"],
         "longevity": "6–8 Hours",
-        "best_for": [
-            "Dates",
-            "Weddings",
-            "Events",
-            "Office",
-            "Evening Wear"
-        ]
+        "best_for": ["Dates", "Weddings", "Events", "Office", "Evening Wear"]
     },
     {
         "id": 11,
@@ -278,21 +205,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Sweet, Warm & Addictive.",
-        "notes": [
-            "Chestnut",
-            "Vanilla",
-            "Sweet Spicy",
-            "Amber",
-            "Woody"
-        ],
+        "notes": ["Chestnut", "Vanilla", "Sweet Spicy", "Amber", "Woody"],
         "longevity": "7–10 Hours",
-        "best_for": [
-            "Dates",
-            "Winter",
-            "Night Out",
-            "Parties",
-            "Special Moments"
-        ]
+        "best_for": ["Dates", "Winter", "Night Out", "Parties", "Special Moments"]
     },
     {
         "id": 12,
@@ -303,21 +218,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Elegant, Feminine & Soft Luxury.",
-        "notes": [
-            "Floral",
-            "Citrus",
-            "Sweet",
-            "Powdery",
-            "Soft Woody"
-        ],
+        "notes": ["Floral", "Citrus", "Sweet", "Powdery", "Soft Woody"],
         "longevity": "5–7 Hours",
-        "best_for": [
-            "Daily Wear",
-            "Office",
-            "College",
-            "Dates",
-            "Casual Outings"
-        ]
+        "best_for": ["Daily Wear", "Office", "College", "Dates", "Casual Outings"]
     },
     {
         "id": 13,
@@ -328,21 +231,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1299,
         "stock": 20,
         "description": "Clean, Iconic & Timeless.",
-        "notes": [
-            "Citrus",
-            "Green",
-            "Fresh Spicy",
-            "Aromatic",
-            "Woody"
-        ],
+        "notes": ["Citrus", "Green", "Fresh Spicy", "Aromatic", "Woody"],
         "longevity": "6–8 Hours",
-        "best_for": [
-            "Daily Wear",
-            "Summer Days",
-            "College",
-            "Office",
-            "Casual Outings"
-        ]
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"]
     },
     {
         "id": 14,
@@ -353,21 +244,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Bold, Sweet & Irresistible.",
-        "notes": [
-            "Vanilla",
-            "Sweet",
-            "Fruity",
-            "Amber",
-            "Warm Spicy"
-        ],
+        "notes": ["Vanilla", "Sweet", "Fruity", "Amber", "Warm Spicy"],
         "longevity": "8–10 Hours",
-        "best_for": [
-            "Date Night",
-            "Evening Wear",
-            "Parties",
-            "Winter Days",
-            "Special Occasions"
-        ]
+        "best_for": ["Date Night", "Evening Wear", "Parties", "Winter Days", "Special Occasions"]
     },
     {
         "id": 15,
@@ -378,21 +257,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1299,
         "stock": 20,
         "description": "Fresh, Clean & Timeless.",
-        "notes": [
-            "Aquatic",
-            "Marine",
-            "Green",
-            "Aromatic",
-            "Fresh Spicy"
-        ],
+        "notes": ["Aquatic", "Marine", "Green", "Aromatic", "Fresh Spicy"],
         "longevity": "6–8 Hours",
-        "best_for": [
-            "Daily Wear",
-            "Summer Days",
-            "College",
-            "Office",
-            "Casual Outings"
-        ]
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"]
     },
     {
         "id": 16,
@@ -403,22 +270,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1699,
         "stock": 20,
         "description": "Rich, Warm & Addictive.",
-        "notes": [
-            "Cinnamon",
-            "Vanilla",
-            "Sweet",
-            "Amber",
-            "Woody",
-            "Warm Spicy"
-        ],
+        "notes": ["Cinnamon", "Vanilla", "Sweet", "Amber", "Woody", "Warm Spicy"],
         "longevity": "8–12 Hours",
-        "best_for": [
-            "Date Night",
-            "Winter Days",
-            "Parties",
-            "Special Occasions",
-            "Evening Wear"
-        ]
+        "best_for": ["Date Night", "Winter Days", "Parties", "Special Occasions", "Evening Wear"]
     },
     {
         "id": 17,
@@ -429,21 +283,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1799,
         "stock": 20,
         "description": "Bold, Powerful & Legendary.",
-        "notes": [
-            "Pineapple",
-            "Bergamot",
-            "Smoky",
-            "Woody",
-            "Musky"
-        ],
+        "notes": ["Pineapple", "Bergamot", "Smoky", "Woody", "Musky"],
         "longevity": "8–10 Hours",
-        "best_for": [
-            "Office",
-            "Date Night",
-            "Parties",
-            "Special Occasions",
-            "Year-Round Wear"
-        ]
+        "best_for": ["Office", "Date Night", "Parties", "Special Occasions", "Year-Round Wear"]
     },
     {
         "id": 18,
@@ -454,21 +296,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1299,
         "stock": 20,
         "description": "Sweet, Juicy & Addictive.",
-        "notes": [
-            "Blueberry",
-            "Fruity",
-            "Sweet",
-            "Fresh",
-            "Musky"
-        ],
+        "notes": ["Blueberry", "Fruity", "Sweet", "Fresh", "Musky"],
         "longevity": "6–8 Hours",
-        "best_for": [
-            "Daily Wear",
-            "College",
-            "Casual Outings",
-            "Hangouts",
-            "Daytime Wear"
-        ]
+        "best_for": ["Daily Wear", "College", "Casual Outings", "Hangouts", "Daytime Wear"]
     },
     {
         "id": 19,
@@ -479,21 +309,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1699,
         "stock": 20,
         "description": "Rich, Warm & Addictive.",
-        "notes": [
-            "Tobacco",
-            "Vanilla",
-            "Sweet",
-            "Warm Spicy",
-            "Woody"
-        ],
+        "notes": ["Tobacco", "Vanilla", "Sweet", "Warm Spicy", "Woody"],
         "longevity": "8–12 Hours",
-        "best_for": [
-            "Date Night",
-            "Winter Days",
-            "Evening Wear",
-            "Parties",
-            "Special Occasions"
-        ]
+        "best_for": ["Date Night", "Winter Days", "Evening Wear", "Parties", "Special Occasions"]
     },
     {
         "id": 20,
@@ -504,21 +322,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1699,
         "stock": 20,
         "description": "Sweet, Bold & Irresistible.",
-        "notes": [
-            "Vanilla",
-            "White Floral",
-            "Sweet",
-            "Warm Spicy",
-            "Cacao"
-        ],
+        "notes": ["Vanilla", "White Floral", "Sweet", "Warm Spicy", "Cacao"],
         "longevity": "8–10 Hours",
-        "best_for": [
-            "Date Night",
-            "Parties",
-            "Evening Wear",
-            "Special Occasions",
-            "Winter Days"
-        ]
+        "best_for": ["Date Night", "Parties", "Evening Wear", "Special Occasions", "Winter Days"]
     },
     {
         "id": 21,
@@ -529,22 +335,9 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Fresh, Bold & Irresistible.",
-        "notes": [
-            "Mint",
-            "Vanilla",
-            "Apple",
-            "Citrus",
-            "Woody",
-            "Fresh Spicy"
-        ],
+        "notes": ["Mint", "Vanilla", "Apple", "Citrus", "Woody", "Fresh Spicy"],
         "longevity": "8–10 Hours",
-        "best_for": [
-            "Date Night",
-            "Parties",
-            "College",
-            "Casual Outings",
-            "Evening Wear"
-        ]
+        "best_for": ["Date Night", "Parties", "College", "Casual Outings", "Evening Wear"]
     },
     {
         "id": 22,
@@ -555,31 +348,53 @@ INITIAL_PRODUCTS = [
         "regular_30ml": 1499,
         "stock": 20,
         "description": "Bold, Dark & Unapologetic.",
-        "notes": [
-            "Cocoa",
-            "Tonka Bean",
-            "Amber",
-            "Citrus",
-            "Woody",
-            "Aromatic"
-        ],
+        "notes": ["Cocoa", "Tonka Bean", "Amber", "Citrus", "Woody", "Aromatic"],
         "longevity": "8–10 Hours",
-        "best_for": [
-            "Date Night",
-            "Parties",
-            "Evening Wear",
-            "Winter Days",
-            "Special Occasions"
-        ]
+        "best_for": ["Date Night", "Parties", "Evening Wear", "Winter Days", "Special Occasions"]
     }
 ]
 
 
+# =========================================================
+# JSON HELPERS
+# =========================================================
+
+def load_json_file(filename, default=None):
+    if default is None:
+        default = []
+
+    try:
+        if not os.path.exists(filename):
+            return default
+
+        with open(filename, "r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        return data
+
+    except Exception as error:
+        print("JSON LOAD ERROR:", error)
+        return default
+
+
+def save_json_file(filename, data):
+    try:
+        with open(filename, "w", encoding="utf-8") as file:
+            json.dump(
+                data,
+                file,
+                ensure_ascii=False,
+                indent=2
+            )
+
+        return True
+
+    except Exception as error:
+        print("JSON SAVE ERROR:", error)
+        return False
+
+
 def init_product_file():
-    """
-    Create products.json only if it does not already exist.
-    Existing product data will not be overwritten.
-    """
     if not os.path.exists(PRODUCT_FILE):
         save_json_file(
             PRODUCT_FILE,
@@ -588,6 +403,24 @@ def init_product_file():
 
 
 init_product_file()
+
+
+def get_products():
+    products = load_json_file(
+        PRODUCT_FILE,
+        INITIAL_PRODUCTS
+    )
+
+    return products if isinstance(products, list) else INITIAL_PRODUCTS
+
+
+def get_orders():
+    orders = load_json_file(
+        ORDER_FILE,
+        []
+    )
+
+    return orders if isinstance(orders, list) else []
 
 
 # =========================================================
@@ -603,78 +436,6 @@ if OpenAI and OPENAI_API_KEY:
         )
     except Exception as error:
         print("OPENAI CLIENT ERROR:", error)
-        client = None
-
-
-# =========================================================
-# JSON FILE HELPERS
-# =========================================================
-
-def load_json_file(filename, default=None):
-
-    if default is None:
-        default = []
-
-    try:
-
-        if not os.path.exists(filename):
-            return default
-
-        with open(
-            filename,
-            "r",
-            encoding="utf-8"
-        ) as file:
-
-            return json.load(file)
-
-    except Exception as error:
-
-        print("JSON LOAD ERROR:", error)
-
-        return default
-
-
-def save_json_file(filename, data):
-
-    try:
-
-        with open(
-            filename,
-            "w",
-            encoding="utf-8"
-        ) as file:
-
-            json.dump(
-                data,
-                file,
-                ensure_ascii=False,
-                indent=2
-            )
-
-        return True
-
-    except Exception as error:
-
-        print("JSON SAVE ERROR:", error)
-
-        return False
-
-
-def get_products():
-
-    return load_json_file(
-        PRODUCT_FILE,
-        INITIAL_PRODUCTS
-    )
-
-
-def get_orders():
-
-    return load_json_file(
-        ORDER_FILE,
-        []
-    )
 
 
 # =========================================================
@@ -688,16 +449,14 @@ sheet_cache = {
 
 
 # =========================================================
-# GOOGLE SHEET DOWNLOADER
+# GOOGLE SHEET DOWNLOAD
 # =========================================================
 
 def download_google_sheet():
 
     try:
 
-        print(
-            "Downloading knowledge from Google Sheet..."
-        )
+        print("Downloading Google Sheet knowledge...")
 
         req = urllib.request.Request(
             GOOGLE_SHEET_CSV_URL,
@@ -718,14 +477,12 @@ def download_google_sheet():
             "utf-8-sig"
         )
 
-
         reader = csv.DictReader(
             io.StringIO(text)
         )
 
 
         rows = []
-
 
         for row in reader:
 
@@ -748,19 +505,16 @@ def download_google_sheet():
 
 
             if any(cleaned.values()):
-
                 rows.append(cleaned)
 
 
         sheet_cache["data"] = rows
-
         sheet_cache["loaded_at"] = datetime.now()
 
 
         print(
-            f"Google Sheet successfully loaded: {len(rows)} rows"
+            f"Google Sheet loaded: {len(rows)} rows"
         )
-
 
         return rows
 
@@ -781,7 +535,6 @@ def download_google_sheet():
 def get_sheet_data():
 
     if not sheet_cache["data"]:
-
         return download_google_sheet()
 
     return sheet_cache["data"]
@@ -797,6 +550,22 @@ def normalize_text(text):
         text or ""
     ).lower()
 
+    text = text.replace(
+        "৳",
+        " taka "
+    )
+
+    text = text.replace(
+        "tk",
+        " taka "
+    )
+
+    text = re.sub(
+        r"[^a-z0-9\u0980-\u09ff\s]",
+        " ",
+        text
+    )
+
     text = re.sub(
         r"\s+",
         " ",
@@ -806,11 +575,256 @@ def normalize_text(text):
     return text.strip()
 
 
+def tokenize(text):
+
+    return set(
+        re.findall(
+            r"[a-z0-9\u0980-\u09ff]+",
+            normalize_text(text)
+        )
+    )
+
+
 # =========================================================
-# SMART GOOGLE SHEET MATCHING
+# PRODUCT MATCHING
 # =========================================================
 
-def find_matching_sheet_answer(user_message):
+def find_product(user_message):
+
+    text = normalize_text(
+        user_message
+    )
+
+    products = get_products()
+
+
+    # Exact / full name matching
+    for product in products:
+
+        name = normalize_text(
+            product.get("name", "")
+        )
+
+        if name and name in text:
+            return product
+
+
+    # Alias / important keyword matching
+    aliases = {
+
+        "dior": "DIOR SAUVAGE",
+
+        "sauvage": "DIOR SAUVAGE",
+
+        "vampire": "VAMPIRE BLOOD",
+
+        "vempire": "VAMPIRE BLOOD",
+
+        "212": "212 MEN NYC",
+
+        "dunhill": "DUNHILL DESIRE",
+
+        "hawas fire": "HAWAS FIRE",
+
+        "hawas ice": "HAWAS ICE",
+
+        "one million": "ONE MILLION",
+
+        "nautica": "NAUTICA VOYAGE",
+
+        "bleu": "BLEU DE CHANEL",
+
+        "srk": "SRK (Shah Rukh Inspired)",
+
+        "stronger with you": "STRONGER WITH YOU",
+
+        "gucci": "GUCCI FLORA",
+
+        "ck1": "CK1",
+
+        "9pm": "9PM",
+
+        "cool water": "COOL WATER",
+
+        "khamrah": "LATTAFA KHAMRAH",
+
+        "lattafa": "LATTAFA KHAMRAH",
+
+        "aventus": "CREED AVENTUS",
+
+        "creed": "CREED AVENTUS",
+
+        "blueberry": "BLUEBERRY",
+
+        "tobacco vanille": "TOBACCO VANILLE",
+
+        "good girl": "GOOD GIRL",
+
+        "eros": "VERSACE EROS",
+
+        "versace": "VERSACE EROS",
+
+        "bad boy": "BAD BOY"
+    }
+
+
+    for alias, product_name in aliases.items():
+
+        if alias in text:
+
+            for product in products:
+
+                if normalize_text(
+                    product.get("name", "")
+                ) == normalize_text(
+                    product_name
+                ):
+
+                    return product
+
+
+    return None
+
+
+# =========================================================
+# SIZE DETECTION
+# =========================================================
+
+def detect_size(message):
+
+    text = normalize_text(
+        message
+    )
+
+    match = re.search(
+        r"\b(15|30|50)\s*(?:ml|m l)\b",
+        text
+    )
+
+    if match:
+        return match.group(1) + "ml"
+
+
+    if re.search(
+        r"\b15\b",
+        text
+    ):
+        return "15ml"
+
+
+    if re.search(
+        r"\b30\b",
+        text
+    ):
+        return "30ml"
+
+
+    if re.search(
+        r"\b50\b",
+        text
+    ):
+        return "50ml"
+
+
+    return None
+
+
+# =========================================================
+# PRICE QUERY DETECTION
+# =========================================================
+
+def is_price_query(message):
+
+    text = normalize_text(
+        message
+    )
+
+    price_words = [
+        "price",
+        "price koto",
+        "koto",
+        "dam",
+        "দাম",
+        "কত",
+        "দাম কত",
+        "price koto",
+        "tk",
+        "taka"
+    ]
+
+    return any(
+        word in text
+        for word in price_words
+    )
+
+
+# =========================================================
+# PRODUCT ANSWER
+# =========================================================
+
+def build_product_answer(
+    product,
+    size=None
+):
+
+    name = product.get(
+        "name",
+        "Product"
+    )
+
+    if size == "15ml":
+
+        price = product.get(
+            "price_15ml"
+        )
+
+        regular = product.get(
+            "regular_15ml"
+        )
+
+        return (
+            f"{name} 15ml-এর বর্তমান price "
+            f"৳{price}। Regular price ৳{regular}।"
+        )
+
+
+    if size == "30ml":
+
+        price = product.get(
+            "price_30ml"
+        )
+
+        regular = product.get(
+            "regular_30ml"
+        )
+
+        return (
+            f"{name} 30ml-এর বর্তমান price "
+            f"৳{price}। Regular price ৳{regular}।"
+        )
+
+
+    price_15 = product.get(
+        "price_15ml"
+    )
+
+    price_30 = product.get(
+        "price_30ml"
+    )
+
+    return (
+        f"{name} 15ml ৳{price_15} "
+        f"এবং 30ml ৳{price_30}।"
+    )
+
+
+# =========================================================
+# GOOGLE SHEET Q&A MATCHING
+# =========================================================
+
+def find_matching_sheet_answer(
+    user_message
+):
 
     rows = get_sheet_data()
 
@@ -822,76 +836,72 @@ def find_matching_sheet_answer(user_message):
         user_message
     )
 
-
-    user_words = set(
-        re.findall(
-            r"\w+",
-            user_text
-        )
+    user_words = tokenize(
+        user_message
     )
 
 
-    best_answer = None
-
-    highest_score = 0
-
-
+    # Exact question match first
     for row in rows:
 
-        q_text = normalize_text(
+        question = normalize_text(
             row.get(
                 "question",
                 ""
             )
         )
 
-        kw_text = normalize_text(
+        answer = str(
+            row.get(
+                "answer",
+                ""
+            )
+        ).strip()
+
+        if (
+            question
+            and answer
+            and user_text == question
+        ):
+            return answer
+
+
+    best_answer = None
+    best_score = 0
+
+
+    for row in rows:
+
+        question = normalize_text(
+            row.get(
+                "question",
+                ""
+            )
+        )
+
+        keywords = normalize_text(
             row.get(
                 "keywords",
                 ""
             )
         )
 
-        ans_text = row.get(
-            "answer",
-            ""
-        )
+        answer = str(
+            row.get(
+                "answer",
+                ""
+            )
+        ).strip()
 
 
-        if not ans_text:
+        if not answer:
             continue
 
 
-        # Exact question match
-
-        if (
-            user_text
-            and
-            user_text == q_text
-        ):
-
-            return ans_text
-
-
-        keywords_set = set(
-            re.findall(
-                r"\w+",
-                kw_text
-            )
-        )
-
-
-        q_words_set = set(
-            re.findall(
-                r"\w+",
-                q_text
-            )
-        )
-
-
         target_words = (
-            keywords_set
-            .union(q_words_set)
+            tokenize(question)
+            |
+            tokenize(keywords)
         )
 
 
@@ -899,32 +909,41 @@ def find_matching_sheet_answer(user_message):
             continue
 
 
-        common_words = (
+        common = (
             user_words
-            .intersection(
-                target_words
-            )
+            &
+            target_words
         )
 
 
-        score = (
-            len(common_words)
-            /
-            max(
-                len(target_words),
-                1
-            )
+        if not common:
+            continue
+
+
+        # Better scoring:
+        # matched words / user's meaningful words
+        score = len(common) / max(
+            len(user_words),
+            1
         )
 
 
-        if score > highest_score:
+        # Penalize very weak one-word matches
+        if len(common) == 1 and len(
+            user_words
+        ) > 2:
 
-            highest_score = score
-
-            best_answer = ans_text
+            score *= 0.45
 
 
-    if highest_score >= 0.25:
+        if score > best_score:
+
+            best_score = score
+            best_answer = answer
+
+
+    # Only accept a meaningful match.
+    if best_score >= 0.45:
 
         return best_answer
 
@@ -933,7 +952,7 @@ def find_matching_sheet_answer(user_message):
 
 
 # =========================================================
-# PRODUCT KNOWLEDGE BASE
+# KNOWLEDGE BASE
 # =========================================================
 
 def build_knowledge_base():
@@ -941,7 +960,7 @@ def build_knowledge_base():
     products = get_products()
 
     kb = [
-        "=== EZKROY PERFUME PRODUCTS CATALOG ==="
+        "=== EZKROY PRODUCT CATALOG ==="
     ]
 
 
@@ -959,152 +978,91 @@ def build_knowledge_base():
 
 
 # =========================================================
-# ORDER EXTRACTION
+# ORDER DETECTION
 # =========================================================
 
-def extract_order_information(message):
+def is_order_request(message):
 
-    text = str(
-        message or ""
-    ).strip()
-
-    lower = text.lower()
+    text = normalize_text(
+        message
+    )
 
 
-    product = None
+    order_phrases = [
 
-    size = None
+        "order",
+        "order korte chai",
+        "order korte cchai",
+        "order korbo",
+        "nibo",
+        "nib",
+        "nite chai",
+        "nitte chai",
+        "kinbo",
+        "kinte chai",
+        "buy",
+        "book",
+        "অর্ডার",
+        "অর্ডার করতে চাই",
+        "নিব",
+        "নিতে চাই",
+        "কিনবো",
+        "কিনতে চাই"
+    ]
+
+
+    return any(
+        phrase in text
+        for phrase in order_phrases
+    )
+
+
+# =========================================================
+# ORDER INFORMATION
+# =========================================================
+
+def extract_order_information(
+    message
+):
+
+    product = find_product(
+        message
+    )
+
+    size = detect_size(
+        message
+    )
+
 
     quantity = 1
 
-
-    # -----------------------------------------------------
-    # SIZE DETECTION
-    # -----------------------------------------------------
-
-    size_match = re.search(
-        r"\b(15|30|50)\s*ml\b",
-        lower
-    )
-
-
-    if size_match:
-
-        size = (
-            size_match.group(1)
-            + "ml"
-        )
-
-
-    # -----------------------------------------------------
-    # QUANTITY DETECTION
-    # -----------------------------------------------------
-
     quantity_match = re.search(
-        r"\b(?:x|qty|quantity|পরিমাণ)\s*(\d+)\b",
-        lower
+        r"(?:x|qty|quantity|পরিমাণ)\s*(\d+)",
+        normalize_text(message)
     )
-
 
     if quantity_match:
 
         try:
-
-            quantity = max(
-                1,
-                int(
-                    quantity_match.group(1)
-                )
+            quantity = int(
+                quantity_match.group(1)
             )
 
-        except ValueError:
-
+        except:
             quantity = 1
-
-
-    # -----------------------------------------------------
-    # EXACT PRODUCT MATCH
-    # -----------------------------------------------------
-
-    products = get_products()
-
-
-    for item in products:
-
-        name = str(
-            item.get(
-                "name",
-                ""
-            )
-        ).strip()
-
-
-        if (
-            name
-            and
-            name.lower() in lower
-        ):
-
-            product = name
-
-            break
-
-
-    # -----------------------------------------------------
-    # PARTIAL PRODUCT MATCH
-    # -----------------------------------------------------
-
-    if not product:
-
-        for item in products:
-
-            name = str(
-                item.get(
-                    "name",
-                    ""
-                )
-            ).lower()
-
-
-            name_parts = name.split()
-
-
-            for part in name_parts:
-
-                if (
-                    len(part) > 3
-                    and part in lower
-                ):
-
-                    product = item.get(
-                        "name"
-                    )
-
-                    break
-
-
-            if product:
-
-                break
 
 
     return {
 
         "product": (
-            product
-            or
-            "General Perfume"
+            product.get("name")
+            if product
+            else None
         ),
 
-        "size": (
-            size
-            if size
-            else
-            "15ml"
-        ),
+        "size": size,
 
         "quantity": quantity
-
     }
 
 
@@ -1117,8 +1075,16 @@ def save_order(
     customer_details=None
 ):
 
-    order_info = extract_order_information(
-        message
+    customer_details = (
+        customer_details
+        or {}
+    )
+
+
+    order_info = (
+        extract_order_information(
+            message
+        )
     )
 
 
@@ -1126,7 +1092,6 @@ def save_order(
 
 
     next_id = 1
-
 
     if orders:
 
@@ -1145,7 +1110,7 @@ def save_order(
                 + 1
             )
 
-        except Exception:
+        except:
 
             next_id = (
                 len(orders)
@@ -1153,58 +1118,50 @@ def save_order(
             )
 
 
-    customer_details = (
-        customer_details
-        or
-        {}
-    )
-
-
     order = {
 
         "id": next_id,
 
-        "customer_name": str(
+        "customer_name":
             customer_details.get(
                 "name",
                 ""
-            )
-        ).strip(),
+            ),
 
-        "phone": str(
+        "phone":
             customer_details.get(
                 "phone",
                 ""
-            )
-        ).strip(),
+            ),
 
-        "address": str(
+        "address":
             customer_details.get(
                 "address",
                 ""
-            )
-        ).strip(),
+            ),
 
-        "product": order_info[
-            "product"
-        ],
+        "product":
+            order_info["product"]
+            or "Not specified",
 
-        "size": order_info[
-            "size"
-        ],
+        "size":
+            order_info["size"]
+            or "Not specified",
 
-        "quantity": order_info[
-            "quantity"
-        ],
+        "quantity":
+            order_info["quantity"],
 
-        "status": "pending",
+        "status":
+            "pending",
 
-        "created_at": datetime.now().isoformat()
-
+        "created_at":
+            datetime.now().isoformat()
     }
 
 
-    orders.append(order)
+    orders.append(
+        order
+    )
 
 
     save_json_file(
@@ -1217,53 +1174,48 @@ def save_order(
 
 
 # =========================================================
-# EZKROY AI SYSTEM PROMPT
+# SYSTEM PROMPT
 # =========================================================
 
 SYSTEM_PROMPT = """
-You are EZKROY AI Sales Assistant, an intelligent AI sales agent for an online perfume store.
-
-Your job is to:
-- Help customers choose perfumes.
-- Explain product prices.
-- Explain fragrance notes.
-- Explain longevity.
-- Recommend perfumes based on customer needs.
-- Answer store-related questions using verified business data.
-- Help customers place orders.
+You are EZKROY AI, a professional AI sales assistant for an online perfume business.
 
 LANGUAGE:
-1. Understand Bangla, Banglish, and English.
-2. Reply in the same language/style used by the customer.
-3. Keep replies short, friendly, natural, and professional.
+- Understand Bangla, Banglish and English.
+- Reply naturally in the same language/style as the customer.
+- Keep replies short, friendly and useful.
 
-PRODUCT DATA:
-4. Never invent product prices, stock, sizes, longevity, notes, or other product information.
-5. Use the provided product catalog as the source of truth for products.
-6. Use verified Google Sheet answers when available.
+IMPORTANT PRODUCT RULE:
+- Use ONLY the supplied EZKROY product catalog for product names, prices, sizes, stock and product information.
+- Never invent a price.
+- If a product is not found, say that you need to check the available catalog.
+- If the customer asks only a simple greeting such as "hi", "hello", "assalamu alaikum", etc., respond naturally. Do NOT give delivery information unless they ask for it.
 
-ORDER PROCESS:
-7. When a customer clearly wants to order, collect:
-   - Name
-   - Phone Number
-   - Address
-   - Product
-   - Size
-   - Quantity
+GOOGLE SHEET:
+- Use the verified sheet answer when it clearly matches the customer's question.
+- Do not use an unrelated sheet answer.
+- Never force a sheet answer onto an unrelated question.
 
-8. Do not ask for all information in a confusing way.
-9. Ask for missing order information step by step.
-10. Do not claim that an order is confirmed unless the system has actually created an order.
+SALES:
+- Help customers choose perfumes based on notes, occasion, freshness, sweetness, longevity, etc.
+- If the customer wants to order, guide them through the required information:
+  1. Product
+  2. Size
+  3. Quantity
+  4. Name
+  5. Phone
+  6. Address
 
 STYLE:
-11. Be concise.
-12. Do not use unnecessary long explanations.
-13. Be polite and sales-friendly without being pushy.
+- Friendly
+- Professional
+- Concise
+- No unnecessary long explanations
 """
 
 
 # =========================================================
-# ASK OPENAI
+# AI RESPONSE
 # =========================================================
 
 def ask_ai(
@@ -1275,8 +1227,7 @@ def ask_ai(
 
         return (
             "EZKROY AI server-এর সাথে "
-            "connect হয়নি। "
-            "OPENAI_API_KEY চেক করুন।"
+            "connect হয়নি। OPENAI_API_KEY check করুন।"
         )
 
 
@@ -1286,25 +1237,16 @@ def ask_ai(
     full_prompt = f"""
 {SYSTEM_PROMPT}
 
-==============================
-PRODUCT CATALOG
-==============================
-
+=== PRODUCT CATALOG ===
 {catalog}
 
+=== VERIFIED GOOGLE SHEET ANSWER ===
+{context_info or "No verified sheet answer found."}
 
-==============================
-VERIFIED GOOGLE SHEET ANSWER
-==============================
-
-{context_info}
-
-
-==============================
-CUSTOMER MESSAGE
-==============================
-
+=== CUSTOMER MESSAGE ===
 {user_message}
+
+Give the most relevant answer.
 """
 
 
@@ -1317,19 +1259,23 @@ CUSTOMER MESSAGE
             messages=[
 
                 {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT
+                    "role":
+                        "system",
+
+                    "content":
+                        SYSTEM_PROMPT
                 },
 
                 {
-                    "role": "user",
-                    "content": full_prompt
-                }
+                    "role":
+                        "user",
 
+                    "content":
+                        full_prompt
+                }
             ],
 
-            temperature=0.7
-
+            temperature=0.4
         )
 
 
@@ -1341,14 +1287,11 @@ CUSTOMER MESSAGE
         )
 
 
-        if reply:
-
-            return reply.strip()
-
-
         return (
-            "দুঃখিত, এই মুহূর্তে "
-            "উত্তর তৈরি করা যাচ্ছে না।"
+            reply.strip()
+            if reply
+            else
+            "দুঃখিত, এই মুহূর্তে উত্তর তৈরি করা যাচ্ছে না।"
         )
 
 
@@ -1358,7 +1301,6 @@ CUSTOMER MESSAGE
             "OPENAI ERROR:",
             error
         )
-
 
         return (
             "দুঃখিত, AI server-এর সাথে "
@@ -1388,10 +1330,8 @@ def home():
 )
 def products_api():
 
-    products = get_products()
-
     return jsonify(
-        products
+        get_products()
     )
 
 
@@ -1405,10 +1345,8 @@ def products_api():
 )
 def orders_api():
 
-    orders = get_orders()
-
     return jsonify(
-        orders
+        get_orders()
     )
 
 
@@ -1424,18 +1362,15 @@ def knowledge_api():
 
     rows = get_sheet_data()
 
-
     return jsonify({
 
-        "rows": len(rows),
+        "rows":
+            len(rows),
 
-        "status": (
+        "status":
             "connected"
             if rows
-            else
-            "empty"
-        )
-
+            else "empty"
     })
 
 
@@ -1451,20 +1386,13 @@ def refresh_knowledge():
 
     rows = download_google_sheet()
 
-
     return jsonify({
 
-        "success": True,
+        "success":
+            True,
 
-        "rows": len(rows),
-
-        "status": (
-            "connected"
-            if rows
-            else
-            "empty"
-        )
-
+        "rows":
+            len(rows)
     })
 
 
@@ -1479,12 +1407,10 @@ def refresh_knowledge():
 def chat():
 
     data = (
-        request
-        .get_json(
+        request.get_json(
             silent=True
         )
-        or
-        {}
+        or {}
     )
 
 
@@ -1505,7 +1431,6 @@ def chat():
 
             "order_created":
                 False
-
         })
 
 
@@ -1516,7 +1441,20 @@ def chat():
 
 
     # -----------------------------------------------------
-    # GOOGLE SHEET MATCH
+    # PRODUCT DETECTION
+    # -----------------------------------------------------
+
+    product = find_product(
+        message
+    )
+
+    size = detect_size(
+        message
+    )
+
+
+    # -----------------------------------------------------
+    # VERIFIED SHEET ANSWER
     # -----------------------------------------------------
 
     verified_answer = (
@@ -1527,75 +1465,46 @@ def chat():
 
 
     # -----------------------------------------------------
-    # AI RESPONSE
+    # PRODUCT PRICE ANSWER
     # -----------------------------------------------------
 
-    reply = ask_ai(
+    if (
+        product
+        and is_price_query(message)
+    ):
 
-        message,
+        product_answer = (
+            build_product_answer(
+                product,
+                size
+            )
+        )
 
-        verified_answer
-        or
-        "No direct sheet Q&A found. Use the product catalog and verified store information."
+        reply = ask_ai(
+            message,
+            product_answer
+        )
 
-    )
+
+    else:
+
+        reply = ask_ai(
+            message,
+            verified_answer
+            or
+            "No direct verified sheet answer found."
+        )
 
 
     # -----------------------------------------------------
-    # ORDER DETECTION
+    # ORDER
     # -----------------------------------------------------
 
     order = None
 
-
-    order_keywords = [
-
-        "order",
-
-        "অর্ডার",
-
-        "নিব",
-
-        "নিতে চাই",
-
-        "চাই",
-
-        "দাও",
-
-        "book",
-
-        "booking",
-
-        "buy",
-
-        "কিনব",
-
-        "কিনতে চাই",
-
-        "অর্ডার করতে চাই",
-
-        "order korte chai",
-
-        "order korbo",
-
-        "order korte cchai"
-
-    ]
-
-
-    lower_message = message.lower()
-
-
-    is_order_request = any(
-
-        keyword in lower_message
-
-        for keyword in order_keywords
-
-    )
-
-
-    if is_order_request:
+    if is_order_request(
+        message
+    ):
 
         order = save_order(
             message
@@ -1608,11 +1517,11 @@ def chat():
 
     response_data = {
 
-        "reply": reply,
+        "reply":
+            reply,
 
         "order_created":
             bool(order)
-
     }
 
 
@@ -1638,31 +1547,28 @@ def chat():
 )
 def health():
 
-    sheet_rows = len(
-        get_sheet_data()
-    )
-
-    products = get_products()
-
-    orders = get_orders()
-
-
     return jsonify({
 
-        "status": "online",
+        "status":
+            "online",
 
         "google_sheet_rows":
-            sheet_rows,
+            len(
+                get_sheet_data()
+            ),
 
         "total_products":
-            len(products),
+            len(
+                get_products()
+            ),
 
         "total_orders":
-            len(orders),
+            len(
+                get_orders()
+            ),
 
-        "openai_connected":
+        "openai":
             bool(client)
-
     })
 
 
@@ -1677,7 +1583,7 @@ if __name__ == "__main__":
     )
 
     print(
-        "       EZKROY AI SALES ASSISTANT"
+        "       EZKROY AI SALES AGENT"
     )
 
     print(
@@ -1685,27 +1591,12 @@ if __name__ == "__main__":
     )
 
 
-    print(
-        f"OpenAI connected: {bool(client)}"
-    )
-
-    print(
-        f"Google Sheet ID: {GOOGLE_SHEET_ID}"
-    )
-
-
-    # Load Google Sheet on startup
-
     download_google_sheet()
 
 
     app.run(
-
         host="0.0.0.0",
-
         port=5000,
-
         debug=True
-
     )
 ```
