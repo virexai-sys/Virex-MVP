@@ -10,23 +10,25 @@ from datetime import datetime
 
 
 # =========================================================
-# EZKROY AI — SHEET + PROFILE + SALES AGENT
+# EZKROY AI — GOOGLE SHEET + PROFILE + SALES AGENT
 # =========================================================
 #
 # ANSWER PRIORITY
 #
-# 1. Product-specific Google Sheet answer
-# 2. General Google Sheet answer
-# 3. Personal Profile answer
-# 4. System fallback
+# 1. Product-specific Google Sheet
+# 2. General Google Sheet
+# 3. Personal Profile
+# 4. Order fallback
+# 5. System fallback
 #
 # IMPORTANT
 # - NO OpenAI
 # - NO ChatGPT API
+# - Google Sheet = Main Knowledge Source
 # - Existing products preserved
-# - Google Sheet remains the main knowledge source
-# - Profile system handles personal questions
-# - Portfolio link can be returned
+# - Profile system enabled
+# - Portfolio enabled
+# - 5121+ Google Sheet rows supported
 #
 # =========================================================
 
@@ -38,10 +40,12 @@ app = Flask(__name__)
 # GOOGLE SHEET CONFIG
 # =========================================================
 
-GOOGLE_SHEET_ID = "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
+GOOGLE_SHEET_ID = (
+    "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
+)
 
 GOOGLE_SHEET_CSV_URL = (
-    f"https://docs.google.com/spreadsheets/d/"
+    "https://docs.google.com/spreadsheets/d/"
     f"{GOOGLE_SHEET_ID}/export?format=csv"
 )
 
@@ -52,51 +56,54 @@ GOOGLE_SHEET_CSV_URL = (
 
 PROFILE = {
 
-    "name": "Asad Ullah Mozumder Aiman",
+    "name":
+        "Asad Ullah Mozumder Aiman",
 
-    "short_name": "Aiman",
+    "short_name":
+        "Aiman",
 
-    "role": (
-        "Student, Entrepreneur, "
-        "Sales & Data Enthusiast"
-    ),
+    "role":
+        "Student, Entrepreneur, Sales & Data Enthusiast",
 
-    "project": "EZKROY",
+    "project":
+        "EZKROY",
 
-    "business": "NOIR Fragrance",
+    "business":
+        "NOIR Fragrance",
 
-    "education": (
-        "Geography student"
-    ),
+    "education":
+        "Geography student",
 
-    "institution": (
-        "Dhaka Central University"
-    ),
+    "institution":
+        "Dhaka Central University",
 
-    "previous_institution": (
-        "Dhaka College"
-    ),
+    "previous_institution":
+        "Dhaka College",
 
-    "field": "Geography",
+    "field":
+        "Geography",
 
-    "hometown": "Feni, Bangladesh",
+    "hometown":
+        "Feni, Bangladesh",
 
-    "country": "Bangladesh",
+    "country":
+        "Bangladesh",
 
-    "portfolio": (
+    "portfolio":
         "https://sites.google.com/view/"
-        "aiman-porfolio/home"
-    ),
+        "aiman-porfolio/home",
 
-    "portfolio_name": "Aiman's Portfolio",
+    "portfolio_name":
+        "Aiman's Portfolio",
 
-    "about": (
-        "Aiman is a student and entrepreneur "
-        "with interests in sales, data, technology "
-        "and AI. He is also the founder of NOIR "
-        "Fragrance and works on EZKROY, an AI-powered "
-        "sales assistant project."
-    ),
+    "about":
+        (
+            "Aiman is a student and entrepreneur "
+            "with interests in sales, data, technology "
+            "and AI. He is also the founder of NOIR "
+            "Fragrance and works on EZKROY, an "
+            "AI-powered sales assistant project."
+        ),
 
     "projects": [
         "EZKROY",
@@ -111,20 +118,22 @@ PROFILE = {
         "Technology"
     ],
 
-    "creator_description": (
-        "Aiman is the creator/developer of this "
-        "EZKROY project."
-    ),
+    "creator_description":
+        (
+            "Aiman is the creator and developer "
+            "of the EZKROY project."
+        ),
 
-    "contact_note": (
-        "For direct contact information, please "
-        "refer to Aiman's portfolio."
-    )
+    "contact_note":
+        (
+            "For direct contact information, please "
+            "refer to Aiman's portfolio."
+        )
 }
 
 
 # =========================================================
-# PROFILE QUESTION KEYWORDS
+# PROFILE INTENTS
 # =========================================================
 
 PROFILE_INTENTS = {
@@ -149,7 +158,12 @@ PROFILE_INTENTS = {
         "creator ke",
         "owner ke",
         "developer ke",
-        "malik ke"
+        "malik ke",
+        "tomre ke banaise",
+        "tomake ke banaise",
+        "tomake ke banayse",
+        "tomare ke banaise",
+        "tomare ke banayse"
     ],
 
     "name": [
@@ -912,7 +926,7 @@ def save_json_file(filename, data):
 
 
 # =========================================================
-# INITIALIZE PRODUCT FILE
+# INITIALIZE PRODUCTS
 # =========================================================
 
 def init_product_file():
@@ -985,22 +999,24 @@ sheet_cache = {
 def download_google_sheet():
 
     print("")
-    print("=" * 60)
+    print("=" * 70)
     print("GOOGLE SHEET: STARTING DOWNLOAD")
-    print("=" * 60)
+    print("=" * 70)
 
     try:
 
         request_object = urllib.request.Request(
             GOOGLE_SHEET_CSV_URL,
             headers={
-                "User-Agent": "Mozilla/5.0"
+                "User-Agent":
+                    "Mozilla/5.0 "
+                    "(Windows NT 10.0; Win64; x64)"
             }
         )
 
         with urllib.request.urlopen(
             request_object,
-            timeout=20
+            timeout=30
         ) as response:
 
             raw_data = response.read()
@@ -1013,7 +1029,8 @@ def download_google_sheet():
         )
 
         text = raw_data.decode(
-            "utf-8-sig"
+            "utf-8-sig",
+            errors="replace"
         )
 
         print(
@@ -1067,9 +1084,33 @@ def download_google_sheet():
                 for value in cleaned.values()
             ):
 
-                rows.append(
-                    cleaned
+                rows.append(cleaned)
+
+        # Validate expected columns
+        required_columns = {
+            "question",
+            "answer",
+            "keywords"
+        }
+
+        available_columns = set(
+            rows[0].keys()
+        ) if rows else set()
+
+        missing_columns = (
+            required_columns
+            -
+            available_columns
+        )
+
+        if missing_columns:
+
+            raise Exception(
+                "Missing required columns: "
+                + ", ".join(
+                    sorted(missing_columns)
                 )
+            )
 
         sheet_cache["data"] = rows
 
@@ -1095,7 +1136,7 @@ def download_google_sheet():
             "GOOGLE SHEET: SUCCESS"
         )
 
-        print("=" * 60)
+        print("=" * 70)
 
         return rows
 
@@ -1174,23 +1215,48 @@ def normalize_text(text):
 
     text = str(
         text or ""
-    ).lower()
+    ).lower().strip()
 
     replacements = {
 
-        "tmi": "tumi",
-        "tmre": "tomare",
-        "tmr": "tomar",
+        "tmi":
+            "tumi",
 
-        "ami": "ami",
-        "apni": "apni",
+        "tmre":
+            "tomare",
 
-        "15 ml": "15ml",
-        "30 ml": "30ml",
-        "50 ml": "50ml",
+        "tmr":
+            "tomar",
 
-        "৳": " taka ",
-        "tk": " taka "
+        "tmra":
+            "tomra",
+
+        "apnr":
+            "apnar",
+
+        "pls":
+            "please",
+
+        "plz":
+            "please",
+
+        "15 ml":
+            "15ml",
+
+        "30 ml":
+            "30ml",
+
+        "50 ml":
+            "50ml",
+
+        "৳":
+            " taka ",
+
+        "tk":
+            " taka ",
+
+        "bdt":
+            " taka "
     }
 
     for old, new in replacements.items():
@@ -1238,18 +1304,18 @@ def get_profile_answer(intent):
     if intent == "identity":
 
         return (
-            f"আমি EZKROY-এর AI sales assistant। "
-            f"এই project-এর creator/developer হলেন "
+            "আমি EZKROY-এর AI sales assistant। "
+            "এই project-এর creator/developer হলেন "
             f"{PROFILE['name']} ({PROFILE['short_name']})।"
         )
 
     if intent == "name":
 
         return (
-            f"আমার project-এর creator/developer হলেন "
+            "আমার project-এর creator/developer হলেন "
             f"{PROFILE['name']}। "
             f"তাকে সাধারণত {PROFILE['short_name']} "
-            f"নামে ডাকা হয়।"
+            "নামে ডাকা হয়।"
         )
 
     if intent == "education":
@@ -1258,7 +1324,7 @@ def get_profile_answer(intent):
             f"Aiman {PROFILE['institution']}-এ "
             f"{PROFILE['field']} নিয়ে পড়াশোনা করছেন। "
             f"তিনি আগে {PROFILE['previous_institution']}-এর "
-            f"সাথেও যুক্ত ছিলেন।"
+            "সাথেও যুক্ত ছিলেন।"
         )
 
     if intent == "hometown":
@@ -1273,22 +1339,22 @@ def get_profile_answer(intent):
         return (
             f"Aiman-এর business project-এর মধ্যে "
             f"{PROFILE['business']} উল্লেখযোগ্য। "
-            f"এটি একটি fragrance/perfume business।"
+            "এটি একটি fragrance/perfume business।"
         )
 
     if intent == "project":
 
         return (
             f"{PROFILE['project']} হলো Aiman-এর "
-            f"AI-powered sales assistant project। "
-            f"এর লক্ষ্য হলো business-এর customer "
-            f"questions এবং sales process সহজ করা।"
+            "AI-powered sales assistant project। "
+            "এর লক্ষ্য হলো business-এর customer "
+            "questions এবং sales process সহজ করা।"
         )
 
     if intent == "portfolio":
 
         return (
-            f"Aiman-এর portfolio দেখতে এখানে যেতে পারেন:\n"
+            "Aiman-এর portfolio দেখতে এখানে যেতে পারেন:\n"
             f"{PROFILE['portfolio']}"
         )
 
@@ -1323,7 +1389,7 @@ def find_profile_answer(message):
     if not user_text:
         return None
 
-    # Portfolio gets highest direct priority
+    # Portfolio priority
     portfolio_terms = [
         "portfolio",
         "portfolio link",
@@ -1346,7 +1412,7 @@ def find_profile_answer(message):
     best_score = 0
 
     user_words = tokenize(
-        message
+        user_text
     )
 
     for intent, phrases in PROFILE_INTENTS.items():
@@ -1362,12 +1428,14 @@ def find_profile_answer(message):
             if not phrase_normalized:
                 continue
 
-            # Exact phrase
-            if phrase_normalized in user_text:
+            if user_text == phrase_normalized:
+
+                score += 20
+
+            elif phrase_normalized in user_text:
 
                 score += 10
 
-            # Token overlap
             phrase_words = tokenize(
                 phrase
             )
@@ -1385,7 +1453,10 @@ def find_profile_answer(message):
             best_score = score
             best_intent = intent
 
-    if best_intent and best_score >= 3:
+    if (
+        best_intent
+        and best_score >= 3
+    ):
 
         return get_profile_answer(
             best_intent
@@ -1400,65 +1471,119 @@ def find_profile_answer(message):
 
 PRODUCT_ALIASES = {
 
-    "dior": "DIOR SAUVAGE",
-    "sauvage": "DIOR SAUVAGE",
-    "dior sauvage": "DIOR SAUVAGE",
+    "dior":
+        "DIOR SAUVAGE",
 
-    "vampire": "VAMPIRE BLOOD",
-    "vempire": "VAMPIRE BLOOD",
-    "vempire blood": "VAMPIRE BLOOD",
-    "vampire blood": "VAMPIRE BLOOD",
+    "sauvage":
+        "DIOR SAUVAGE",
 
-    "212": "212 MEN NYC",
-    "212 men": "212 MEN NYC",
+    "dior sauvage":
+        "DIOR SAUVAGE",
 
-    "dunhill": "DUNHILL DESIRE",
+    "vampire":
+        "VAMPIRE BLOOD",
 
-    "hawas fire": "HAWAS FIRE",
-    "hawas ice": "HAWAS ICE",
+    "vempire":
+        "VAMPIRE BLOOD",
 
-    "hawas": "HAWAS FIRE",
+    "vempire blood":
+        "VAMPIRE BLOOD",
 
-    "one million": "ONE MILLION",
+    "vampire blood":
+        "VAMPIRE BLOOD",
 
-    "nautica": "NAUTICA VOYAGE",
-    "nautica voyage": "NAUTICA VOYAGE",
+    "212":
+        "212 MEN NYC",
 
-    "bleu": "BLEU DE CHANEL",
-    "bleu chanel": "BLEU DE CHANEL",
+    "212 men":
+        "212 MEN NYC",
 
-    "srk": "SRK (Shah Rukh Inspired)",
+    "dunhill":
+        "DUNHILL DESIRE",
 
-    "stronger": "STRONGER WITH YOU",
-    "stronger with you": "STRONGER WITH YOU",
+    "hawas fire":
+        "HAWAS FIRE",
 
-    "gucci": "GUCCI FLORA",
-    "gucci flora": "GUCCI FLORA",
+    "hawas ice":
+        "HAWAS ICE",
 
-    "ck1": "CK1",
+    "hawas":
+        "HAWAS FIRE",
 
-    "9pm": "9PM",
+    "one million":
+        "ONE MILLION",
 
-    "cool water": "COOL WATER",
+    "nautica":
+        "NAUTICA VOYAGE",
 
-    "khamrah": "LATTAFA KHAMRAH",
-    "lattafa": "LATTAFA KHAMRAH",
+    "nautica voyage":
+        "NAUTICA VOYAGE",
 
-    "aventus": "CREED AVENTUS",
-    "creed": "CREED AVENTUS",
+    "bleu":
+        "BLEU DE CHANEL",
 
-    "blueberry": "BLUEBERRY",
+    "bleu chanel":
+        "BLEU DE CHANEL",
 
-    "tobacco": "TOBACCO VANILLE",
-    "tobacco vanille": "TOBACCO VANILLE",
+    "srk":
+        "SRK (Shah Rukh Inspired)",
 
-    "good girl": "GOOD GIRL",
+    "stronger":
+        "STRONGER WITH YOU",
 
-    "eros": "VERSACE EROS",
-    "versace": "VERSACE EROS",
-    "versace eros": "VERSACE EROS",
+    "stronger with you":
+        "STRONGER WITH YOU",
 
-    "bad boy": "BAD BOY"
+    "gucci":
+        "GUCCI FLORA",
+
+    "gucci flora":
+        "GUCCI FLORA",
+
+    "ck1":
+        "CK1",
+
+    "9pm":
+        "9PM",
+
+    "cool water":
+        "COOL WATER",
+
+    "khamrah":
+        "LATTAFA KHAMRAH",
+
+    "lattafa":
+        "LATTAFA KHAMRAH",
+
+    "aventus":
+        "CREED AVENTUS",
+
+    "creed":
+        "CREED AVENTUS",
+
+    "blueberry":
+        "BLUEBERRY",
+
+    "tobacco":
+        "TOBACCO VANILLE",
+
+    "tobacco vanille":
+        "TOBACCO VANILLE",
+
+    "good girl":
+        "GOOD GIRL",
+
+    "eros":
+        "VERSACE EROS",
+
+    "versace":
+        "VERSACE EROS",
+
+    "versace eros":
+        "VERSACE EROS",
+
+    "bad boy":
+        "BAD BOY"
 }
 
 
@@ -1474,7 +1599,7 @@ def find_product(message):
 
     products = get_products()
 
-    # Exact full product name
+    # Full product name first
     for product in products:
 
         product_name = normalize_text(
@@ -1491,10 +1616,12 @@ def find_product(message):
 
             return product
 
-    # Alias
+    # Aliases
     aliases_sorted = sorted(
         PRODUCT_ALIASES.items(),
-        key=lambda item: len(item[0]),
+        key=lambda item: len(
+            item[0]
+        ),
         reverse=True
     )
 
@@ -1545,14 +1672,384 @@ def detect_size(message):
 
         return (
             match.group(1)
-            + "ml"
+            +
+            "ml"
         )
 
     return None
 
 
 # =========================================================
-# STRICT SHEET MATCHING
+# SHEET ROW HELPERS
+# =========================================================
+
+GENERIC_WORDS = {
+
+    "price",
+    "dam",
+    "koto",
+    "taka",
+    "tk",
+    "cost",
+    "details",
+    "detail",
+    "good",
+    "best",
+    "ki",
+    "konta",
+    "what",
+    "how",
+    "is",
+    "the",
+    "a",
+    "an",
+    "ami",
+    "chai",
+    "want",
+    "please",
+    "do",
+    "you",
+    "your",
+    "for",
+    "of",
+    "to",
+    "in",
+    "and",
+    "or"
+}
+
+
+def get_row_question(row):
+
+    return normalize_text(
+        row.get(
+            "question",
+            ""
+        )
+    )
+
+
+def get_row_keywords(row):
+
+    return normalize_text(
+        row.get(
+            "keywords",
+            ""
+        )
+    )
+
+
+def get_row_answer(row):
+
+    return str(
+        row.get(
+            "answer",
+            ""
+        )
+    ).strip()
+
+
+def get_row_category(row):
+
+    return normalize_text(
+        row.get(
+            "category",
+            ""
+        )
+    )
+
+
+# =========================================================
+# PRODUCT CONTEXT MATCH
+# =========================================================
+
+def product_matches_row(
+    product,
+    row
+):
+
+    if not product:
+        return False
+
+    product_name = normalize_text(
+        product.get(
+            "name",
+            ""
+        )
+    )
+
+    question = get_row_question(
+        row
+    )
+
+    keywords = get_row_keywords(
+        row
+    )
+
+    category = get_row_category(
+        row
+    )
+
+    combined = (
+        question
+        + " "
+        + keywords
+        + " "
+        + category
+    )
+
+    if product_name in combined:
+
+        return True
+
+    for alias, target in PRODUCT_ALIASES.items():
+
+        if normalize_text(target) != product_name:
+            continue
+
+        alias_normalized = normalize_text(
+            alias
+        )
+
+        if (
+            alias_normalized
+            and alias_normalized in combined
+        ):
+
+            return True
+
+    return False
+
+
+# =========================================================
+# PRODUCT SHEET ANSWER
+# =========================================================
+
+def find_product_sheet_answer(message):
+
+    product = find_product(
+        message
+    )
+
+    if not product:
+
+        return None
+
+    rows = get_sheet_data()
+
+    if not rows:
+
+        return None
+
+    user_text = normalize_text(
+        message
+    )
+
+    user_words = tokenize(
+        user_text
+    )
+
+    product_name = normalize_text(
+        product.get(
+            "name",
+            ""
+        )
+    )
+
+    candidates = []
+
+    for index, row in enumerate(rows):
+
+        answer = get_row_answer(
+            row
+        )
+
+        if not answer:
+            continue
+
+        if not product_matches_row(
+            product,
+            row
+        ):
+
+            continue
+
+        question = get_row_question(
+            row
+        )
+
+        keywords = get_row_keywords(
+            row
+        )
+
+        category = get_row_category(
+            row
+        )
+
+        combined = (
+            question
+            + " "
+            + keywords
+            + " "
+            + category
+        )
+
+        target_words = tokenize(
+            combined
+        )
+
+        meaningful_target = (
+            target_words
+            -
+            GENERIC_WORDS
+        )
+
+        common = (
+            user_words
+            &
+            target_words
+        )
+
+        meaningful_common = (
+            common
+            -
+            GENERIC_WORDS
+        )
+
+        score = 0
+
+        # Strong product context
+        score += 30
+
+        # Exact question
+        if question:
+
+            if user_text == question:
+
+                score += 100
+
+            elif question in user_text:
+
+                score += 70
+
+        # Keyword phrase
+        keyword_phrases = [
+            k.strip()
+            for k in keywords.split(",")
+            if k.strip()
+        ]
+
+        for phrase in keyword_phrases:
+
+            phrase_normalized = normalize_text(
+                phrase
+            )
+
+            if (
+                phrase_normalized
+                and phrase_normalized in user_text
+            ):
+
+                score += 50
+
+        # Meaningful overlap
+        score += (
+            len(meaningful_common)
+            * 8
+        )
+
+        # Coverage
+        if user_words:
+
+            score += (
+                len(meaningful_common)
+                /
+                max(
+                    len(
+                        user_words
+                        -
+                        GENERIC_WORDS
+                    ),
+                    1
+                )
+            ) * 25
+
+        if meaningful_target:
+
+            score += (
+                len(meaningful_common)
+                /
+                len(meaningful_target)
+            ) * 15
+
+        # Size relevance
+        size = detect_size(
+            message
+        )
+
+        if size and size in combined:
+
+            score += 25
+
+        candidates.append({
+
+            "score":
+                score,
+
+            "answer":
+                answer,
+
+            "question":
+                question,
+
+            "category":
+                category,
+
+            "index":
+                index
+        })
+
+    if not candidates:
+
+        return None
+
+    candidates.sort(
+        key=lambda item: (
+            item["score"],
+            -item["index"]
+        ),
+        reverse=True
+    )
+
+    best = candidates[0]
+
+    # Strict minimum threshold
+    if best["score"] < 18:
+
+        print(
+            "PRODUCT SHEET MATCH TOO WEAK:",
+            best["score"]
+        )
+
+        return None
+
+    print(
+        "PRODUCT SHEET MATCH:",
+        product_name,
+        "|",
+        best["question"],
+        "| SCORE:",
+        round(
+            best["score"],
+            2
+        )
+    )
+
+    return best["answer"]
+
+
+# =========================================================
+# GENERAL SHEET MATCHING
 # =========================================================
 
 def find_matching_sheet_answer(message):
@@ -1571,8 +2068,12 @@ def find_matching_sheet_answer(message):
         message
     )
 
+    if not user_text:
+
+        return None
+
     user_words = tokenize(
-        message
+        user_text
     )
 
     print("")
@@ -1583,50 +2084,38 @@ def find_matching_sheet_answer(message):
 
     candidates = []
 
+    product = find_product(
+        message
+    )
+
     for index, row in enumerate(rows):
 
-        question = normalize_text(
-            row.get(
-                "question",
-                ""
-            )
+        answer = get_row_answer(
+            row
         )
-
-        keywords = normalize_text(
-            row.get(
-                "keywords",
-                ""
-            )
-        )
-
-        answer = str(
-            row.get(
-                "answer",
-                ""
-            )
-        ).strip()
 
         if not answer:
             continue
 
-        question_words = tokenize(
-            question
+        question = get_row_question(
+            row
         )
 
-        keyword_words = tokenize(
-            keywords
+        keywords = get_row_keywords(
+            row
         )
 
-        all_target_words = (
-            question_words
-            |
-            keyword_words
+        category = get_row_category(
+            row
         )
 
-        if not all_target_words:
+        if not question and not keywords:
             continue
 
+        # -------------------------------------------------
         # Exact question
+        # -------------------------------------------------
+
         if question:
 
             if user_text == question:
@@ -1638,7 +2127,51 @@ def find_matching_sheet_answer(message):
 
                 return answer
 
-        # Exact keyword phrases
+        # -------------------------------------------------
+        # Combined target
+        # -------------------------------------------------
+
+        combined = (
+            question
+            + " "
+            + keywords
+            + " "
+            + category
+        )
+
+        target_words = tokenize(
+            combined
+        )
+
+        if not target_words:
+            continue
+
+        common = (
+            user_words
+            &
+            target_words
+        )
+
+        meaningful_common = (
+            common
+            -
+            GENERIC_WORDS
+        )
+
+        # Avoid generic-only matches
+        if (
+            not meaningful_common
+            and len(user_words) > 1
+        ):
+
+            continue
+
+        score = 0
+
+        # -------------------------------------------------
+        # Keyword exact phrase
+        # -------------------------------------------------
+
         keyword_phrases = [
             k.strip()
             for k in keywords.split(",")
@@ -1656,128 +2189,123 @@ def find_matching_sheet_answer(message):
                 and phrase_normalized in user_text
             ):
 
-                candidates.append({
-                    "score": 100,
-                    "answer": answer,
-                    "question": question,
-                    "index": index
-                })
+                score += 80
 
-                break
-
+        # -------------------------------------------------
         # Question phrase
+        # -------------------------------------------------
+
         if (
             question
             and len(question.split()) >= 2
             and question in user_text
         ):
 
-            candidates.append({
-                "score": 95,
-                "answer": answer,
-                "question": question,
-                "index": index
-            })
+            score += 70
 
-        # Token scoring
-        common = (
+        # -------------------------------------------------
+        # Token overlap
+        # -------------------------------------------------
+
+        score += (
+            len(meaningful_common)
+            * 8
+        )
+
+        # -------------------------------------------------
+        # User coverage
+        # -------------------------------------------------
+
+        user_meaningful = (
             user_words
-            &
-            all_target_words
+            -
+            GENERIC_WORDS
         )
 
-        if not common:
-            continue
+        if user_meaningful:
 
-        generic_words = {
+            score += (
+                len(
+                    meaningful_common
+                )
+                /
+                max(
+                    len(
+                        user_meaningful
+                    ),
+                    1
+                )
+            ) * 30
 
-            "price",
-            "dam",
-            "koto",
-            "taka",
-            "tk",
-            "cost",
-            "details",
-            "detail",
-            "good",
-            "best",
-            "ki",
-            "konta",
-            "what",
-            "how",
-            "is",
-            "the",
-            "a",
-            "ami",
-            "chai",
-            "want"
-        }
+        # -------------------------------------------------
+        # Target coverage
+        # -------------------------------------------------
 
-        meaningful_common = {
-
-            word
-            for word in common
-            if word not in generic_words
-        }
-
-        if (
-            not meaningful_common
-            and len(user_words) > 1
-        ):
-
-            continue
-
-        coverage = (
-            len(meaningful_common)
-            /
-            max(
-                len(user_words),
-                1
-            )
+        meaningful_target = (
+            target_words
+            -
+            GENERIC_WORDS
         )
 
-        target_coverage = (
-            len(meaningful_common)
-            /
-            max(
-                len(all_target_words),
-                1
-            )
-        )
+        if meaningful_target:
 
-        score = (
-            coverage * 60
-            +
-            target_coverage * 40
-        )
+            score += (
+                len(
+                    meaningful_common
+                )
+                /
+                len(
+                    meaningful_target
+                )
+            ) * 20
 
-        product = find_product(
-            message
-        )
+        # -------------------------------------------------
+        # Product relevance
+        # -------------------------------------------------
 
         if product:
 
-            product_name = normalize_text(
-                product.get(
-                    "name",
-                    ""
-                )
-            )
-
-            if (
-                product_name
-                and product_name in question
+            if product_matches_row(
+                product,
+                row
             ):
 
-                score += 50
+                score += 45
 
-        if score >= 45:
+        # -------------------------------------------------
+        # Size relevance
+        # -------------------------------------------------
+
+        size = detect_size(
+            message
+        )
+
+        if size and size in combined:
+
+            score += 20
+
+        # -------------------------------------------------
+        # Candidate
+        # -------------------------------------------------
+
+        if score >= 25:
 
             candidates.append({
-                "score": score,
-                "answer": answer,
-                "question": question,
-                "index": index
+
+                "score":
+                    score,
+
+                "answer":
+                    answer,
+
+                "question":
+                    question,
+
+                "category":
+                    category,
+
+                "index":
+                    index
             })
 
     if not candidates:
@@ -1801,159 +2329,13 @@ def find_matching_sheet_answer(message):
     print(
         "SHEET MATCH FOUND:",
         best["question"],
+        "| CATEGORY:",
+        best["category"],
         "| SCORE:",
         round(
             best["score"],
             2
         )
-    )
-
-    return best["answer"]
-
-
-# =========================================================
-# PRODUCT SHEET ANSWER
-# =========================================================
-
-def find_product_sheet_answer(message):
-
-    product = find_product(
-        message
-    )
-
-    if not product:
-
-        return None
-
-    rows = get_sheet_data()
-
-    if not rows:
-
-        return None
-
-    product_name = normalize_text(
-        product.get(
-            "name",
-            ""
-        )
-    )
-
-    aliases_for_product = []
-
-    for alias, target in PRODUCT_ALIASES.items():
-
-        if normalize_text(target) == product_name:
-
-            aliases_for_product.append(
-                normalize_text(alias)
-            )
-
-    user_text = normalize_text(
-        message
-    )
-
-    user_words = tokenize(
-        user_text
-    )
-
-    candidates = []
-
-    for index, row in enumerate(rows):
-
-        question = normalize_text(
-            row.get(
-                "question",
-                ""
-            )
-        )
-
-        keywords = normalize_text(
-            row.get(
-                "keywords",
-                ""
-            )
-        )
-
-        answer = str(
-            row.get(
-                "answer",
-                ""
-            )
-        ).strip()
-
-        if not answer:
-            continue
-
-        combined = (
-            question
-            + " "
-            + keywords
-        )
-
-        if product_name not in combined:
-
-            product_alias_found = any(
-                alias in combined
-                for alias in aliases_for_product
-            )
-
-            if not product_alias_found:
-                continue
-
-        target_words = tokenize(
-            combined
-        )
-
-        common = (
-            user_words
-            &
-            target_words
-        )
-
-        score = len(common)
-
-        if (
-            question
-            and question in user_text
-        ):
-
-            score += 20
-
-        # Product itself is important
-        if product_name in user_text:
-
-            score += 10
-
-        if score > 0:
-
-            candidates.append({
-                "score": score,
-                "answer": answer,
-                "question": question,
-                "index": index
-            })
-
-    if not candidates:
-
-        return None
-
-    candidates.sort(
-        key=lambda item: (
-            item["score"],
-            -item["index"]
-        ),
-        reverse=True
-    )
-
-    best = candidates[0]
-
-    print(
-        "PRODUCT SHEET MATCH:",
-        product.get("name"),
-        "|",
-        best["question"],
-        "| SCORE:",
-        best["score"]
     )
 
     return best["answer"]
@@ -1978,6 +2360,8 @@ def is_order_request(message):
         "order korbo",
 
         "order dibo",
+
+        "order dite chai",
 
         "nibo",
 
@@ -2009,7 +2393,7 @@ def is_order_request(message):
 
 
 # =========================================================
-# EXTRACT ORDER INFO
+# EXTRACT ORDER INFORMATION
 # =========================================================
 
 def extract_order_information(message):
@@ -2097,9 +2481,10 @@ def save_order(
 
         except Exception:
 
-            next_id = len(
-                orders
-            ) + 1
+            next_id = (
+                len(orders)
+                + 1
+            )
 
     order = {
 
@@ -2223,11 +2608,17 @@ def profile_api():
         "institution":
             PROFILE["institution"],
 
+        "previous_institution":
+            PROFILE["previous_institution"],
+
         "field":
             PROFILE["field"],
 
         "hometown":
             PROFILE["hometown"],
+
+        "country":
+            PROFILE["country"],
 
         "business":
             PROFILE["business"],
@@ -2452,12 +2843,14 @@ def test_sheet():
                 "Use ?q=your question"
         })
 
-    answer = find_matching_sheet_answer(
-        message
-    )
-
     product_answer = (
         find_product_sheet_answer(
+            message
+        )
+    )
+
+    general_answer = (
+        find_matching_sheet_answer(
             message
         )
     )
@@ -2470,17 +2863,21 @@ def test_sheet():
 
     final_answer = (
         product_answer
-        or answer
+        or general_answer
         or profile_answer
     )
 
     if product_answer:
 
-        source = "google_sheet_product"
+        source = (
+            "google_sheet_product"
+        )
 
-    elif answer:
+    elif general_answer:
 
-        source = "google_sheet"
+        source = (
+            "google_sheet"
+        )
 
     elif profile_answer:
 
@@ -2500,11 +2897,16 @@ def test_sheet():
                 message
             ),
 
-        "general_sheet_answer":
-            answer,
+        "product":
+            find_product(
+                message
+            ),
 
         "product_sheet_answer":
             product_answer,
+
+        "general_sheet_answer":
+            general_answer,
 
         "profile_answer":
             profile_answer,
@@ -2562,7 +2964,8 @@ def chat():
 
 
     print("")
-    print("=" * 60)
+    print("=" * 70)
+
     print(
         "CUSTOMER:",
         message
@@ -2598,7 +3001,8 @@ def chat():
     if product_answer:
 
         print(
-            "FINAL SOURCE: PRODUCT SHEET"
+            "FINAL SOURCE:",
+            "PRODUCT GOOGLE SHEET"
         )
 
         return jsonify({
@@ -2610,7 +3014,12 @@ def chat():
                 False,
 
             "source":
-                "google_sheet_product"
+                "google_sheet_product",
+
+            "product":
+                product.get("name")
+                if product
+                else None
         })
 
 
@@ -2627,7 +3036,8 @@ def chat():
     if sheet_answer:
 
         print(
-            "FINAL SOURCE: GOOGLE SHEET"
+            "FINAL SOURCE:",
+            "GOOGLE SHEET"
         )
 
         return jsonify({
@@ -2639,12 +3049,17 @@ def chat():
                 False,
 
             "source":
-                "google_sheet"
+                "google_sheet",
+
+            "product":
+                product.get("name")
+                if product
+                else None
         })
 
 
     # =====================================================
-    # 3. PROFILE SYSTEM
+    # 3. PROFILE
     # =====================================================
 
     profile_answer = (
@@ -2656,7 +3071,8 @@ def chat():
     if profile_answer:
 
         print(
-            "FINAL SOURCE: PROFILE"
+            "FINAL SOURCE:",
+            "PROFILE"
         )
 
         return jsonify({
@@ -2678,12 +3094,20 @@ def chat():
 
     if is_order_request(message):
 
+        print(
+            "FINAL SOURCE:",
+            "ORDER FALLBACK"
+        )
+
         return jsonify({
 
             "reply":
-                "অর্ডার সংক্রান্ত তথ্য Google Sheet-এ "
-                "পাওয়া যায়নি। অনুগ্রহ করে Sheet-এ "
-                "এই প্রশ্নের উত্তর যোগ করুন।",
+                (
+                    "অর্ডার সংক্রান্ত তথ্য "
+                    "Google Sheet-এ পাওয়া যায়নি। "
+                    "অনুগ্রহ করে Sheet-এ এই প্রশ্নের "
+                    "উত্তর যোগ করুন।"
+                ),
 
             "order_created":
                 False,
@@ -2697,11 +3121,19 @@ def chat():
     # 5. NOTHING FOUND
     # =====================================================
 
+    print(
+        "FINAL SOURCE:",
+        "KNOWLEDGE MISSING"
+    )
+
     return jsonify({
 
         "reply":
-            "দুঃখিত, এই প্রশ্নের উত্তর আমার "
-            "Google Sheet বা Profile-এ পাওয়া যায়নি।",
+            (
+                "দুঃখিত, এই প্রশ্নের উত্তর "
+                "আমার Google Sheet বা Profile-এ "
+                "পাওয়া যায়নি।"
+            ),
 
         "order_created":
             False,
@@ -2773,9 +3205,9 @@ def health():
 if __name__ == "__main__":
 
     print("")
-    print("=" * 60)
-    print("             EZKROY AI")
-    print("=" * 60)
+    print("=" * 70)
+    print("                         EZKROY AI")
+    print("=" * 70)
 
     print(
         "MODE:",
@@ -2798,6 +3230,11 @@ if __name__ == "__main__":
     )
 
     print(
+        "BUSINESS:",
+        PROFILE["business"]
+    )
+
+    print(
         "PORTFOLIO:",
         PROFILE["portfolio"]
     )
@@ -2814,11 +3251,11 @@ if __name__ == "__main__":
         )
     )
 
-    print("=" * 60)
+    print("=" * 70)
 
 
     # =====================================================
-    # LOAD SHEET IMMEDIATELY
+    # LOAD GOOGLE SHEET IMMEDIATELY
     # =====================================================
 
     download_google_sheet()
