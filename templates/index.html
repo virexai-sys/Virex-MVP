@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EZKROY - Intelligence & Command Dashboard</title>
+    <title>EZKROY - AI Sales & Analytics Dashboard</title>
     <!-- Favicon -->
-    <link rel="icon" href="https://placehold.co/32x32/6366f1/ffffff?text=E" type="image/png">
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_ncqm3gncqm3gncqm_2.jfif">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -14,547 +14,295 @@
             theme: {
                 extend: {
                     colors: {
-                        ezkroy: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
-                            dark: '#0f172a',
-                            card: '#1e293b'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
+                        darkBg: '#0b0f19',
+                        cardBg: '#131b2e',
+                        cardBorder: '#1e293b',
+                        accentBlue: '#3b82f6',
+                        accentHover: '#2563eb'
                     }
                 }
             }
         }
     </script>
-    <!-- Font Inter & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome & Chart.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Particles.js CDN -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            pointer-events: none;
-        }
-        .dashboard-container {
-            position: relative;
-            z-index: 10;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.5);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.8);
-        }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-darkBg text-slate-100 font-sans antialiased h-screen overflow-hidden flex">
 
-    <!-- Particle Background -->
-    <div id="particles-js"></div>
+    <!-- Sidebar (Minimalist SellzyBD Inspired, Chat First) -->
+    <aside class="w-20 lg:w-64 bg-cardBg border-r border-cardBorder flex flex-col justify-between transition-all duration-300 z-20">
+        <div>
+            <!-- Brand Logo -->
+            <div class="h-16 flex items-center px-4 lg:px-6 border-b border-cardBorder gap-3">
+                <img src="Gemini_Generated_Image_ncqm3gncqm3gncqm_2.jfif" alt="EZKROY Logo" class="w-9 h-9 object-cover rounded-lg shadow-md shrink-0">
+                <span class="hidden lg:inline font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">EZKROY</span>
+            </div>
 
-    <div class="dashboard-container flex h-screen overflow-hidden">
-        
-        <!-- Sidebar -->
-        <aside id="sidebar" class="bg-slate-900/80 backdrop-blur-xl border-r border-slate-800 w-64 flex-shrink-0 flex flex-col transition-all duration-300 z-30 -translate-x-full md:translate-x-0 absolute md:relative h-full">
-            <div class="p-6 flex items-center justify-between border-b border-slate-800/80">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <i class="fa-solid fa-cube text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <span class="text-xl font-bold tracking-wider bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">EZKROY</span>
-                        <span class="block text-[10px] text-indigo-400 font-semibold tracking-widest uppercase">Command v3.2</span>
-                    </div>
+            <!-- Nav Links (Chat First Priority) -->
+            <nav class="p-3 space-y-2">
+                <button onclick="switchTab('chat')" id="nav-chat" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-blue-600 text-white font-medium shadow-lg shadow-blue-500/20 transition-all">
+                    <i class="fa-solid fa-comments text-lg shrink-0"></i>
+                    <span class="hidden lg:inline">AI Sales Chat</span>
+                </button>
+                <button onclick="switchTab('performance')" id="nav-performance" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all">
+                    <i class="fa-solid fa-chart-line text-lg shrink-0"></i>
+                    <span class="hidden lg:inline">Performance</span>
+                </button>
+                <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all">
+                    <i class="fa-solid fa-box-archive text-lg shrink-0"></i>
+                    <span class="hidden lg:inline">Products & Sheet</span>
+                </button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all">
+                    <i class="fa-solid fa-gear text-lg shrink-0"></i>
+                    <span class="hidden lg:inline">Settings</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- User Profile Bottom -->
+        <div class="p-4 border-t border-cardBorder flex items-center gap-3">
+            <img src="Gemini_Generated_Image_ncqm3gncqm3gncqm_2.jfif" alt="User" class="w-9 h-9 rounded-full object-cover border border-blue-500/30">
+            <div class="hidden lg:block truncate">
+                <p class="text-sm font-semibold text-slate-200 truncate">Store Admin</p>
+                <p class="text-xs text-slate-400 truncate">admin@ezkroy.com</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Topbar -->
+        <header class="h-16 bg-cardBg border-b border-cardBorder px-6 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <h1 id="page-title" class="text-lg font-semibold text-slate-100">AI Sales Assistant</h1>
+                <span class="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Sheet Sync Active</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden sm:block">
+                    <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" placeholder="Search sheet database..." class="bg-darkBg border border-cardBorder rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500 w-64 transition-all">
                 </div>
-                <button id="sidebar-close" class="md:hidden text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+                <button class="w-10 h-10 rounded-xl bg-darkBg border border-cardBorder flex items-center justify-center text-slate-300 hover:text-white transition-all">
+                    <i class="fa-regular fa-bell"></i>
                 </button>
             </div>
+        </header>
 
-            <!-- Navigation Links -->
-            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                <a href="#dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 font-medium transition-all group">
-                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#analytics" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/60 hover:text-white font-medium transition-all group">
-                    <i class="fa-solid fa-chart-line w-5 text-center text-slate-500 group-hover:text-indigo-400"></i>
-                    <span>Analytics</span>
-                </a>
-                <a href="#products" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/60 hover:text-white font-medium transition-all group">
-                    <i class="fa-solid fa-box-open w-5 text-center text-slate-500 group-hover:text-indigo-400"></i>
-                    <span>EZKROY Products</span>
-                </a>
-                <a href="#chat" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/60 hover:text-white font-medium transition-all group">
-                    <i class="fa-solid fa-comments w-5 text-center text-slate-500 group-hover:text-indigo-400"></i>
-                    <span>AI Assistant</span>
-                    <span class="ml-auto bg-indigo-500/20 text-indigo-400 text-xs px-2 py-0.5 rounded-full border border-indigo-500/30">New</span>
-                </a>
-                <a href="#team" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/60 hover:text-white font-medium transition-all group">
-                    <i class="fa-solid fa-users w-5 text-center text-slate-500 group-hover:text-indigo-400"></i>
-                    <span>Team Management</span>
-                </a>
-                <a href="#settings" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/60 hover:text-white font-medium transition-all group">
-                    <i class="fa-solid fa-gear w-5 text-center text-slate-500 group-hover:text-indigo-400"></i>
-                    <span>Settings</span>
-                </a>
-            </nav>
+        <!-- Dynamic Views Container -->
+        <main class="flex-1 overflow-y-auto p-6 bg-darkBg relative">
 
-            <!-- Sidebar Footer Widget -->
-            <div class="p-4 m-4 rounded-2xl bg-gradient-to-br from-indigo-950/60 to-slate-900 border border-indigo-500/20 text-center">
-                <div class="w-8 h-8 mx-auto mb-2 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <h4 class="text-xs font-semibold text-slate-200">EZKROY Security Active</h4>
-                <p class="text-[11px] text-slate-400 mt-1">All neural modules and clusters operating smoothly.</p>
-            </div>
-        </aside>
-
-        <!-- Main Content Wrapper -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            
-            <!-- Topbar -->
-            <header class="bg-slate-900/60 backdrop-blur-md border-b border-slate-800 h-16 flex items-center justify-between px-6 z-20">
-                <div class="flex items-center space-x-4">
-                    <button id="sidebar-toggle" class="text-slate-400 hover:text-white md:hidden p-2 rounded-lg bg-slate-800/50">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <div class="relative hidden sm:block w-72">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                        </span>
-                        <input type="text" placeholder="Search EZKROY systems..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
-                    </div>
-                </div>
-
-                <!-- Topbar Right Actions -->
-                <div class="flex items-center space-x-4">
-                    <button class="relative p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-white hover:border-indigo-500/50 transition-all">
-                        <i class="fa-regular fa-bell"></i>
-                        <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                    </button>
-                    
-                    <div class="flex items-center space-x-3 pl-4 border-l border-slate-800">
-                        <img src="https://placehold.co/40x40/4f46e5/ffffff?text=EZ" alt="User Avatar" class="w-10 h-10 rounded-xl border border-indigo-500/30 object-cover">
-                        <div class="hidden md:block text-left">
-                            <h4 class="text-sm font-semibold text-slate-200">Alex Vance</h4>
-                            <span class="text-xs text-indigo-400 font-medium">EZKROY Admin</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Scrollable Dashboard Content -->
-            <main class="flex-1 overflow-y-auto p-6 space-y-6">
-                
-                <!-- Welcome Banner -->
-                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900/40 via-slate-900 to-indigo-950/60 border border-indigo-500/20 p-8 shadow-2xl">
-                    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                        <div>
-                            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-3">
-                                <i class="fa-solid fa-sparkles"></i>
-                                <span>Welcome to EZKROY Command Center</span>
-                            </div>
-                            <h1 class="text-2xl md:text-3xl font-bold text-white">System Status: Optimal & Secure</h1>
-                            <p class="text-slate-400 mt-2 max-w-xl text-sm leading-relaxed">
-                                EZKROY infrastructure is running at peak capacity across all 4 core nodes. Neural processing efficiency is up 14.2% since last cycle.
-                            </p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button onclick="triggerNotification('EZKROY diagnostics executed successfully.')" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center space-x-2">
-                                <i class="fa-solid fa-bolt"></i>
-                                <span>Run Diagnostics</span>
-                            </button>
-                            <button onclick="triggerNotification('Documentation opened in workspace.')" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-medium text-sm transition-all">
-                                View Docs
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Stat 1 -->
-                    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 transition-all hover:border-indigo-500/40 group">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-users text-lg"></i>
-                            </div>
-                            <span class="inline-flex items-center space-x-1 text-emerald-400 text-xs font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                                <i class="fa-solid fa-arrow-trend-up text-[10px]"></i>
-                                <span>+18.4%</span>
-                            </span>
-                        </div>
-                        <h3 class="text-slate-400 text-xs font-medium uppercase tracking-wider">Active EZKROY Users</h3>
-                        <div class="text-2xl font-bold text-white mt-1">48,215</div>
-                        <p class="text-slate-500 text-xs mt-2">vs. 40,700 previous period</p>
-                    </div>
-
-                    <!-- Stat 2 -->
-                    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 transition-all hover:border-indigo-500/40 group">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-bolt text-lg"></i>
-                            </div>
-                            <span class="inline-flex items-center space-x-1 text-emerald-400 text-xs font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                                <i class="fa-solid fa-arrow-trend-up text-[10px]"></i>
-                                <span>+24.1%</span>
-                            </span>
-                        </div>
-                        <h3 class="text-slate-400 text-xs font-medium uppercase tracking-wider">API Requests / Sec</h3>
-                        <div class="text-2xl font-bold text-white mt-1">1,492</div>
-                        <p class="text-slate-500 text-xs mt-2">Peak load handled smoothly</p>
-                    </div>
-
-                    <!-- Stat 3 -->
-                    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 transition-all hover:border-indigo-500/40 group">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-microchip text-lg"></i>
-                            </div>
-                            <span class="inline-flex items-center space-x-1 text-indigo-400 text-xs font-semibold bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">
-                                <span>Stable</span>
-                            </span>
-                        </div>
-                        <h3 class="text-slate-400 text-xs font-medium uppercase tracking-wider">Neural Latency</h3>
-                        <div class="text-2xl font-bold text-white mt-1">14.8 ms</div>
-                        <p class="text-slate-500 text-xs mt-2">Optimized globally</p>
-                    </div>
-
-                    <!-- Stat 4 -->
-                    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 transition-all hover:border-indigo-500/40 group">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-server text-lg"></i>
-                            </div>
-                            <span class="inline-flex items-center space-x-1 text-emerald-400 text-xs font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                                <i class="fa-solid fa-check text-[10px]"></i>
-                                <span>99.99%</span>
-                            </span>
-                        </div>
-                        <h3 class="text-slate-400 text-xs font-medium uppercase tracking-wider">Uptime Rate</h3>
-                        <div class="text-2xl font-bold text-white mt-1">365 Days</div>
-                        <p class="text-slate-500 text-xs mt-2">Zero downtime recorded</p>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Main Chart -->
-                    <div class="lg:col-span-2 bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 class="text-lg font-bold text-white">EZKROY System Performance</h3>
-                                <p class="text-xs text-slate-400">Real-time throughput and traffic volume</p>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <button class="px-3 py-1.5 rounded-xl bg-slate-800 text-xs font-medium text-indigo-400 border border-indigo-500/30">Live</button>
-                                <button class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-medium text-slate-400">Weekly</button>
-                            </div>
-                        </div>
-                        <div class="relative h-72 w-full">
-                            <canvas id="performanceChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- EZKROY Products Panel -->
-                    <div id="products" class="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-white">EZKROY Products</h3>
-                            <span class="text-xs text-indigo-400 font-semibold cursor-pointer hover:underline" onclick="triggerNotification('Showing all active products.')">View All</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-6">Active core modules currently deployed</p>
-
-                        <div class="space-y-4 flex-1">
-                            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-950/50 border border-slate-800/80 hover:border-indigo-500/40 transition-all">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">
-                                        <i class="fa-solid fa-brain"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-semibold text-white">EZKROY Neural Mind</h4>
-                                        <span class="text-xs text-slate-400">LLM & Deep Reasoning</span>
-                                    </div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold border border-indigo-500/20">Active</span>
-                            </div>
-
-                            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-950/50 border border-slate-800/80 hover:border-indigo-500/40 transition-all">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 font-bold text-sm">
-                                        <i class="fa-solid fa-shield-cat"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-semibold text-white">EZKROY Sentinel</h4>
-                                        <span class="text-xs text-slate-400">Cyber Defense Suite</span>
-                                    </div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold border border-indigo-500/20">Active</span>
-                            </div>
-
-                            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-950/50 border border-slate-800/80 hover:border-indigo-500/40 transition-all">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">
-                                        <i class="fa-solid fa-bolt-lightning"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-semibold text-white">EZKROY SpeedCore</h4>
-                                        <span class="text-xs text-slate-400">Real-time Caching & Edge</span>
-                                    </div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold border border-indigo-500/20">Active</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chat Assistant Section -->
-                <div id="chat" class="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 flex flex-col h-[500px]">
-                    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white">
+            <!-- TAB 1: AI SALES CHAT VIEW (Default & Priority) -->
+            <div id="view-chat" class="space-y-6 max-w-4xl mx-auto h-full flex flex-col">
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 flex-1 flex flex-col shadow-xl">
+                    <!-- Chat Header Info -->
+                    <div class="flex items-center justify-between pb-4 border-b border-cardBorder">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
                                 <i class="fa-solid fa-robot"></i>
                             </div>
                             <div>
-                                <h3 class="text-base font-bold text-white">EZKROY Intelligence Assistant</h3>
-                                <span class="text-xs text-emerald-400 flex items-center space-x-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                    <span>Online & Ready</span>
-                                </span>
+                                <h3 class="font-semibold text-slate-200">EZKROY Sheet Bot</h3>
+                                <p class="text-xs text-slate-400">Answering automatically based on your uploaded sheet data</p>
                             </div>
                         </div>
-                        <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all">
-                            Clear Chat
-                        </button>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     </div>
 
-                    <!-- Chat Messages Stream -->
+                    <!-- Chat Messages Box -->
                     <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-4 pr-2">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 rounded-xl bg-indigo-600/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
-                                <i class="fa-solid fa-robot text-xs"></i>
-                            </div>
-                            <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl rounded-tl-sm p-4 max-w-lg text-sm text-slate-200">
-                                Hello Alex! I am your EZKROY Intelligence Assistant. How can I assist you with your neural pipelines or analytics today?
+                        <div class="flex items-start gap-3">
+                            <img src="Gemini_Generated_Image_ncqm3gncqm3gncqm_2.jfif" class="w-8 h-8 rounded-full object-cover shrink-0 mt-1" alt="Bot">
+                            <div class="bg-slate-800/80 border border-cardBorder rounded-2xl p-4 text-sm text-slate-200 max-w-lg shadow-sm">
+                                হ্যালো! আমি EZKROY এআই অ্যাসিস্ট্যান্ট। আপনার শিটের ডেটা অনুযায়ী গ্রাহকদের যেকোনো প্রশ্নের উত্তর দিতে আমি প্রস্তুত বলুন কি জানতে চান?
                             </div>
                         </div>
                     </div>
 
                     <!-- Chat Input Area -->
-                    <div class="pt-4 border-t border-slate-800">
-                        <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center space-x-3">
-                            <input type="text" id="chat-input" placeholder="Ask EZKROY Assistant anything..." class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all">
-                            <button type="submit" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center space-x-2 flex-shrink-0">
-                                <i class="fa-solid fa-paper-plane text-xs"></i>
-                                <span>Send</span>
+                    <div class="pt-3 border-t border-cardBorder">
+                        <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-3">
+                            <input type="text" id="chat-input" placeholder="Ask anything from your connected sheet..." class="flex-1 bg-darkBg border border-cardBorder rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center">
+                                <i class="fa-solid fa-paper-plane"></i>
                             </button>
                         </form>
                     </div>
                 </div>
+            </div>
 
-            </main>
-        </div>
+            <!-- TAB 2: PERFORMANCE VIEW -->
+            <div id="view-performance" class="space-y-6 hidden">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Revenue</p>
+                        <h3 class="text-2xl font-bold text-slate-100 mt-2">$24,580</h3>
+                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +14.2% this month</span>
+                    </div>
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Sheet Queries Handled</p>
+                        <h3 class="text-2xl font-bold text-slate-100 mt-2">1,420</h3>
+                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +8.5% automation</span>
+                    </div>
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Customers</p>
+                        <h3 class="text-2xl font-bold text-slate-100 mt-2">840</h3>
+                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +5.1% growth</span>
+                    </div>
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">AI Accuracy Rate</p>
+                        <h3 class="text-2xl font-bold text-slate-100 mt-2">98.4%</h3>
+                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-check"></i> Optimized</span>
+                    </div>
+                </div>
+
+                <!-- Chart Card -->
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-base font-semibold text-slate-200 mb-4">Revenue & Query Performance Trend</h3>
+                    <div class="h-72 w-full">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: PRODUCTS & SHEET SYNC VIEW -->
+            <div id="view-products" class="space-y-6 hidden">
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold text-slate-200">Connected Sheet & Products Data</h3>
+                        <button class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-medium transition-all">Sync Sheet</button>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-6">Your AI bot reads answers directly from your active Google Sheet / CSV database.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="bg-darkBg text-xs uppercase text-slate-400 border-b border-cardBorder">
+                                <tr>
+                                    <th class="p-3 rounded-l-xl">Question Key</th>
+                                    <th class="p-3">Automated Answer</th>
+                                    <th class="p-3 rounded-r-xl">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-cardBorder">
+                                <tr>
+                                    <td class="p-3 font-medium text-slate-200">Delivery charge koto?</td>
+                                    <td class="p-3 text-slate-400">Inside Dhaka 60 TK, Outside Dhaka 120 TK.</td>
+                                    <td class="p-3"><span class="px-2 py-1 text-xs bg-emerald-500/10 text-emerald-400 rounded-md border border-emerald-500/20">Synced</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium text-slate-200">Order kivabe korbo?</td>
+                                    <td class="p-3 text-slate-400">Order button-e click kore form fillup korun.</td>
+                                    <td class="p-3"><span class="px-2 py-1 text-xs bg-emerald-500/10 text-emerald-400 rounded-md border border-emerald-500/20">Synced</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: SETTINGS VIEW -->
+            <div id="view-settings" class="space-y-6 hidden max-w-2xl mx-auto">
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm space-y-4">
+                    <h3 class="text-base font-semibold text-slate-200">Store Settings</h3>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Store Name</label>
+                        <input type="text" value="EZKROY Store" class="w-full bg-darkBg border border-cardBorder rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Google Sheet / CSV Link</label>
+                        <input type="text" value="https://docs.google.com/spreadsheets/d/your-sheet-id" class="w-full bg-darkBg border border-cardBorder rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <button class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20">Save Changes</button>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <!-- Toast Notification Banner -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 border border-indigo-500/40 px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm text-slate-200">
-        <div class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 flex-shrink-0">
-            <i class="fa-solid fa-info text-xs"></i>
-        </div>
-        <span id="toast-message">Notification message here</span>
-    </div>
-
-    <!-- Scripts & Initialization -->
+    <!-- JavaScript Logic -->
     <script>
-        // Particles.js Initialization
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 60, density: { enable: true, value_area: 800 } },
-                color: { value: '#6366f1' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#6366f1',
-                    opacity: 0.15,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 1.5,
-                    direction: 'none',
-                    random: true,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
+        function switchTab(tabId) {
+            const tabs = ['chat', 'performance', 'products', 'settings'];
+            tabs.forEach(t => {
+                document.getElementById('view-' + t).classList.add('hidden');
+                document.getElementById('nav-' + t).className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 font-medium transition-all";
+            });
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-' + tabId).className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl bg-blue-600 text-white font-medium shadow-lg shadow-blue-500/20 transition-all";
+
+            const titles = {
+                'chat': 'AI Sales Assistant',
+                'performance': 'Performance Analytics',
+                'products': 'Products & Sheet Database',
+                'settings': 'Store Settings'
+            };
+            document.getElementById('page-title').innerText = titles[tabId];
+        }
+
+        // Chat Simulation with Sheet Context
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            const chatMessages = document.getElementById('chat-messages');
+
+            // User Message
+            chatMessages.innerHTML += `
+                <div class="flex items-start justify-end gap-3">
+                    <div class="bg-blue-600 text-white rounded-2xl p-4 text-sm max-w-lg shadow-sm">
+                        ${msg}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-1 font-bold text-xs">U</div>
+                </div>
+            `;
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Simulated AI Response based on Sheet
+            setTimeout(() => {
+                let botReply = "আপনার শিট অনুযায়ী এই প্রশ্নের উত্তর: আমাদের ডেলিভারি চার্জ ঢাকার মধ্যে ৬০ টাকা এবং ঢাকার বাইরে ১২০ টাকা।";
+                if(msg.toLowerCase().includes('order')) {
+                    botReply = "শিট ডেটা অনুযায়ী: অর্ডার করতে আমাদের ওয়েবসাইটে প্রোডাক্ট সিলেক্ট করে অর্ডার বাটন প্রেস করুন।";
                 }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, grab: { distance: 140, line_linked: { opacity: 0.3 } } },
-                    onclick: { enable: true, push: { particles_nb: 3 } }
-                }
-            },
-            retina_detect: true
-        });
+                chatMessages.innerHTML += `
+                    <div class="flex items-start gap-3">
+                        <img src="Gemini_Generated_Image_ncqm3gncqm3gncqm_2.jfif" class="w-8 h-8 rounded-full object-cover shrink-0 mt-1" alt="Bot">
+                        <div class="bg-slate-800/80 border border-cardBorder rounded-2xl p-4 text-sm text-slate-200 max-w-lg shadow-sm">
+                            ${botReply}
+                        </div>
+                    </div>
+                `;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 700);
+        }
 
-        // Sidebar Responsive Toggle
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const sidebarClose = document.getElementById('sidebar-close');
-
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-        });
-
-        sidebarClose.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-        });
-
-        // Chart.js Performance Chart Setup
+        // Initialize Chart.js
         const ctx = document.getElementById('performanceChart').getContext('2d');
-        const performanceChart = new Chart(ctx, {
+        new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
                 datasets: [{
-                    label: 'EZKROY Throughput (req/s)',
-                    data: [820, 930, 1150, 1492, 1380, 1220, 1050],
-                    borderColor: '#6366f1',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    borderWidth: 3,
+                    label: 'Revenue ($)',
+                    data: [4200, 5800, 7100, 8900],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#6366f1',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    x: {
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
-                    }
+                    x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
                 }
             }
         });
-
-        // Toast Notification System
-        function triggerNotification(msg) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-message');
-            toastMsg.textContent = msg;
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-24', 'opacity-0');
-            }, 3500);
-        }
-
-        // Chat Functionality
-        function handleChatSubmit(e) {
-            e.preventDefault();
-            const input = document.getElementById('chat-input');
-            const query = input.value.trim();
-            if (!query) return;
-
-            const chatMessages = document.getElementById('chat-messages');
-
-            // User Message
-            const userDiv = document.createElement('div');
-            userDiv.className = 'flex items-start justify-end space-x-3';
-            userDiv.innerHTML = `
-                <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm p-4 max-w-lg text-sm shadow-md">
-                    ${escapeHtml(query)}
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-indigo-500/30 flex items-center justify-center text-indigo-300 flex-shrink-0">
-                    <i class="fa-solid fa-user text-xs"></i>
-                </div>
-            `;
-            chatMessages.appendChild(userDiv);
-            input.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // Simulated AI Response after 600ms
-            setTimeout(() => {
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'flex items-start space-x-3';
-                aiDiv.innerHTML = `
-                    <div class="w-8 h-8 rounded-xl bg-indigo-600/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
-                        <i class="fa-solid fa-robot text-xs"></i>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl rounded-tl-sm p-4 max-w-lg text-sm text-slate-200">
-                        EZKROY Neural engine processed your inquiry regarding "${escapeHtml(query)}". All systems report optimal operational metrics. Let me know if you need deeper telemetry analysis!
-                    </div>
-                `;
-                chatMessages.appendChild(aiDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 600);
-        }
-
-        function clearChat() {
-            const chatMessages = document.getElementById('chat-messages');
-            chatMessages.innerHTML = `
-                <div class="flex items-start space-x-3">
-                    <div class="w-8 h-8 rounded-xl bg-indigo-600/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
-                        <i class="fa-solid fa-robot text-xs"></i>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl rounded-tl-sm p-4 max-w-lg text-sm text-slate-200">
-                        Chat cleared. How else can EZKROY assist you today?
-                    </div>
-                </div>
-            `;
-            triggerNotification('Chat history cleared.');
-        }
-
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-        }
     </script>
 </body>
 </html>
