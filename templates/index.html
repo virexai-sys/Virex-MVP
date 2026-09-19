@@ -999,65 +999,181 @@
 
 
         /* =========================================================
-           BOTTOM PROGRESS
-        ========================================================= */
+           INFINITY LOADING
+           ========================================================= */
 
         .ezkroy-loader-bottom {
             width: min(100%, 480px);
 
             margin-top: 4px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .ezkroy-progress-track {
-            width: 100%;
 
-            height: 4px;
+        /* Main infinity wrapper */
 
-            background: #e0f2fe;
+        .ezkroy-infinity-loader {
+            position: relative;
 
-            border-radius: 999px;
+            width: 94px;
+            height: 48px;
 
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-top: 2px;
+            margin-bottom: 8px;
         }
 
-        .ezkroy-progress-bar {
-            width: 0%;
 
-            height: 100%;
+        /* Infinity SVG */
 
-            border-radius: inherit;
+        .ezkroy-infinity-svg {
+            width: 94px;
+            height: 48px;
 
-            background:
-                linear-gradient(
-                    90deg,
-                    #38bdf8,
-                    #0ea5e9,
-                    #0284c7
+            overflow: visible;
+        }
+
+
+        /* Background infinity */
+
+        .ezkroy-infinity-bg {
+            fill: none;
+
+            stroke: #dbeafe;
+
+            stroke-width: 5;
+
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+
+        /* Glowing progress infinity */
+
+        .ezkroy-infinity-progress {
+            fill: none;
+
+            stroke:
+                url(#ezkroyInfinityGradient);
+
+            stroke-width: 5;
+
+            stroke-linecap: round;
+            stroke-linejoin: round;
+
+            stroke-dasharray: 330;
+
+            stroke-dashoffset: 330;
+
+            filter:
+                drop-shadow(
+                    0 0 4px
+                    rgba(14,165,233,0.45)
+                )
+                drop-shadow(
+                    0 0 9px
+                    rgba(14,165,233,0.28)
                 );
 
-            box-shadow:
-                0 0 15px
-                rgba(14,165,233,0.4);
-
             transition:
-                width .65s ease;
+                stroke-dashoffset .65s ease;
         }
 
-        .ezkroy-loader-status {
+
+        /* Moving shine */
+
+        .ezkroy-infinity-shine {
+            position: absolute;
+
+            width: 13px;
+            height: 13px;
+
+            border-radius: 50%;
+
+            background: #38bdf8;
+
+            box-shadow:
+                0 0 8px #38bdf8,
+                0 0 18px rgba(14,165,233,0.75),
+                0 0 30px rgba(14,165,233,0.35);
+
+            opacity: 0;
+
+            transform:
+                translate(-40px, 0);
+
+            pointer-events: none;
+        }
+
+        .ezkroy-infinity-loader.active .ezkroy-infinity-shine {
+            opacity: 1;
+
+            animation:
+                infinityShine 2.2s
+                linear infinite;
+        }
+
+
+        /* Percentage */
+
+        .ezkroy-loader-percent-wrap {
+            min-height: 22px;
+
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            justify-content: center;
 
-            margin-top: 9px;
-
-            font-size: 9px;
-
-            color: #94a3b8;
+            margin-top: 1px;
         }
 
         #ezkroy-loader-percent {
             color: #0284c7;
 
-            font-weight: 800;
+            font-size: 12px;
+
+            font-weight: 850;
+
+            letter-spacing: .5px;
+
+            text-shadow:
+                0 0 12px
+                rgba(14,165,233,0.15);
+
+            transition:
+                transform .25s ease,
+                opacity .25s ease;
+        }
+
+
+        /* Status */
+
+        .ezkroy-loader-status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            width: 100%;
+
+            margin-top: 3px;
+
+            min-height: 18px;
+
+            font-size: 9px;
+
+            color: #94a3b8;
+
+            text-align: center;
+        }
+
+        #ezkroy-loader-status {
+            transition:
+                opacity .25s ease;
         }
 
 
@@ -1223,6 +1339,86 @@
 
 
         /* =========================================================
+           INFINITY SHINE ANIMATION
+        ========================================================= */
+
+        @keyframes infinityShine {
+
+            0% {
+                transform:
+                    translate(-39px, 0)
+                    scale(.65);
+
+                opacity: .35;
+            }
+
+            12% {
+                transform:
+                    translate(-27px, -5px)
+                    scale(.85);
+
+                opacity: 1;
+            }
+
+            25% {
+                transform:
+                    translate(-14px, -10px)
+                    scale(1);
+
+                opacity: 1;
+            }
+
+            38% {
+                transform:
+                    translate(0, -3px)
+                    scale(.9);
+
+                opacity: .9;
+            }
+
+            50% {
+                transform:
+                    translate(14px, 8px)
+                    scale(.8);
+
+                opacity: .8;
+            }
+
+            62% {
+                transform:
+                    translate(27px, -5px)
+                    scale(1);
+
+                opacity: 1;
+            }
+
+            75% {
+                transform:
+                    translate(39px, 0)
+                    scale(.9);
+
+                opacity: .95;
+            }
+
+            88% {
+                transform:
+                    translate(25px, 7px)
+                    scale(.75);
+
+                opacity: .6;
+            }
+
+            100% {
+                transform:
+                    translate(-39px, 0)
+                    scale(.65);
+
+                opacity: .35;
+            }
+        }
+
+
+        /* =========================================================
            MOBILE
         ========================================================= */
 
@@ -1278,6 +1474,14 @@
 
             .ezkroy-scene-label {
                 font-size: 8px;
+            }
+
+            .ezkroy-infinity-loader {
+                transform: scale(.92);
+            }
+
+            #ezkroy-loader-percent {
+                font-size: 11px;
             }
         }
 
@@ -1803,30 +2007,102 @@
 
 
             <!-- =====================================================
-                 PROGRESS
+                 INFINITY PROGRESS
             ===================================================== -->
 
             <div class="ezkroy-loader-bottom">
 
 
-                <div class="ezkroy-progress-track">
+                <div
+                    id="ezkroy-infinity-loader"
+                    class="ezkroy-infinity-loader active"
+                >
 
-                    <div
-                        id="ezkroy-progress-bar"
-                        class="ezkroy-progress-bar"
-                    ></div>
+                    <svg
+                        class="ezkroy-infinity-svg"
+                        viewBox="0 0 120 60"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+
+                        <defs>
+
+                            <linearGradient
+                                id="ezkroyInfinityGradient"
+                                x1="0%"
+                                y1="0%"
+                                x2="100%"
+                                y2="0%"
+                            >
+
+                                <stop
+                                    offset="0%"
+                                    stop-color="#38bdf8"
+                                />
+
+                                <stop
+                                    offset="50%"
+                                    stop-color="#0ea5e9"
+                                />
+
+                                <stop
+                                    offset="100%"
+                                    stop-color="#0284c7"
+                                />
+
+                            </linearGradient>
+
+                        </defs>
+
+
+                        <!-- Background infinity -->
+
+                        <path
+                            class="ezkroy-infinity-bg"
+                            d="M 15 30
+                               C 15 12, 37 12, 60 30
+                               C 83 48, 105 48, 105 30
+                               C 105 12, 83 12, 60 30
+                               C 37 48, 15 48, 15 30"
+                        />
+
+
+                        <!-- Progress infinity -->
+
+                        <path
+                            id="ezkroy-infinity-progress"
+                            class="ezkroy-infinity-progress"
+                            d="M 15 30
+                               C 15 12, 37 12, 60 30
+                               C 83 48, 105 48, 105 30
+                               C 105 12, 83 12, 60 30
+                               C 37 48, 15 48, 15 30"
+                        />
+
+                    </svg>
+
+
+                    <div class="ezkroy-infinity-shine"></div>
 
                 </div>
 
+
+                <!-- Percentage -->
+
+                <div class="ezkroy-loader-percent-wrap">
+
+                    <span id="ezkroy-loader-percent">
+                        0%
+                    </span>
+
+                </div>
+
+
+                <!-- Status -->
 
                 <div class="ezkroy-loader-status">
 
                     <span id="ezkroy-loader-status">
                         Starting EZKROY...
-                    </span>
-
-                    <span id="ezkroy-loader-percent">
-                        0%
                     </span>
 
                 </div>
@@ -2450,9 +2726,15 @@
                 );
 
 
-            const progressBar =
+            const infinityProgress =
                 document.getElementById(
-                    "ezkroy-progress-bar"
+                    "ezkroy-infinity-progress"
+                );
+
+
+            const infinityLoader =
+                document.getElementById(
+                    "ezkroy-infinity-loader"
                 );
 
 
@@ -2579,16 +2861,76 @@
             ) {
 
 
-                progressBar.style.width =
-                    value + "%";
+                /*
+                 * SVG infinity path length is approximately 330.
+                 * Lower dashoffset means more of the infinity glows.
+                 */
 
+                const totalLength = 330;
+
+                const offset =
+                    totalLength -
+                    (
+                        totalLength *
+                        value /
+                        100
+                    );
+
+
+                if (infinityProgress) {
+
+                    infinityProgress.style.strokeDashoffset =
+                        offset;
+
+                }
+
+
+                /*
+                 * Percentage
+                 */
 
                 percent.textContent =
                     value + "%";
 
 
+                /*
+                 * Status
+                 */
+
                 status.textContent =
                     text;
+
+
+                /*
+                 * Small percentage pulse
+                 */
+
+                percent.style.transform =
+                    "scale(1.08)";
+
+
+                setTimeout(
+                    () => {
+
+                        percent.style.transform =
+                            "scale(1)";
+
+                    },
+                    180
+                );
+
+
+                /*
+                 * At 100%, make the infinity glow stronger.
+                 */
+
+                if (value >= 100) {
+
+                    infinityProgress.style.filter =
+                        "drop-shadow(0 0 6px rgba(14,165,233,0.65)) " +
+                        "drop-shadow(0 0 15px rgba(14,165,233,0.45))";
+
+                }
 
             }
 
@@ -2661,8 +3003,22 @@
                             "loader-hidden"
                         );
 
+
                     },
                     550
+                );
+
+            }
+
+
+            /*
+             * Start infinity animation.
+             */
+
+            if (infinityLoader) {
+
+                infinityLoader.classList.add(
+                    "active"
                 );
 
             }
