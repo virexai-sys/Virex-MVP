@@ -1086,41 +1086,9 @@
         }
 
 
-        /* Moving shine */
-
-        .ezkroy-infinity-shine {
-            position: absolute;
-
-            width: 13px;
-            height: 13px;
-
-            border-radius: 50%;
-
-            background: #38bdf8;
-
-            box-shadow:
-                0 0 8px #38bdf8,
-                0 0 18px rgba(14,165,233,0.75),
-                0 0 30px rgba(14,165,233,0.35);
-
-            opacity: 0;
-
-            transform:
-                translate(-40px, 0);
-
-            pointer-events: none;
-        }
-
-        .ezkroy-infinity-loader.active .ezkroy-infinity-shine {
-            opacity: 1;
-
-            animation:
-                infinityShine 2.2s
-                linear infinite;
-        }
-
-
-        /* Percentage */
+        /* =========================================================
+           Percentage
+        ========================================================= */
 
         .ezkroy-loader-percent-wrap {
             min-height: 22px;
@@ -1334,86 +1302,6 @@
 
             50% {
                 transform: translate(-45px,-35px);
-            }
-        }
-
-
-        /* =========================================================
-           INFINITY SHINE ANIMATION
-        ========================================================= */
-
-        @keyframes infinityShine {
-
-            0% {
-                transform:
-                    translate(-39px, 0)
-                    scale(.65);
-
-                opacity: .35;
-            }
-
-            12% {
-                transform:
-                    translate(-27px, -5px)
-                    scale(.85);
-
-                opacity: 1;
-            }
-
-            25% {
-                transform:
-                    translate(-14px, -10px)
-                    scale(1);
-
-                opacity: 1;
-            }
-
-            38% {
-                transform:
-                    translate(0, -3px)
-                    scale(.9);
-
-                opacity: .9;
-            }
-
-            50% {
-                transform:
-                    translate(14px, 8px)
-                    scale(.8);
-
-                opacity: .8;
-            }
-
-            62% {
-                transform:
-                    translate(27px, -5px)
-                    scale(1);
-
-                opacity: 1;
-            }
-
-            75% {
-                transform:
-                    translate(39px, 0)
-                    scale(.9);
-
-                opacity: .95;
-            }
-
-            88% {
-                transform:
-                    translate(25px, 7px)
-                    scale(.75);
-
-                opacity: .6;
-            }
-
-            100% {
-                transform:
-                    translate(-39px, 0)
-                    scale(.65);
-
-                opacity: .35;
             }
         }
 
@@ -2015,7 +1903,7 @@
 
                 <div
                     id="ezkroy-infinity-loader"
-                    class="ezkroy-infinity-loader active"
+                    class="ezkroy-infinity-loader"
                 >
 
                     <svg
@@ -2079,9 +1967,6 @@
                         />
 
                     </svg>
-
-
-                    <div class="ezkroy-infinity-shine"></div>
 
                 </div>
 
@@ -2732,12 +2617,6 @@
                 );
 
 
-            const infinityLoader =
-                document.getElementById(
-                    "ezkroy-infinity-loader"
-                );
-
-
             const percent =
                 document.getElementById(
                     "ezkroy-loader-percent"
@@ -2924,7 +2803,10 @@
                  * At 100%, make the infinity glow stronger.
                  */
 
-                if (value >= 100) {
+                if (
+                    value >= 100 &&
+                    infinityProgress
+                ) {
 
                     infinityProgress.style.filter =
                         "drop-shadow(0 0 6px rgba(14,165,233,0.65)) " +
@@ -3006,19 +2888,6 @@
 
                     },
                     550
-                );
-
-            }
-
-
-            /*
-             * Start infinity animation.
-             */
-
-            if (infinityLoader) {
-
-                infinityLoader.classList.add(
-                    "active"
                 );
 
             }
