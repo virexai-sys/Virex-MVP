@@ -1,359 +1,2482 @@
+```html
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EZKROY - AI Sales Assistant</title>
-    <!-- Tailwind CSS CDN -->
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        /* =====================================================
+           EZKROY PREMIUM STORY LOADER
+        ===================================================== */
+
+        #ezkroy-story-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 50% 35%,
+                    rgba(14,165,233,0.13) 0%,
+                    rgba(56,189,248,0.06) 22%,
+                    rgba(248,250,252,1) 68%
+                );
+
+            opacity: 1;
+            visibility: visible;
+
+            transition:
+                opacity 0.8s ease,
+                visibility 0.8s ease;
+        }
+
+        #ezkroy-story-loader.loader-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           BACKGROUND EFFECTS
+        ===================================================== */
+
+        .ezkroy-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            pointer-events: none;
+        }
+
+        .ezkroy-orb-one {
+            width: 280px;
+            height: 280px;
+            background: rgba(56,189,248,0.12);
+            top: -100px;
+            left: -80px;
+            animation: orbFloatOne 7s ease-in-out infinite;
+        }
+
+        .ezkroy-orb-two {
+            width: 320px;
+            height: 320px;
+            background: rgba(14,165,233,0.09);
+            right: -120px;
+            bottom: -130px;
+            animation: orbFloatTwo 8s ease-in-out infinite;
+        }
+
+
+        /* =====================================================
+           MAIN LOADER
+        ===================================================== */
+
+        .ezkroy-story-container {
+            position: relative;
+            z-index: 5;
+
+            width: min(92%, 620px);
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            text-align: center;
+        }
+
+
+        /* =====================================================
+           BRAND
+        ===================================================== */
+
+        .ezkroy-loader-logo {
+            width: 58px;
+            height: 58px;
+
+            border-radius: 17px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #38bdf8,
+                    #0284c7
+                );
+
+            color: white;
+
+            font-size: 27px;
+            font-weight: 900;
+
+            box-shadow:
+                0 15px 40px rgba(14,165,233,0.28),
+                inset 0 1px rgba(255,255,255,0.4);
+
+            margin-bottom: 15px;
+
+            animation:
+                logoFloat 2.4s ease-in-out infinite,
+                logoAppear 0.7s ease both;
+        }
+
+        .ezkroy-loader-brand {
+            font-size: 25px;
+            font-weight: 800;
+
+            letter-spacing: 5px;
+
+            color: #0f172a;
+
+            margin-left: 5px;
+
+            animation: fadeUp 0.8s ease both;
+        }
+
+        .ezkroy-loader-subtitle {
+            margin-top: 6px;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: 3px;
+
+            color: #0ea5e9;
+
+            animation: fadeUp 1s ease both;
+        }
+
+
+        /* =====================================================
+           STORY AREA
+        ===================================================== */
+
+        .ezkroy-story {
+            width: 100%;
+
+            min-height: 310px;
+
+            margin-top: 28px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+        }
+
+
+        /* =====================================================
+           SCENE
+        ===================================================== */
+
+        .ezkroy-scene {
+            position: absolute;
+
+            width: 100%;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            opacity: 0;
+            transform: translateY(18px) scale(0.97);
+
+            pointer-events: none;
+
+            transition:
+                opacity 0.55s ease,
+                transform 0.55s ease;
+        }
+
+        .ezkroy-scene.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .ezkroy-scene.exit {
+            opacity: 0;
+            transform: translateY(-18px) scale(0.98);
+        }
+
+
+        /* =====================================================
+           SCENE LABEL
+        ===================================================== */
+
+        .ezkroy-scene-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 6px 11px;
+
+            border-radius: 999px;
+
+            background: rgba(14,165,233,0.08);
+            border: 1px solid rgba(14,165,233,0.12);
+
+            color: #0284c7;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: 0.5px;
+
+            margin-bottom: 14px;
+        }
+
+
+        /* =====================================================
+           CHAT CARD
+        ===================================================== */
+
+        .ezkroy-chat-card {
+            width: min(100%, 470px);
+
+            padding: 18px;
+
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.92);
+
+            border: 1px solid rgba(226,232,240,0.9);
+
+            box-shadow:
+                0 20px 60px rgba(15,23,42,0.08);
+
+            text-align: left;
+        }
+
+        .ezkroy-chat-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 16px;
+        }
+
+        .ezkroy-avatar {
+            width: 36px;
+            height: 36px;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+        }
+
+        .customer-avatar {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .ai-avatar {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .ezkroy-person-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .ezkroy-person-status {
+            font-size: 9px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+
+        /* =====================================================
+           CHAT BUBBLES
+        ===================================================== */
+
+        .ezkroy-message {
+            max-width: 88%;
+
+            padding: 13px 15px;
+
+            border-radius: 15px;
+
+            font-size: 13px;
+            line-height: 1.6;
+
+            margin-bottom: 10px;
+        }
+
+        .ezkroy-customer-message {
+            margin-left: auto;
+
+            background: #0ea5e9;
+            color: white;
+
+            border-bottom-right-radius: 5px;
+        }
+
+        .ezkroy-ai-message {
+            margin-right: auto;
+
+            background: #f8fafc;
+
+            border: 1px solid #e2e8f0;
+
+            color: #334155;
+
+            border-bottom-left-radius: 5px;
+        }
+
+
+        /* =====================================================
+           TYPING DOTS
+        ===================================================== */
+
+        .ezkroy-typing {
+            display: flex;
+            gap: 4px;
+
+            padding: 4px 0;
+        }
+
+        .ezkroy-typing span {
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #38bdf8;
+
+            animation: typing 1.1s infinite;
+        }
+
+        .ezkroy-typing span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .ezkroy-typing span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+
+        /* =====================================================
+           PRODUCT CARD
+        ===================================================== */
+
+        .ezkroy-product-card {
+            width: min(100%, 430px);
+
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 22px;
+
+            padding: 18px;
+
+            box-shadow:
+                0 20px 60px rgba(15,23,42,0.08);
+        }
+
+        .ezkroy-product-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ezkroy-product-icon {
+            width: 62px;
+            height: 62px;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #e0f2fe,
+                    #bae6fd
+                );
+
+            color: #0284c7;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 24px;
+
+            flex-shrink: 0;
+        }
+
+        .ezkroy-product-info {
+            text-align: left;
+            flex: 1;
+        }
+
+        .ezkroy-product-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .ezkroy-product-size {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .ezkroy-product-price {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0284c7;
+        }
+
+
+        /* =====================================================
+           ORDER CONFIRMATION
+        ===================================================== */
+
+        .ezkroy-success-icon {
+            width: 76px;
+            height: 76px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #ecfdf5;
+
+            border: 1px solid #a7f3d0;
+
+            color: #059669;
+
+            font-size: 30px;
+
+            margin-bottom: 16px;
+
+            animation:
+                successPop 0.65s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        .ezkroy-success-title {
+            font-size: 21px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .ezkroy-success-text {
+            margin-top: 6px;
+
+            font-size: 12px;
+
+            color: #64748b;
+        }
+
+
+        /* =====================================================
+           ORDER PROGRESS
+        ===================================================== */
+
+        .ezkroy-order-card {
+            width: min(100%, 470px);
+
+            padding: 22px;
+
+            background: white;
+
+            border-radius: 22px;
+
+            border: 1px solid #e2e8f0;
+
+            box-shadow:
+                0 20px 60px rgba(15,23,42,0.08);
+        }
+
+        .ezkroy-order-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+
+            text-align: left;
+
+            margin-bottom: 23px;
+        }
+
+        .ezkroy-order-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ezkroy-order-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            position: relative;
+
+            z-index: 2;
+        }
+
+        .ezkroy-step-icon {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #e0f2fe;
+
+            color: #0284c7;
+
+            font-size: 14px;
+
+            border: 4px solid white;
+
+            box-shadow:
+                0 0 0 1px #bae6fd;
+        }
+
+        .ezkroy-step-text {
+            margin-top: 8px;
+
+            font-size: 9px;
+
+            color: #64748b;
+
+            font-weight: 600;
+        }
+
+        .ezkroy-connector {
+            height: 2px;
+
+            flex: 1;
+
+            background: #bae6fd;
+
+            margin: 0 -2px;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =====================================================
+           DELIVERY SCENE
+        ===================================================== */
+
+        .ezkroy-delivery-card {
+            width: min(100%, 470px);
+
+            padding: 24px;
+
+            border-radius: 22px;
+
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            box-shadow:
+                0 20px 60px rgba(15,23,42,0.08);
+        }
+
+        .ezkroy-delivery-icon {
+            font-size: 44px;
+
+            color: #0284c7;
+
+            animation: truckMove 2.2s ease-in-out infinite;
+        }
+
+        .ezkroy-road {
+            width: 85%;
+
+            height: 2px;
+
+            margin: 18px auto;
+
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    #cbd5e1 0 15px,
+                    transparent 15px 28px
+                );
+        }
+
+        .ezkroy-delivery-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .ezkroy-delivery-text {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+
+        /* =====================================================
+           CUSTOMER RECEIVED
+        ===================================================== */
+
+        .ezkroy-happy-icon {
+            width: 86px;
+            height: 86px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #e0f2fe;
+
+            color: #0284c7;
+
+            font-size: 37px;
+
+            margin-bottom: 18px;
+
+            animation:
+                happyBounce 1.8s ease-in-out infinite;
+        }
+
+        .ezkroy-happy-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .ezkroy-happy-text {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+
+        /* =====================================================
+           BOTTOM PROGRESS
+        ===================================================== */
+
+        .ezkroy-loader-bottom {
+            width: min(100%, 470px);
+
+            margin-top: 12px;
+        }
+
+        .ezkroy-progress-track {
+            width: 100%;
+            height: 4px;
+
+            background: #e0f2fe;
+
+            border-radius: 999px;
+
+            overflow: hidden;
+        }
+
+        .ezkroy-progress-bar {
+            width: 0%;
+
+            height: 100%;
+
+            border-radius: inherit;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #38bdf8,
+                    #0ea5e9,
+                    #0284c7
+                );
+
+            box-shadow:
+                0 0 15px rgba(14,165,233,0.4);
+
+            transition: width 0.6s ease;
+        }
+
+        .ezkroy-loader-status {
+            display: flex;
+            justify-content: space-between;
+
+            margin-top: 9px;
+
+            font-size: 10px;
+
+            color: #94a3b8;
+        }
+
+        #ezkroy-loader-percent {
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           ANIMATIONS
+        ===================================================== */
+
+        @keyframes logoAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.7) translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.45;
+            }
+
+            30% {
+                transform: translateY(-4px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes successPop {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.08);
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes truckMove {
+            0%, 100% {
+                transform: translateX(-8px);
+            }
+
+            50% {
+                transform: translateX(8px);
+            }
+        }
+
+        @keyframes happyBounce {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-7px) rotate(-4deg);
+            }
+
+            75% {
+                transform: translateY(-4px) rotate(4deg);
+            }
+        }
+
+        @keyframes orbFloatOne {
+            0%, 100% {
+                transform: translate(0,0);
+            }
+
+            50% {
+                transform: translate(50px,30px);
+            }
+        }
+
+        @keyframes orbFloatTwo {
+            0%, 100% {
+                transform: translate(0,0);
+            }
+
+            50% {
+                transform: translate(-40px,-30px);
+            }
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            .ezkroy-loader-brand {
+                font-size: 22px;
+                letter-spacing: 4px;
+            }
+
+            .ezkroy-loader-subtitle {
+                font-size: 9px;
+                letter-spacing: 2.5px;
+            }
+
+            .ezkroy-story {
+                min-height: 340px;
+                margin-top: 20px;
+            }
+
+            .ezkroy-chat-card,
+            .ezkroy-product-card,
+            .ezkroy-order-card,
+            .ezkroy-delivery-card {
+                width: 94%;
+            }
+
+            .ezkroy-message {
+                font-size: 12px;
+            }
+
+            .ezkroy-step-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .ezkroy-step-text {
+                font-size: 8px;
+            }
+
+            .ezkroy-loader-bottom {
+                width: 88%;
+            }
+        }
+
+    </style>
 </head>
+
+
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row">
 
-    <!-- Mobile Header -->
+
+    <!-- =====================================================
+         EZKROY STORY LOADING SCREEN
+    ===================================================== -->
+
+    <div id="ezkroy-story-loader">
+
+        <!-- Background ambient lights -->
+        <div class="ezkroy-orb ezkroy-orb-one"></div>
+        <div class="ezkroy-orb ezkroy-orb-two"></div>
+
+
+        <div class="ezkroy-story-container">
+
+            <!-- EZKROY Logo -->
+            <div class="ezkroy-loader-logo">
+                E
+            </div>
+
+            <div class="ezkroy-loader-brand">
+                EZKROY
+            </div>
+
+            <div class="ezkroy-loader-subtitle">
+                AI SALES AGENT
+            </div>
+
+
+            <!-- =================================================
+                 STORY
+            ================================================= -->
+
+            <div class="ezkroy-story">
+
+
+                <!-- SCENE 1: CUSTOMER MESSAGE -->
+
+                <div class="ezkroy-scene active" data-scene="0">
+
+                    <div class="ezkroy-scene-label">
+                        <i class="fa-solid fa-message"></i>
+                        CUSTOMER MESSAGE
+                    </div>
+
+                    <div class="ezkroy-chat-card">
+
+                        <div class="ezkroy-chat-head">
+
+                            <div class="ezkroy-avatar customer-avatar">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+
+                            <div>
+                                <div class="ezkroy-person-name">
+                                    Customer
+                                </div>
+
+                                <div class="ezkroy-person-status">
+                                    Messenger
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="ezkroy-message ezkroy-customer-message">
+                            ভাই, Dior Sauvage 15ml এর দাম কত?
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SCENE 2: AI ANSWER -->
+
+                <div class="ezkroy-scene" data-scene="1">
+
+                    <div class="ezkroy-scene-label">
+                        <i class="fa-solid fa-robot"></i>
+                        EZKROY AI REPLIES
+                    </div>
+
+                    <div class="ezkroy-chat-card">
+
+                        <div class="ezkroy-chat-head">
+
+                            <div class="ezkroy-avatar ai-avatar">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+
+                            <div>
+                                <div class="ezkroy-person-name">
+                                    EZKROY AI
+                                </div>
+
+                                <div class="ezkroy-person-status">
+                                    Responding automatically
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="ezkroy-message ezkroy-customer-message">
+                            ভাই, Dior Sauvage 15ml এর দাম ৳499। চাইলে এখনই order করতে পারেন।
+                        </div>
+
+                        <div class="ezkroy-message ezkroy-ai-message">
+
+                            <div class="ezkroy-typing">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SCENE 3: PRODUCT -->
+
+                <div class="ezkroy-scene" data-scene="2">
+
+                    <div class="ezkroy-scene-label">
+                        <i class="fa-solid fa-box-open"></i>
+                        PRODUCT SELECTED
+                    </div>
+
+                    <div class="ezkroy-product-card">
+
+                        <div class="ezkroy-product-top">
+
+                            <div class="ezkroy-product-icon">
+                                <i class="fa-solid fa-spray-can-sparkles"></i>
+                            </div>
+
+                            <div class="ezkroy-product-info">
+
+                                <div class="ezkroy-product-name">
+                                    Dior Sauvage
+                                </div>
+
+                                <div class="ezkroy-product-size">
+                                    15ml · 1 item
+                                </div>
+
+                            </div>
+
+                            <div class="ezkroy-product-price">
+                                ৳499
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SCENE 4: ORDER CONFIRMED -->
+
+                <div class="ezkroy-scene" data-scene="3">
+
+                    <div class="ezkroy-success-icon">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div class="ezkroy-success-title">
+                        Order Confirmed
+                    </div>
+
+                    <div class="ezkroy-success-text">
+                        EZKROY automatically captured the customer order.
+                    </div>
+
+                </div>
+
+
+                <!-- SCENE 5: ORDER PROCESS -->
+
+                <div class="ezkroy-scene" data-scene="4">
+
+                    <div class="ezkroy-scene-label">
+                        <i class="fa-solid fa-box"></i>
+                        ORDER PROCESSING
+                    </div>
+
+                    <div class="ezkroy-order-card">
+
+                        <div class="ezkroy-order-title">
+                            Order #EZK-1048
+                        </div>
+
+                        <div class="ezkroy-order-line">
+
+                            <div class="ezkroy-order-step">
+
+                                <div class="ezkroy-step-icon">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+
+                                <div class="ezkroy-step-text">
+                                    Ordered
+                                </div>
+
+                            </div>
+
+
+                            <div class="ezkroy-connector"></div>
+
+
+                            <div class="ezkroy-order-step">
+
+                                <div class="ezkroy-step-icon">
+                                    <i class="fa-solid fa-box"></i>
+                                </div>
+
+                                <div class="ezkroy-step-text">
+                                    Packed
+                                </div>
+
+                            </div>
+
+
+                            <div class="ezkroy-connector"></div>
+
+
+                            <div class="ezkroy-order-step">
+
+                                <div class="ezkroy-step-icon">
+                                    <i class="fa-solid fa-truck"></i>
+                                </div>
+
+                                <div class="ezkroy-step-text">
+                                    Delivery
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SCENE 6: DELIVERY -->
+
+                <div class="ezkroy-scene" data-scene="5">
+
+                    <div class="ezkroy-delivery-card">
+
+                        <div class="ezkroy-delivery-icon">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+
+                        <div class="ezkroy-road"></div>
+
+                        <div class="ezkroy-delivery-title">
+                            Out for Delivery
+                        </div>
+
+                        <div class="ezkroy-delivery-text">
+                            Your customer's order is on its way.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SCENE 7: CUSTOMER RECEIVES -->
+
+                <div class="ezkroy-scene" data-scene="6">
+
+                    <div class="ezkroy-happy-icon">
+                        <i class="fa-solid fa-face-smile"></i>
+                    </div>
+
+                    <div class="ezkroy-happy-title">
+                        Product Delivered
+                    </div>
+
+                    <div class="ezkroy-happy-text">
+                        Customer received the order successfully.
+                    </div>
+
+                </div>
+
+
+                <!-- SCENE 8: FINAL BRAND -->
+
+                <div class="ezkroy-scene" data-scene="7">
+
+                    <div class="ezkroy-success-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+
+                    <div class="ezkroy-success-title">
+                        Sales, Simplified.
+                    </div>
+
+                    <div class="ezkroy-success-text">
+                        From customer message to delivered order — EZKROY handles the journey.
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 PROGRESS
+            ================================================= -->
+
+            <div class="ezkroy-loader-bottom">
+
+                <div class="ezkroy-progress-track">
+                    <div
+                        id="ezkroy-progress-bar"
+                        class="ezkroy-progress-bar"
+                    ></div>
+                </div>
+
+                <div class="ezkroy-loader-status">
+
+                    <span id="ezkroy-loader-status">
+                        Connecting your sales assistant...
+                    </span>
+
+                    <span id="ezkroy-loader-percent">
+                        0%
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MOBILE HEADER
+    ===================================================== -->
+
     <div class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center shadow-md">
+
         <div class="flex items-center space-x-2">
+
             <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i class="fa-solid fa-bag-shopping"></i>
             </div>
-            <span class="font-bold text-lg tracking-wide">EZKROY</span>
+
+            <span class="font-bold text-lg tracking-wide">
+                EZKROY
+            </span>
+
         </div>
+
         <div class="flex items-center space-x-2 text-xs bg-emerald-600 px-2.5 py-1 rounded-full text-white">
+
             <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-            <span>Sheet Sync Active</span>
+
+            <span>
+                Sheet Sync Active
+            </span>
+
         </div>
+
     </div>
 
-    <!-- Sidebar / Navigation -->
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ===================================================== -->
+
     <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex shrink-0">
+
         <div>
-            <!-- Brand Logo -->
+
             <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
+
                 <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+
                     <i class="fa-solid fa-bag-shopping text-lg"></i>
+
                 </div>
+
                 <div>
-                    <h1 class="font-bold text-slate-900 tracking-wide text-lg">EZKROY</h1>
-                    <p class="text-xs text-slate-500">AI Sales Chat</p>
+
+                    <h1 class="font-bold text-slate-900 tracking-wide text-lg">
+                        EZKROY
+                    </h1>
+
+                    <p class="text-xs text-slate-500">
+                        AI Sales Chat
+                    </p>
+
                 </div>
+
             </div>
 
-            <!-- Menu Links -->
+
             <nav class="p-4 space-y-1.5">
-                <button onclick="switchTab('chat')" id="nav-chat" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all bg-blue-600 text-white shadow-md shadow-blue-500/20">
+
+                <button
+                    onclick="switchTab('chat')"
+                    id="nav-chat"
+                    class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                >
                     <i class="fa-solid fa-comments w-5"></i>
                     <span>AI Sales Chat</span>
                 </button>
-                <button onclick="switchTab('performance')" id="nav-performance" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all">
+
+
+                <button
+                    onclick="switchTab('performance')"
+                    id="nav-performance"
+                    class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all"
+                >
                     <i class="fa-solid fa-chart-line w-5"></i>
                     <span>Performance</span>
                 </button>
-                <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all">
+
+
+                <button
+                    onclick="switchTab('products')"
+                    id="nav-products"
+                    class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all"
+                >
                     <i class="fa-solid fa-box-archive w-5"></i>
                     <span>Products & Sheet</span>
                 </button>
-                <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all">
+
+
+                <button
+                    onclick="switchTab('settings')"
+                    id="nav-settings"
+                    class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all"
+                >
                     <i class="fa-solid fa-gear w-5"></i>
                     <span>Settings</span>
                 </button>
+
             </nav>
+
         </div>
 
-        <!-- Store Admin Footer -->
+
         <div class="p-4 border-t border-slate-100 m-4 bg-slate-50 rounded-2xl">
+
             <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">A</div>
-                <div class="overflow-hidden">
-                    <p class="text-xs font-bold text-slate-900 truncate">Store Admin</p>
-                    <p class="text-[11px] text-slate-500 truncate">admin@ezkroy.com</p>
+
+                <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">
+                    A
                 </div>
+
+                <div class="overflow-hidden">
+
+                    <p class="text-xs font-bold text-slate-900 truncate">
+                        Store Admin
+                    </p>
+
+                    <p class="text-[11px] text-slate-500 truncate">
+                        admin@ezkroy.com
+                    </p>
+
+                </div>
+
             </div>
+
         </div>
+
     </aside>
 
-    <!-- Main Content Area -->
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ===================================================== -->
+
     <main class="flex-1 flex flex-col h-[calc(100vh-64px)] md:h-screen overflow-hidden bg-slate-50">
-        
-        <!-- Tab 1: AI Sales Chat -->
-        <section id="tab-chat" class="flex-1 flex flex-col h-full overflow-hidden">
-            <!-- Chat Topbar -->
+
+
+        <!-- =================================================
+             CHAT
+        ================================================= -->
+
+        <section
+            id="tab-chat"
+            class="flex-1 flex flex-col h-full overflow-hidden"
+        >
+
             <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
+
                 <div class="flex items-center space-x-3">
+
                     <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+
                         <i class="fa-solid fa-robot"></i>
+
                     </div>
+
                     <div>
-                        <h2 class="font-bold text-slate-900 text-sm md:text-base">AI Sales Assistant</h2>
+
+                        <h2 class="font-bold text-slate-900 text-sm md:text-base">
+                            AI Sales Assistant
+                        </h2>
+
                         <div class="flex items-center space-x-1.5">
+
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span class="text-xs text-slate-500">Sheet Sync Active</span>
+
+                            <span class="text-xs text-slate-500">
+                                Sheet Sync Active
+                            </span>
+
                         </div>
+
                     </div>
+
                 </div>
-                <button onclick="refreshKnowledge()" title="Sync Sheet" class="p-2 text-slate-600 hover:text-blue-600 transition-all rounded-lg hover:bg-slate-100">
+
+
+                <button
+                    onclick="refreshKnowledge()"
+                    title="Sync Sheet"
+                    class="p-2 text-slate-600 hover:text-blue-600 transition-all rounded-lg hover:bg-slate-100"
+                >
                     <i class="fa-solid fa-rotate"></i>
                 </button>
+
             </header>
 
-            <!-- Chat Messages Container -->
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-                <!-- Welcome Bot Message -->
+
+            <div
+                id="chat-messages"
+                class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4"
+            >
+
                 <div class="flex items-start space-x-3">
+
                     <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+
                         <i class="fa-solid fa-robot"></i>
+
                     </div>
+
                     <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm max-w-[85%] md:max-w-xl text-sm leading-relaxed">
-                        হ্যালো! আমি EZKROY এআই অ্যাসিস্ট্যান্ট। বলুন কি জানতে চান?
+
+                        হ্যালো! আমি EZKROY এআই অ্যাসিস্ট্যান্ট। গ্রাহকদের যেকোনো প্রশ্নের উত্তর দিতে আমি প্রস্তুত। বলুন কি জানতে চান?
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- Chat Input Box -->
+
             <div class="bg-white border-t border-slate-200 p-3 md:p-4 shrink-0">
-                <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center space-x-2">
-                    <input type="text" id="user-input" placeholder="আপনার প্রশ্ন বা অর্ডার এখানে লিখুন..." class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium text-sm transition-all shadow-md shadow-blue-500/20 shrink-0">
+
+                <form
+                    id="chat-form"
+                    onsubmit="sendMessage(event)"
+                    class="flex items-center space-x-2"
+                >
+
+                    <input
+                        type="text"
+                        id="user-input"
+                        placeholder="আপনার প্রশ্ন বা অর্ডার এখানে লিখুন..."
+                        class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-600 focus:bg-white transition-all"
+                    >
+
+                    <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium text-sm transition-all shadow-md shadow-blue-500/20 shrink-0"
+                    >
+
                         <i class="fa-solid fa-paper-plane md:mr-1.5"></i>
-                        <span class="hidden md:inline">Send</span>
+
+                        <span class="hidden md:inline">
+                            Send
+                        </span>
+
                     </button>
+
                 </form>
+
             </div>
+
         </section>
 
-        <!-- Tab 2: Performance -->
-        <section id="tab-performance" class="flex-1 overflow-y-auto p-4 md:p-8 hidden">
-            <h2 class="text-xl font-bold text-slate-900 mb-6">Performance & Analytics</h2>
+
+
+        <!-- =================================================
+             PERFORMANCE
+        ================================================= -->
+
+        <section
+            id="tab-performance"
+            class="flex-1 overflow-y-auto p-4 md:p-8 hidden"
+        >
+
+            <h2 class="text-xl font-bold text-slate-900 mb-6">
+                Performance & Analytics
+            </h2>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-semibold text-slate-500 uppercase">Total Orders</p>
-                    <h3 id="stat-orders" class="text-2xl font-bold text-slate-900 mt-2">0</h3>
+
+                    <p class="text-xs font-semibold text-slate-500 uppercase">
+                        Total Orders
+                    </p>
+
+                    <h3
+                        id="stat-orders"
+                        class="text-2xl font-bold text-slate-900 mt-2"
+                    >
+                        0
+                    </h3>
+
                 </div>
+
+
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-semibold text-slate-500 uppercase">Sheet Rows Synced</p>
-                    <h3 id="stat-rows" class="text-2xl font-bold text-slate-900 mt-2">0</h3>
+
+                    <p class="text-xs font-semibold text-slate-500 uppercase">
+                        Sheet Rows Synced
+                    </p>
+
+                    <h3
+                        id="stat-rows"
+                        class="text-2xl font-bold text-slate-900 mt-2"
+                    >
+                        0
+                    </h3>
+
                 </div>
+
+
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-semibold text-slate-500 uppercase">Available Products</p>
-                    <h3 id="stat-products" class="text-2xl font-bold text-slate-900 mt-2">0</h3>
+
+                    <p class="text-xs font-semibold text-slate-500 uppercase">
+                        Available Products
+                    </p>
+
+                    <h3
+                        id="stat-products"
+                        class="text-2xl font-bold text-slate-900 mt-2"
+                    >
+                        0
+                    </h3>
+
                 </div>
+
             </div>
+
         </section>
 
-        <!-- Tab 3: Products & Sheet -->
-        <section id="tab-products" class="flex-1 overflow-y-auto p-4 md:p-8 hidden">
+
+
+        <!-- =================================================
+             PRODUCTS
+        ================================================= -->
+
+        <section
+            id="tab-products"
+            class="flex-1 overflow-y-auto p-4 md:p-8 hidden"
+        >
+
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-slate-900">Products & Sheet Status</h2>
-                <button onclick="refreshKnowledge()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-sm hover:bg-emerald-700 transition-all">
-                    <i class="fa-solid fa-sync mr-1.5"></i> Refresh Sheet
+
+                <h2 class="text-xl font-bold text-slate-900">
+                    Products & Sheet Status
+                </h2>
+
+                <button
+                    onclick="refreshKnowledge()"
+                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-sm hover:bg-emerald-700 transition-all"
+                >
+
+                    <i class="fa-solid fa-sync mr-1.5"></i>
+
+                    Refresh Sheet
+
                 </button>
+
             </div>
+
+
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div class="p-4 border-b border-slate-100 font-semibold text-sm text-slate-700">Connected Products List</div>
-                <div id="products-list" class="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
-                    <!-- Loaded dynamically -->
+
+                <div class="p-4 border-b border-slate-100 font-semibold text-sm text-slate-700">
+
+                    Connected Products List
+
                 </div>
+
+                <div
+                    id="products-list"
+                    class="divide-y divide-slate-100 max-h-[400px] overflow-y-auto"
+                >
+                </div>
+
             </div>
+
         </section>
 
-        <!-- Tab 4: Settings -->
-        <section id="tab-settings" class="flex-1 overflow-y-auto p-4 md:p-8 hidden">
-            <h2 class="text-xl font-bold text-slate-900 mb-6">Bot Settings</h2>
+
+
+        <!-- =================================================
+             SETTINGS
+        ================================================= -->
+
+        <section
+            id="tab-settings"
+            class="flex-1 overflow-y-auto p-4 md:p-8 hidden"
+        >
+
+            <h2 class="text-xl font-bold text-slate-900 mb-6">
+                Bot Settings
+            </h2>
+
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-xl space-y-4">
+
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Google Sheet CSV Link</label>
-                    <input type="text" readonly value="Connected via Backend" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600">
+
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                        Google Sheet CSV Link
+                    </label>
+
+                    <input
+                        type="text"
+                        readonly
+                        value="Connected via Backend"
+                        class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600"
+                    >
+
                 </div>
+
+
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Active AI Model</label>
-                    <input type="text" readonly value="GPT-4o (Optimized)" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600">
+
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                        Active AI Model
+                    </label>
+
+                    <input
+                        type="text"
+                        readonly
+                        value="GPT-4o (Optimized)"
+                        class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600"
+                    >
+
                 </div>
+
             </div>
+
         </section>
 
     </main>
 
-    <!-- Mobile Bottom Navigation Bar -->
+
+
+    <!-- =====================================================
+         MOBILE NAVIGATION
+    ===================================================== -->
+
     <nav class="md:hidden bg-white border-t border-slate-200 h-16 flex justify-around items-center px-2 shrink-0 z-50">
-        <button onclick="switchTab('chat')" id="mob-nav-chat" class="flex flex-col items-center justify-center flex-1 py-1 text-blue-600">
+
+        <button
+            onclick="switchTab('chat')"
+            id="mob-nav-chat"
+            class="flex flex-col items-center justify-center flex-1 py-1 text-blue-600"
+        >
+
             <i class="fa-solid fa-comments text-lg mb-1"></i>
-            <span class="text-[10px] font-medium">Chat</span>
+
+            <span class="text-[10px] font-medium">
+                Chat
+            </span>
+
         </button>
-        <button onclick="switchTab('performance')" id="mob-nav-performance" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600">
+
+
+        <button
+            onclick="switchTab('performance')"
+            id="mob-nav-performance"
+            class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600"
+        >
+
             <i class="fa-solid fa-chart-line text-lg mb-1"></i>
-            <span class="text-[10px] font-medium">Stats</span>
+
+            <span class="text-[10px] font-medium">
+                Stats
+            </span>
+
         </button>
-        <button onclick="switchTab('products')" id="mob-nav-products" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600">
+
+
+        <button
+            onclick="switchTab('products')"
+            id="mob-nav-products"
+            class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600"
+        >
+
             <i class="fa-solid fa-box-archive text-lg mb-1"></i>
-            <span class="text-[10px] font-medium">Sheet</span>
+
+            <span class="text-[10px] font-medium">
+                Sheet
+            </span>
+
         </button>
-        <button onclick="switchTab('settings')" id="mob-nav-settings" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600">
+
+
+        <button
+            onclick="switchTab('settings')"
+            id="mob-nav-settings"
+            class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600"
+        >
+
             <i class="fa-solid fa-gear text-lg mb-1"></i>
-            <span class="text-[10px] font-medium">Settings</span>
+
+            <span class="text-[10px] font-medium">
+                Settings
+            </span>
+
         </button>
+
     </nav>
 
-    <!-- JavaScript Frontend Logic -->
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
     <script>
-        function switchTab(tabName) {
-            const tabs = ['chat', 'performance', 'products', 'settings'];
-            tabs.forEach(t => {
-                document.getElementById('tab-' + t).classList.add('hidden');
-                
-                // Desktop active styles
-                const desktopNav = document.getElementById('nav-' + t);
-                if (desktopNav) {
-                    desktopNav.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all";
+
+
+        /* =====================================================
+           EZKROY STORY LOADER
+        ===================================================== */
+
+        (function initEZKROYStoryLoader() {
+
+            const loader =
+                document.getElementById("ezkroy-story-loader");
+
+            const scenes =
+                document.querySelectorAll(".ezkroy-scene");
+
+            const progressBar =
+                document.getElementById("ezkroy-progress-bar");
+
+            const percent =
+                document.getElementById("ezkroy-loader-percent");
+
+            const status =
+                document.getElementById("ezkroy-loader-status");
+
+
+            if (!loader || !scenes.length) {
+                return;
+            }
+
+
+            const story = [
+
+                {
+                    progress: 10,
+                    status: "Customer is asking a question...",
+                    duration: 1900
+                },
+
+                {
+                    progress: 24,
+                    status: "EZKROY AI is responding...",
+                    duration: 2100
+                },
+
+                {
+                    progress: 39,
+                    status: "Finding the right product...",
+                    duration: 1800
+                },
+
+                {
+                    progress: 54,
+                    status: "Capturing the customer order...",
+                    duration: 1700
+                },
+
+                {
+                    progress: 68,
+                    status: "Order is being processed...",
+                    duration: 1900
+                },
+
+                {
+                    progress: 82,
+                    status: "Product is on the way...",
+                    duration: 1800
+                },
+
+                {
+                    progress: 93,
+                    status: "Customer received the product...",
+                    duration: 1800
+                },
+
+                {
+                    progress: 100,
+                    status: "EZKROY is ready.",
+                    duration: 1200
                 }
 
-                // Mobile bottom nav active styles
-                const mobNav = document.getElementById('mob-nav-' + t);
-                if (mobNav) {
-                    mobNav.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600";
+            ];
+
+
+            let currentScene = 0;
+            let pageReady = false;
+            let minimumStoryFinished = false;
+
+
+            function showScene(index) {
+
+                scenes.forEach((scene, i) => {
+
+                    scene.classList.remove("active");
+                    scene.classList.remove("exit");
+
+                    if (i === index) {
+                        scene.classList.add("active");
+                    }
+
+                });
+
+            }
+
+
+            function updateProgress(value, text) {
+
+                progressBar.style.width =
+                    value + "%";
+
+                percent.textContent =
+                    value + "%";
+
+                status.textContent =
+                    text;
+
+            }
+
+
+            function nextScene() {
+
+                if (currentScene >= story.length) {
+
+                    minimumStoryFinished = true;
+
+                    finishIfReady();
+
+                    return;
                 }
+
+
+                const step =
+                    story[currentScene];
+
+
+                showScene(currentScene);
+
+                updateProgress(
+                    step.progress,
+                    step.status
+                );
+
+
+                currentScene++;
+
+
+                setTimeout(
+                    nextScene,
+                    step.duration
+                );
+
+            }
+
+
+            function finishIfReady() {
+
+                if (
+                    !minimumStoryFinished ||
+                    !pageReady
+                ) {
+                    return;
+                }
+
+
+                updateProgress(
+                    100,
+                    "Ready"
+                );
+
+
+                setTimeout(() => {
+
+                    loader.classList.add(
+                        "loader-hidden"
+                    );
+
+                }, 500);
+
+            }
+
+
+            /*
+             * Start story immediately.
+             */
+
+            nextScene();
+
+
+            /*
+             * Page has loaded.
+             */
+
+            window.addEventListener(
+                "load",
+                function () {
+
+                    pageReady = true;
+
+                    finishIfReady();
+
+                }
+            );
+
+
+            /*
+             * Safety fallback.
+             *
+             * If browser does not fire load properly,
+             * never keep the user trapped forever.
+             */
+
+            setTimeout(() => {
+
+                pageReady = true;
+
+                finishIfReady();
+
+            }, 16000);
+
+
+        })();
+
+
+
+        /* =====================================================
+           TAB SWITCHING
+        ===================================================== */
+
+        function switchTab(tabName) {
+
+            const tabs = [
+                'chat',
+                'performance',
+                'products',
+                'settings'
+            ];
+
+
+            tabs.forEach(t => {
+
+                document
+                    .getElementById('tab-' + t)
+                    .classList.add('hidden');
+
+
+                const desktopNav =
+                    document.getElementById(
+                        'nav-' + t
+                    );
+
+
+                if (desktopNav) {
+
+                    desktopNav.className =
+                        "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition-all";
+
+                }
+
+
+                const mobNav =
+                    document.getElementById(
+                        'mob-nav-' + t
+                    );
+
+
+                if (mobNav) {
+
+                    mobNav.className =
+                        "flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600";
+
+                }
+
             });
 
-            document.getElementById('tab-' + tabName).classList.remove('hidden');
 
-            const activeDesktop = document.getElementById('nav-' + tabName);
+            document
+                .getElementById(
+                    'tab-' + tabName
+                )
+                .classList.remove('hidden');
+
+
+            const activeDesktop =
+                document.getElementById(
+                    'nav-' + tabName
+                );
+
+
             if (activeDesktop) {
-                activeDesktop.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm bg-blue-600 text-white shadow-md shadow-blue-500/20";
+
+                activeDesktop.className =
+                    "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm bg-blue-600 text-white shadow-md shadow-blue-500/20";
+
             }
 
-            const activeMob = document.getElementById('mob-nav-' + tabName);
+
+            const activeMob =
+                document.getElementById(
+                    'mob-nav-' + tabName
+                );
+
+
             if (activeMob) {
-                activeMob.className = "flex flex-col items-center justify-center flex-1 py-1 text-blue-600";
+
+                activeMob.className =
+                    "flex flex-col items-center justify-center flex-1 py-1 text-blue-600";
+
             }
 
-            if (tabName === 'performance' || tabName === 'products') {
+
+            if (
+                tabName === 'performance' ||
+                tabName === 'products'
+            ) {
+
                 loadStats();
+
             }
+
         }
+
+
+
+        /* =====================================================
+           CHAT
+        ===================================================== */
 
         async function sendMessage(event) {
+
             event.preventDefault();
-            const inputField = document.getElementById('user-input');
-            const message = inputField.value.trim();
-            if (!message) return;
 
-            const chatMessages = document.getElementById('chat-messages');
 
-            // Append User Message
+            const inputField =
+                document.getElementById(
+                    'user-input'
+                );
+
+
+            const message =
+                inputField.value.trim();
+
+
+            if (!message) {
+                return;
+            }
+
+
+            const chatMessages =
+                document.getElementById(
+                    'chat-messages'
+                );
+
+
+            /*
+             * User message
+             */
+
             chatMessages.innerHTML += `
+
                 <div class="flex items-start justify-end space-x-3">
-                    <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-sm max-w-[85%] md:max-w-xl text-sm leading-relaxed">
-                        ${escapeHtml(message)}
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                </div>
-            `;
-            inputField.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Loading state
-            const loadingId = 'loading-' + Date.now();
-            chatMessages.innerHTML += `
-                <div id="${loadingId}" class="flex items-start space-x-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
-                        <i class="fa-solid fa-robot"></i>
+                    <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-sm max-w-[85%] md:max-w-xl text-sm leading-relaxed">
+
+                        ${escapeHtml(message)}
+
                     </div>
-                    <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm text-sm text-slate-400">
-                        টাইপ করছে...
+
+                    <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+
+                        <i class="fa-solid fa-user"></i>
+
                     </div>
+
                 </div>
+
             `;
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+
+            inputField.value = '';
+
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
+
+
+            /*
+             * AI loading
+             */
+
+            const loadingId =
+                'loading-' + Date.now();
+
+
+            chatMessages.innerHTML += `
+
+                <div
+                    id="${loadingId}"
+                    class="flex items-start space-x-3"
+                >
+
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+
+                        <i class="fa-solid fa-robot"></i>
+
+                    </div>
+
+                    <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm text-sm text-slate-400">
+
+                        টাইপ করছে...
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
+
 
             try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
-                });
-                const data = await response.json();
 
-                document.getElementById(loadingId).remove();
+                const response =
+                    await fetch(
+                        '/api/chat',
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    message:
+                                        message
+                                })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                const loadingElement =
+                    document.getElementById(
+                        loadingId
+                    );
+
+
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+
 
                 chatMessages.innerHTML += `
+
                     <div class="flex items-start space-x-3">
+
                         <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0 shadow-md">
+
                             <i class="fa-solid fa-robot"></i>
+
                         </div>
+
                         <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm max-w-[85%] md:max-w-xl text-sm leading-relaxed text-slate-800">
-                            ${escapeHtml(data.reply)}
+
+                            ${escapeHtml(
+                                data.reply || ''
+                            )}
+
                         </div>
+
                     </div>
+
                 `;
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+
+                chatMessages.scrollTop =
+                    chatMessages.scrollHeight;
+
 
                 if (data.order_created) {
+
                     chatMessages.innerHTML += `
+
                         <div class="flex justify-center my-2">
+
                             <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-4 py-2 rounded-xl font-medium">
-                                <i class="fa-solid fa-check-circle mr-1"></i> আপনার অর্ডারটি সফলভাবে রেকর্ড করা হয়েছে!
+
+                                <i class="fa-solid fa-check-circle mr-1"></i>
+
+                                আপনার অর্ডারটি সফলভাবে রেকর্ড করা হয়েছে!
+
                             </div>
+
                         </div>
+
                     `;
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+
+                    chatMessages.scrollTop =
+                        chatMessages.scrollHeight;
+
                 }
-            } catch (err) {
-                document.getElementById(loadingId).remove();
-                chatMessages.innerHTML += `
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs shrink-0">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-                        <div class="bg-red-50 border border-red-100 p-4 rounded-2xl text-sm text-red-600">
-                            সার্ভারে সংযোগ করতে সমস্যা হচ্ছে।
-                        </div>
-                    </div>
-                `;
+
             }
+
+
+            catch (err) {
+
+                const loadingElement =
+                    document.getElementById(
+                        loadingId
+                    );
+
+
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+
+
+                chatMessages.innerHTML += `
+
+                    <div class="flex items-start space-x-3">
+
+                        <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs shrink-0">
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        </div>
+
+                        <div class="bg-red-50 border border-red-100 p-4 rounded-2xl text-sm text-red-600">
+
+                            সার্ভারে সংযোগ করতে সমস্যা হচ্ছে।
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
         }
+
+
+
+        /* =====================================================
+           STATS
+        ===================================================== */
 
         async function loadStats() {
-            try {
-                const res = await fetch('/api/health');
-                const data = await res.json();
-                document.getElementById('stat-orders').innerText = data.total_orders || 0;
-                document.getElementById('stat-rows').innerText = data.google_sheet_rows || 0;
-                document.getElementById('stat-products').innerText = data.total_products || 0;
 
-                const prodRes = await fetch('/api/products');
-                const products = await prodRes.json();
-                const listEl = document.getElementById('products-list');
+            try {
+
+                const res =
+                    await fetch(
+                        '/api/health'
+                    );
+
+
+                const data =
+                    await res.json();
+
+
+                document.getElementById(
+                    'stat-orders'
+                ).innerText =
+                    data.total_orders || 0;
+
+
+                document.getElementById(
+                    'stat-rows'
+                ).innerText =
+                    data.google_sheet_rows || 0;
+
+
+                document.getElementById(
+                    'stat-products'
+                ).innerText =
+                    data.total_products || 0;
+
+
+                const prodRes =
+                    await fetch(
+                        '/api/products'
+                    );
+
+
+                const products =
+                    await prodRes.json();
+
+
+                const listEl =
+                    document.getElementById(
+                        'products-list'
+                    );
+
+
                 listEl.innerHTML = '';
+
+
                 products.forEach(p => {
+
                     listEl.innerHTML += `
+
                         <div class="p-4 flex justify-between items-center text-sm">
+
                             <div>
-                                <p class="font-bold text-slate-900">${p.name}</p>
-                                <p class="text-xs text-slate-500">15ml: ৳${p.price_15ml} | 30ml: ৳${p.price_30ml}</p>
+
+                                <p class="font-bold text-slate-900">
+
+                                    ${escapeHtml(
+                                        p.name || ''
+                                    )}
+
+                                </p>
+
+                                <p class="text-xs text-slate-500">
+
+                                    15ml: ৳${p.price_15ml}
+
+                                    |
+
+                                    30ml: ৳${p.price_30ml}
+
+                                </p>
+
                             </div>
-                            <span class="bg-blue-50 text-blue-600 text-xs px-2.5 py-1 rounded-lg font-semibold">Stock: ${p.stock}</span>
+
+                            <span class="bg-blue-50 text-blue-600 text-xs px-2.5 py-1 rounded-lg font-semibold">
+
+                                Stock: ${p.stock}
+
+                            </span>
+
                         </div>
+
                     `;
+
                 });
-            } catch (e) {
-                console.error("Stats load error", e);
+
             }
+
+
+            catch (e) {
+
+                console.error(
+                    "Stats load error",
+                    e
+                );
+
+            }
+
         }
+
+
+
+        /* =====================================================
+           GOOGLE SHEET REFRESH
+        ===================================================== */
 
         async function refreshKnowledge() {
+
             try {
-                await fetch('/api/knowledge/refresh', { method: 'POST' });
-                alert('গুগল শিট সফলভাবে রিফ্রেশ ও সিঙ্ক করা হয়েছে!');
+
+                await fetch(
+                    '/api/knowledge/refresh',
+                    {
+                        method: 'POST'
+                    }
+                );
+
+
+                alert(
+                    'গুগল শিট সফলভাবে রিফ্রেশ ও সিঙ্ক করা হয়েছে!'
+                );
+
+
                 loadStats();
-            } catch (e) {
-                alert('রিফ্রেশ করতে সমস্যা হয়েছে।');
+
             }
+
+
+            catch (e) {
+
+                alert(
+                    'রিফ্রেশ করতে সমস্যা হয়েছে।'
+                );
+
+            }
+
         }
 
+
+
+        /* =====================================================
+           HTML ESCAPE
+        ===================================================== */
+
         function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+
+            const map = {
+
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+
+            };
+
+
+            return String(text).replace(
+                /[&<>"']/g,
+                function(m) {
+                    return map[m];
+                }
+            );
+
         }
+
     </script>
+
 </body>
 </html>
+```
