@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -41,7 +42,7 @@
 
         /* =========================================================
            EZKROY PREMIUM STORY LOADER
-        ========================================================= */
+        ========================================================== */
 
         #ezkroy-story-loader {
 
@@ -88,7 +89,7 @@
 
         /* =========================================================
            BACKGROUND GRID
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-grid {
 
@@ -128,7 +129,7 @@
 
         /* =========================================================
            AMBIENT ORBS
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-orb {
 
@@ -182,7 +183,7 @@
 
         /* =========================================================
            MAIN CONTAINER
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-story-container {
 
@@ -203,8 +204,9 @@
 
 
         /* =========================================================
-           BRAND
-        ========================================================= */
+           BRAND BOX
+           E = BLACK
+        ========================================================== */
 
         .ezkroy-loader-logo {
 
@@ -225,7 +227,7 @@
                     #0284c7
                 );
 
-            color: black;
+            color: #000000;
 
             font-size: 29px;
 
@@ -246,6 +248,12 @@
         }
 
 
+        /* =========================================================
+           BRAND TEXT
+           EZK = BLACK
+           ROY = BLUE
+        ========================================================== */
+
         .ezkroy-loader-brand {
 
             font-size: 26px;
@@ -253,8 +261,6 @@
             font-weight: 850;
 
             letter-spacing: 6px;
-
-            color: #0284c7;
 
             margin-left: 6px;
 
@@ -266,17 +272,12 @@
         }
 
 
-        /* =========================================================
-           EZKROY BRAND COLOR
-           EZK = BLACK
-           ROY = BLUE
-        ========================================================= */
-
-        .ezkroy-loader-brand .ezkroy-black {
+        .ezkroy-brand-black {
             color: #000000;
         }
 
-        .ezkroy-loader-brand .ezkroy-blue {
+
+        .ezkroy-brand-blue {
             color: #0284c7;
         }
 
@@ -303,7 +304,7 @@
 
         /* =========================================================
            STORY AREA
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-story {
 
@@ -324,7 +325,7 @@
 
         /* =========================================================
            SCENES
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-scene {
 
@@ -366,7 +367,7 @@
 
         /* =========================================================
            SCENE LABEL
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-scene-label {
 
@@ -405,7 +406,7 @@
 
         /* =========================================================
            COMMON CARD
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-card {
 
@@ -435,7 +436,7 @@
 
         /* =========================================================
            CHAT
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-chat-head {
 
@@ -558,7 +559,7 @@
 
         /* =========================================================
            AI STATUS
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-ai-status {
 
@@ -598,7 +599,7 @@
 
         /* =========================================================
            PRODUCT
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-product-card {
 
@@ -703,7 +704,7 @@
 
         /* =========================================================
            ORDER CAPTURE
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-capture-card {
 
@@ -838,7 +839,7 @@
 
         /* =========================================================
            ORDER PROCESSING
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-order-card {
 
@@ -956,7 +957,7 @@
 
         /* =========================================================
            DELIVERY
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-delivery-card {
 
@@ -1031,7 +1032,7 @@
 
         /* =========================================================
            DELIVERED
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-happy-icon {
 
@@ -1087,7 +1088,7 @@
 
         /* =========================================================
            FINAL
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-final-badge {
 
@@ -1132,7 +1133,7 @@
                     #0284c7
                 );
 
-            color: white;
+            color: #000000;
 
             font-size: 34px;
 
@@ -1174,7 +1175,7 @@
 
         /* =========================================================
            INFINITY LOADING
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-loader-bottom {
 
@@ -1265,7 +1266,7 @@
 
         /* =========================================================
            PERCENTAGE
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-loader-percent-wrap {
 
@@ -1306,7 +1307,7 @@
 
         /* =========================================================
            STATUS
-        ========================================================= */
+        ========================================================== */
 
         .ezkroy-loader-status {
 
@@ -1341,7 +1342,7 @@
 
         /* =========================================================
            ANIMATIONS
-        ========================================================= */
+        ========================================================== */
 
         @keyframes logoAppear {
 
@@ -1517,7 +1518,7 @@
 
         /* =========================================================
            MOBILE
-        ========================================================= */
+        ========================================================== */
 
         @media (max-width:600px) {
 
@@ -1619,11 +1620,10 @@
 
 
     <!-- =========================================================
-         EZKROY STORY LOADER
-    ========================================================= -->
+         EZKROY EXTERNAL STORY LOADER
+    ========================================================== -->
 
     <div id="ezkroy-story-loader">
-
 
         <div class="ezkroy-grid"></div>
 
@@ -1644,10 +1644,10 @@
             </div>
 
 
-            <!-- EZK BLACK + ROY BLUE -->
-
             <div class="ezkroy-loader-brand">
-                <span class="ezkroy-black">EZK</span><span class="ezkroy-blue">ROY</span>
+
+                <span class="ezkroy-brand-black">EZK</span><span class="ezkroy-brand-blue">ROY</span>
+
             </div>
 
 
@@ -1664,9 +1664,7 @@
             <div class="ezkroy-story">
 
 
-                <!-- =================================================
-                     SCENE 1
-                ================================================= -->
+                <!-- SCENE 1 -->
 
                 <div
                     class="ezkroy-scene active"
@@ -1684,9 +1682,7 @@
 
                     <div class="ezkroy-card">
 
-
                         <div class="ezkroy-chat-head">
-
 
                             <div class="ezkroy-avatar customer-avatar">
 
@@ -1707,7 +1703,6 @@
 
                             </div>
 
-
                         </div>
 
 
@@ -1717,16 +1712,13 @@
 
                         </div>
 
-
                     </div>
 
                 </div>
 
 
 
-                <!-- =================================================
-                     SCENE 2
-                ================================================= -->
+                <!-- SCENE 2 -->
 
                 <div
                     class="ezkroy-scene"
@@ -1744,9 +1736,7 @@
 
                     <div class="ezkroy-card">
 
-
                         <div class="ezkroy-chat-head">
-
 
                             <div class="ezkroy-avatar ai-avatar">
 
@@ -1767,7 +1757,6 @@
 
                             </div>
 
-
                         </div>
 
 
@@ -1787,16 +1776,13 @@
 
                         </div>
 
-
                     </div>
 
                 </div>
 
 
 
-                <!-- =================================================
-                     SCENE 3
-                ================================================= -->
+                <!-- SCENE 3 -->
 
                 <div
                     class="ezkroy-scene"
@@ -1814,9 +1800,7 @@
 
                     <div class="ezkroy-product-card">
 
-
                         <div class="ezkroy-product-top">
-
 
                             <div class="ezkroy-product-icon">
 
@@ -1842,9 +1826,7 @@
                                 ৳499
                             </div>
 
-
                         </div>
-
 
                     </div>
 
@@ -1852,9 +1834,7 @@
 
 
 
-                <!-- =================================================
-                     SCENE 4
-                ================================================= -->
+                <!-- SCENE 4 -->
 
                 <div
                     class="ezkroy-scene"
@@ -1872,9 +1852,7 @@
 
                     <div class="ezkroy-capture-card">
 
-
                         <div class="ezkroy-capture-head">
-
 
                             <div class="ezkroy-capture-icon">
 
@@ -1895,12 +1873,10 @@
 
                             </div>
 
-
                         </div>
 
 
                         <div class="ezkroy-order-fields">
-
 
                             <div class="ezkroy-order-field">
 
@@ -1966,9 +1942,7 @@
 
                             </div>
 
-
                         </div>
-
 
                     </div>
 
@@ -1976,9 +1950,7 @@
 
 
 
-                <!-- =================================================
-                     SCENE 5
-                ================================================= -->
+                <!-- SCENE 5 -->
 
                 <div
                     class="ezkroy-scene"
@@ -1996,14 +1968,12 @@
 
                     <div class="ezkroy-order-card">
 
-
                         <div class="ezkroy-order-title">
                             Order #EZK-1048
                         </div>
 
 
                         <div class="ezkroy-order-line">
-
 
                             <div class="ezkroy-order-step">
 
@@ -2055,9 +2025,7 @@
 
                             </div>
 
-
                         </div>
-
 
                     </div>
 
@@ -2065,9 +2033,7 @@
 
 
 
-                <!-- =================================================
-                     SCENE 6
-                ================================================= -->
+                <!-- SCENE 6 -->
 
                 <div
                     class="ezkroy-scene"
@@ -2084,7 +2050,6 @@
 
 
                     <div class="ezkroy-delivery-card">
-
 
                         <div class="ezkroy-delivery-icon">
 
@@ -2105,16 +2070,13 @@
                             The customer's order is on its way.
                         </div>
 
-
                     </div>
 
                 </div>
 
 
 
-                <!-- =================================================
-                     SCENE 7
-                ================================================= -->
+                <!-- SCENE 7 -->
 
                 <div
                     class="ezkroy-scene"
@@ -2141,9 +2103,7 @@
 
 
 
-                <!-- =================================================
-                     SCENE 8
-                ================================================= -->
+                <!-- SCENE 8 -->
 
                 <div
                     class="ezkroy-scene"
@@ -2178,7 +2138,6 @@
 
                     </div>
 
-
                 </div>
 
 
@@ -2198,13 +2157,11 @@
                     class="ezkroy-infinity-loader"
                 >
 
-
                     <svg
                         class="ezkroy-infinity-svg"
                         viewBox="0 0 120 60"
                         xmlns="http://www.w3.org/2000/svg"
                     >
-
 
                         <defs>
 
@@ -2236,8 +2193,6 @@
                         </defs>
 
 
-                        <!-- Background infinity -->
-
                         <path
                             class="ezkroy-infinity-bg"
                             d="
@@ -2249,8 +2204,6 @@
                             "
                         />
 
-
-                        <!-- Animated progress infinity -->
 
                         <path
                             id="ezkroy-infinity-progress"
@@ -2264,17 +2217,10 @@
                             "
                         />
 
-
                     </svg>
-
 
                 </div>
 
-
-
-                <!-- =================================================
-                     PERCENTAGE
-                ================================================= -->
 
                 <div class="ezkroy-loader-percent-wrap">
 
@@ -2284,11 +2230,6 @@
 
                 </div>
 
-
-
-                <!-- =================================================
-                     STATUS
-                ================================================= -->
 
                 <div class="ezkroy-loader-status">
 
@@ -2310,18 +2251,36 @@
 
     <!-- =========================================================
          JAVASCRIPT
-    ========================================================= -->
+         EXTERNAL RENDER WAKE-UP SYSTEM
+    ========================================================== -->
 
     <script>
 
-        /*
-         * =========================================================
-         * EZKROY STORY LOADER
-         * =========================================================
-         */
+        (function initEZKROYExternalLoader() {
 
-        (function initEZKROYStoryLoader() {
 
+            /*
+             * =====================================================
+             * YOUR REAL RENDER APP
+             * =====================================================
+             */
+
+            const EZKROY_APP_URL =
+                "https://virex-ai-zi6c.onrender.com/";
+
+
+            /*
+             * Render-এর server-কে background-এ wake করার জন্য
+             * এই URL ব্যবহার হবে।
+             */
+
+            const EZKROY_WAKE_URL =
+                EZKROY_APP_URL;
+
+
+            /*
+             * DOM ELEMENTS
+             */
 
             const loader =
                 document.getElementById(
@@ -2368,7 +2327,7 @@
 
             /*
              * =====================================================
-             * EZKROY CUSTOMER JOURNEY
+             * STORY
              * =====================================================
              */
 
@@ -2461,16 +2420,25 @@
 
             /*
              * =====================================================
+             * RENDER WAKE STATUS
+             * =====================================================
+             */
+
+            let renderReady = false;
+
+            let wakeStarted = false;
+
+
+            /*
+             * =====================================================
              * SHOW SCENE
              * =====================================================
              */
 
             function showScene(index) {
 
-
                 scenes.forEach(
                     (scene, i) => {
-
 
                         scene.classList.remove(
                             "active"
@@ -2493,7 +2461,7 @@
 
             /*
              * =====================================================
-             * UPDATE INFINITY + PERCENTAGE
+             * UPDATE PROGRESS
              * =====================================================
              */
 
@@ -2501,7 +2469,6 @@
                 value,
                 text
             ) {
-
 
                 const totalLength = 330;
 
@@ -2557,6 +2524,253 @@
 
             /*
              * =====================================================
+             * WAKE RENDER
+             *
+             * Browser background-এ Render URL request পাঠাবে।
+             *
+             * IMPORTANT:
+             * CORS error হলেও server request সাধারণত
+             * Render instance wake করার জন্য যথেষ্ট।
+             * তাই এখানে response-এর উপর নির্ভর করা হচ্ছে না।
+             * =====================================================
+             */
+
+            function wakeRender() {
+
+
+                if (wakeStarted) {
+                    return;
+                }
+
+
+                wakeStarted = true;
+
+
+                try {
+
+                    fetch(
+                        EZKROY_WAKE_URL +
+                        "?ezkroy_wake=" +
+                        Date.now(),
+                        {
+                            method: "GET",
+
+                            mode: "no-cors",
+
+                            cache: "no-store",
+
+                            credentials: "omit"
+                        }
+                    )
+                    .catch(
+                        () => {}
+                    );
+
+                }
+                catch (error) {
+
+                    /* Ignore wake-up errors */
+
+                }
+
+
+                /*
+                 * Image fallback.
+                 *
+                 * Render request পাঠানোর আরেকটি lightweight
+                 * method হিসেবে কাজ করে।
+                 */
+
+                try {
+
+                    const wakeImage =
+                        new Image();
+
+                    wakeImage.src =
+                        EZKROY_WAKE_URL +
+                        "?ezkroy_ping=" +
+                        Date.now();
+
+                }
+                catch (error) {
+
+                    /* Ignore */
+
+                }
+
+            }
+
+
+            /*
+             * =====================================================
+             * CHECK WHETHER RENDER IS READY
+             * =====================================================
+             */
+
+            async function checkRenderReady() {
+
+
+                try {
+
+                    const controller =
+                        new AbortController();
+
+
+                    const timeout =
+                        setTimeout(
+                            () => {
+                                controller.abort();
+                            },
+                            4500
+                        );
+
+
+                    const response =
+                        await fetch(
+                            EZKROY_APP_URL +
+                            "?ezkroy_check=" +
+                            Date.now(),
+                            {
+                                method: "GET",
+
+                                cache: "no-store",
+
+                                signal:
+                                    controller.signal
+                            }
+                        );
+
+
+                    clearTimeout(
+                        timeout
+                    );
+
+
+                    if (
+                        response &&
+                        (
+                            response.ok ||
+                            response.status < 500
+                        )
+                    ) {
+
+                        renderReady = true;
+
+                        return true;
+
+                    }
+
+                }
+                catch (error) {
+
+                    /*
+                     * Render এখনও waking up.
+                     */
+
+                }
+
+
+                return false;
+
+            }
+
+
+            /*
+             * =====================================================
+             * BACKGROUND READY CHECK
+             * =====================================================
+             */
+
+            function startRenderWatcher() {
+
+
+                /*
+                 * প্রথম check
+                 */
+
+                checkRenderReady();
+
+
+                /*
+                 * প্রতি 2.5 second-এ check করবে।
+                 */
+
+                const watcher =
+                    setInterval(
+                        async () => {
+
+                            if (
+                                renderReady
+                            ) {
+
+                                clearInterval(
+                                    watcher
+                                );
+
+                                return;
+
+                            }
+
+
+                            await checkRenderReady();
+
+                        },
+                        2500
+                    );
+
+
+                /*
+                 * সর্বোচ্চ 90 second পর্যন্ত watcher চলবে।
+                 */
+
+                setTimeout(
+                    () => {
+
+                        clearInterval(
+                            watcher
+                        );
+
+                    },
+                    90000
+                );
+
+            }
+
+
+            /*
+             * =====================================================
+             * REDIRECT
+             * =====================================================
+             */
+
+            function redirectToEZKROY() {
+
+
+                /*
+                 * Render ready হলে loader fade করবে।
+                 */
+
+                loader.classList.add(
+                    "loader-hidden"
+                );
+
+
+                setTimeout(
+                    () => {
+
+                        window.location.replace(
+                            EZKROY_APP_URL
+                        );
+
+                    },
+                    500
+                );
+
+            }
+
+
+            /*
+             * =====================================================
              * NEXT SCENE
              * =====================================================
              */
@@ -2572,14 +2786,44 @@
 
                     updateProgress(
                         100,
-                        "EZKROY is ready."
+                        renderReady
+                            ? "EZKROY is ready."
+                            : "Connecting to EZKROY..."
                     );
 
 
-                    setTimeout(
-                        redirectToEZKROY,
-                        650
-                    );
+                    /*
+                     * Render এখনও ready না হলে
+                     * loader বন্ধ হবে না।
+                     *
+                     * এতে Render-এর wake-up screen
+                     * আসার chance কমে যায় কারণ আমরা
+                     * background-এ আগে থেকেই request পাঠিয়েছি।
+                     */
+
+                    if (
+                        renderReady
+                    ) {
+
+                        setTimeout(
+                            redirectToEZKROY,
+                            650
+                        );
+
+                    }
+                    else {
+
+                        /*
+                         * Keep loader alive while Render wakes.
+                         */
+
+                        status.textContent =
+                            "Connecting to EZKROY server...";
+
+
+                        waitForRender();
+
+                    }
 
 
                     return;
@@ -2615,40 +2859,143 @@
 
             /*
              * =====================================================
-             * REDIRECT TO REAL EZKROY APP
+             * WAIT FOR RENDER
              * =====================================================
              */
 
-            function redirectToEZKROY() {
+            function waitForRender() {
 
 
-                const EZKROY_APP_URL =
-                    "https://virex-ai-zi6c.onrender.com/";
+                const startTime =
+                    Date.now();
 
 
-                loader.classList.add(
-                    "loader-hidden"
-                );
+                const maxWait =
+                    120000;
 
 
-                setTimeout(
-                    () => {
+                async function attempt() {
 
-                        window.location.replace(
-                            EZKROY_APP_URL
+
+                    if (
+                        renderReady
+                    ) {
+
+                        updateProgress(
+                            100,
+                            "EZKROY is ready."
                         );
 
-                    },
-                    500
-                );
+
+                        setTimeout(
+                            redirectToEZKROY,
+                            500
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    const ready =
+                        await checkRenderReady();
+
+
+                    if (ready) {
+
+                        updateProgress(
+                            100,
+                            "EZKROY is ready."
+                        );
+
+
+                        setTimeout(
+                            redirectToEZKROY,
+                            500
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Maximum wait পার হলে তবুও app open করবে।
+                     */
+
+                    if (
+                        Date.now() -
+                        startTime >
+                        maxWait
+                    ) {
+
+                        updateProgress(
+                            100,
+                            "Opening EZKROY..."
+                        );
+
+
+                        setTimeout(
+                            redirectToEZKROY,
+                            500
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * User-কে status দেখানো।
+                     */
+
+                    status.textContent =
+                        "Waking up EZKROY server...";
+
+
+                    setTimeout(
+                        attempt,
+                        2500
+                    );
+
+                }
+
+
+                attempt();
 
             }
 
 
             /*
              * =====================================================
-             * START IMMEDIATELY
+             * START
              * =====================================================
+             */
+
+            /*
+             * সবচেয়ে গুরুত্বপূর্ণ অংশ:
+             *
+             * Loader দেখানোর সাথে সাথেই Render-কে wake request।
+             *
+             * অর্থাৎ user যখন animation দেখছে,
+             * তখনই background-এ Render server wake হচ্ছে।
+             */
+
+            wakeRender();
+
+
+            /*
+             * পাশাপাশি server ready watcher চালু।
+             */
+
+            startRenderWatcher();
+
+
+            /*
+             * Animation immediately শুরু।
              */
 
             nextScene();
