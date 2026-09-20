@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template
 import os
 import json
 import csv
@@ -8,11 +8,33 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 
+
 # =========================================================
 # EZKROY AI — GOOGLE SHEET + PROFILE + SALES AGENT
 # =========================================================
+#
+# ANSWER PRIORITY
+#
+# 1. Product-specific Google Sheet
+# 2. General Google Sheet
+# 3. Personal Profile
+# 4. Order fallback
+# 5. System fallback
+#
+# IMPORTANT
+# - NO OpenAI
+# - NO ChatGPT API
+# - Google Sheet = Main Knowledge Source
+# - Existing products preserved
+# - Profile system enabled
+# - Portfolio enabled
+# - 5121+ Google Sheet rows supported
+#
+# =========================================================
+
 
 app = Flask(__name__)
+
 
 # =========================================================
 # GOOGLE SHEET CONFIG
@@ -21,8 +43,10 @@ app = Flask(__name__)
 GOOGLE_SHEET_ID = "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
 
 GOOGLE_SHEET_CSV_URL = (
-    f"https://docs.google.com/spreadsheets/d/{GOOGLE_SHEET_ID}/export?format=csv"
+    "https://docs.google.com/spreadsheets/d/"
+    f"{GOOGLE_SHEET_ID}/export?format=csv"
 )
+
 
 # =========================================================
 # PROFILE CONFIG
@@ -43,8 +67,10 @@ PROFILE = {
     "portfolio": "https://sites.google.com/view/aiman-porfolio/home",
     "portfolio_name": "Aiman's Portfolio",
     "about": (
-        "Aiman is a student and entrepreneur with interests in sales, data, technology "
-        "and AI. He is also the founder of NOIR Fragrance and works on EZKROY, an "
+        "Aiman is a student and entrepreneur "
+        "with interests in sales, data, technology "
+        "and AI. He is also the founder of NOIR "
+        "Fragrance and works on EZKROY, an "
         "AI-powered sales assistant project."
     ),
     "projects": ["EZKROY", "NOIR Fragrance"],
@@ -55,9 +81,16 @@ PROFILE = {
         "Entrepreneurship",
         "Technology",
     ],
-    "creator_description": "Aiman is the creator and developer of the EZKROY project.",
-    "contact_note": "For direct contact information, please refer to Aiman's portfolio.",
+    "creator_description": (
+        "Aiman is the creator and developer "
+        "of the EZKROY project."
+    ),
+    "contact_note": (
+        "For direct contact information, please "
+        "refer to Aiman's portfolio."
+    ),
 }
+
 
 # =========================================================
 # PROFILE INTENTS
@@ -79,12 +112,17 @@ PROFILE_INTENTS = {
         "who designed you",
         "ke banaise",
         "ke banayse",
+        "ke banaiছে",
+        "ke design korse",
         "creator ke",
         "owner ke",
         "developer ke",
         "malik ke",
         "tomre ke banaise",
         "tomake ke banaise",
+        "tomake ke banayse",
+        "tomare ke banaise",
+        "tomare ke banayse",
     ],
     "name": [
         "your name",
@@ -105,6 +143,7 @@ PROFILE_INTENTS = {
         "college ki",
         "what do you study",
         "ki niye poro",
+        "ki niye study koro",
         "subject ki",
         "department ki",
         "geography",
@@ -171,6 +210,7 @@ PROFILE_INTENTS = {
     ],
 }
 
+
 # =========================================================
 # FILE PATHS
 # =========================================================
@@ -181,8 +221,9 @@ ORDER_FILE = os.path.join(DATA_DIR, "orders.json")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
+
 # =========================================================
-# PRODUCT CATALOG (Initial fallback)
+# PRODUCT CATALOG
 # =========================================================
 
 INITIAL_PRODUCTS = [
@@ -213,6 +254,32 @@ INITIAL_PRODUCTS = [
         "best_for": ["Office", "Dates", "Evening Wear", "Winter", "Casual Events"],
     },
     {
+        "id": 3,
+        "name": "HAWAS FIRE",
+        "price_15ml": 329,
+        "regular_15ml": 999,
+        "price_30ml": 599,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Bold, Addictive & Magnetic.",
+        "notes": ["Sweet", "Spicy", "Aquatic", "Smoky", "Amber"],
+        "longevity": "7–9 Hours",
+        "best_for": ["Dates", "Night Out", "Parties", "Winter", "Special Events"],
+    },
+    {
+        "id": 4,
+        "name": "ONE MILLION",
+        "price_15ml": 249,
+        "regular_15ml": 999,
+        "price_30ml": 499,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Bold, Luxurious & Attention-Grabbing.",
+        "notes": ["Sweet", "Spicy", "Citrus", "Leather", "Woody"],
+        "longevity": "7–10 Hours",
+        "best_for": ["Parties", "Night Out", "Dates", "Winter", "Special Events"],
+    },
+    {
         "id": 5,
         "name": "DIOR SAUVAGE",
         "price_15ml": 299,
@@ -225,8 +292,233 @@ INITIAL_PRODUCTS = [
         "longevity": "6–8 Hours",
         "best_for": ["Daily Wear", "Office", "Dates", "Events"],
     },
+    {
+        "id": 6,
+        "name": "NAUTICA VOYAGE",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 599,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Fresh, Clean & Everyday Confidence.",
+        "notes": ["Aquatic", "Green Apple", "Fresh", "Woody"],
+        "longevity": "5–7 Hours",
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"],
+    },
+    {
+        "id": 7,
+        "name": "HAWAS ICE",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 549,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Cool, Fresh & Addictive.",
+        "notes": ["Aquatic", "Citrus", "Sweet", "Musky", "Fresh Spicy"],
+        "longevity": "7–9 Hours",
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"],
+    },
+    {
+        "id": 8,
+        "name": "BLEU DE CHANEL",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 549,
+        "regular_30ml": 999,
+        "stock": 20,
+        "description": "Elegant, Fresh & Sophisticated.",
+        "notes": ["Citrus", "Woody", "Aromatic", "Fresh Spicy", "Incense"],
+        "longevity": "7–10 Hours",
+        "best_for": ["Office", "Daily Wear", "Meetings", "Dates", "Special Events"],
+    },
+    {
+        "id": 9,
+        "name": "VAMPIRE BLOOD",
+        "price_15ml": 399,
+        "regular_15ml": 999,
+        "price_30ml": 649,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Dark, Mysterious & Seductive.",
+        "notes": ["Sweet", "Spicy", "Smoky", "Amber", "Woody"],
+        "longevity": "7–9 Hours",
+        "best_for": ["Night Out", "Parties", "Winter", "Dates", "Special Events"],
+    },
+    {
+        "id": 10,
+        "name": "SRK (Shah Rukh Inspired)",
+        "price_15ml": 299,
+        "regular_15ml": 999,
+        "price_30ml": 499,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Classy, Romantic & Royal.",
+        "notes": ["Fresh", "Woody", "Spicy", "Soft Floral", "Amber"],
+        "longevity": "6–8 Hours",
+        "best_for": ["Dates", "Weddings", "Events", "Office", "Evening Wear"],
+    },
+    {
+        "id": 11,
+        "name": "STRONGER WITH YOU",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 499,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Sweet, Warm & Addictive.",
+        "notes": ["Chestnut", "Vanilla", "Sweet Spicy", "Amber", "Woody"],
+        "longevity": "7–10 Hours",
+        "best_for": ["Dates", "Winter", "Night Out", "Parties", "Special Moments"],
+    },
+    {
+        "id": 12,
+        "name": "GUCCI FLORA",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 599,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Elegant, Feminine & Soft Luxury.",
+        "notes": ["Floral", "Citrus", "Sweet", "Powdery", "Soft Woody"],
+        "longevity": "5–7 Hours",
+        "best_for": ["Daily Wear", "Office", "College", "Dates", "Casual Outings"],
+    },
+    {
+        "id": 13,
+        "name": "CK1",
+        "price_15ml": 299,
+        "regular_15ml": 799,
+        "price_30ml": 499,
+        "regular_30ml": 1299,
+        "stock": 20,
+        "description": "Clean, Iconic & Timeless.",
+        "notes": ["Citrus", "Green", "Fresh Spicy", "Aromatic", "Woody"],
+        "longevity": "6–8 Hours",
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"],
+    },
+    {
+        "id": 14,
+        "name": "9PM",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 549,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Bold, Sweet & Irresistible.",
+        "notes": ["Vanilla", "Sweet", "Fruity", "Amber", "Warm Spicy"],
+        "longevity": "8–10 Hours",
+        "best_for": ["Date Night", "Evening Wear", "Parties", "Winter Days", "Special Occasions"],
+    },
+    {
+        "id": 15,
+        "name": "COOL WATER",
+        "price_15ml": 299,
+        "regular_15ml": 799,
+        "price_30ml": 499,
+        "regular_30ml": 1299,
+        "stock": 20,
+        "description": "Fresh, Clean & Timeless.",
+        "notes": ["Aquatic", "Marine", "Green", "Aromatic", "Fresh Spicy"],
+        "longevity": "6–8 Hours",
+        "best_for": ["Daily Wear", "Summer Days", "College", "Office", "Casual Outings"],
+    },
+    {
+        "id": 16,
+        "name": "LATTAFA KHAMRAH",
+        "price_15ml": 399,
+        "regular_15ml": 1099,
+        "price_30ml": 599,
+        "regular_30ml": 1699,
+        "stock": 20,
+        "description": "Rich, Warm & Addictive.",
+        "notes": ["Cinnamon", "Vanilla", "Sweet", "Amber", "Woody", "Warm Spicy"],
+        "longevity": "8–12 Hours",
+        "best_for": ["Date Night", "Winter Days", "Parties", "Special Occasions", "Evening Wear"],
+    },
+    {
+        "id": 17,
+        "name": "CREED AVENTUS",
+        "price_15ml": 399,
+        "regular_15ml": 1199,
+        "price_30ml": 599,
+        "regular_30ml": 1799,
+        "stock": 20,
+        "description": "Bold, Powerful & Legendary.",
+        "notes": ["Pineapple", "Bergamot", "Smoky", "Woody", "Musky"],
+        "longevity": "8–10 Hours",
+        "best_for": ["Office", "Date Night", "Parties", "Special Occasions", "Year-Round Wear"],
+    },
+    {
+        "id": 18,
+        "name": "BLUEBERRY",
+        "price_15ml": 299,
+        "regular_15ml": 799,
+        "price_30ml": 499,
+        "regular_30ml": 1299,
+        "stock": 20,
+        "description": "Sweet, Juicy & Addictive.",
+        "notes": ["Blueberry", "Fruity", "Sweet", "Fresh", "Musky"],
+        "longevity": "6–8 Hours",
+        "best_for": ["Daily Wear", "College", "Casual Outings", "Hangouts", "Daytime Wear"],
+    },
+    {
+        "id": 19,
+        "name": "TOBACCO VANILLE",
+        "price_15ml": 399,
+        "regular_15ml": 1099,
+        "price_30ml": 599,
+        "regular_30ml": 1699,
+        "stock": 20,
+        "description": "Rich, Warm & Addictive.",
+        "notes": ["Tobacco", "Vanilla", "Sweet", "Warm Spicy", "Woody"],
+        "longevity": "8–12 Hours",
+        "best_for": ["Date Night", "Winter Days", "Evening Wear", "Parties", "Special Occasions"],
+    },
+    {
+        "id": 20,
+        "name": "GOOD GIRL",
+        "price_15ml": 399,
+        "regular_15ml": 1099,
+        "price_30ml": 599,
+        "regular_30ml": 1699,
+        "stock": 20,
+        "description": "Sweet, Bold & Irresistible.",
+        "notes": ["Vanilla", "White Floral", "Sweet", "Warm Spicy", "Cacao"],
+        "longevity": "8–10 Hours",
+        "best_for": ["Date Night", "Parties", "Evening Wear", "Special Occasions", "Winter Days"],
+    },
+    {
+        "id": 21,
+        "name": "VERSACE EROS",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 549,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Fresh, Bold & Irresistible.",
+        "notes": ["Mint", "Vanilla", "Apple", "Citrus", "Woody", "Fresh Spicy"],
+        "longevity": "8–10 Hours",
+        "best_for": ["Date Night", "Parties", "College", "Casual Outings", "Evening Wear"],
+    },
+    {
+        "id": 22,
+        "name": "BAD BOY",
+        "price_15ml": 349,
+        "regular_15ml": 999,
+        "price_30ml": 549,
+        "regular_30ml": 1499,
+        "stock": 20,
+        "description": "Bold, Dark & Unapologetic.",
+        "notes": ["Cocoa", "Tonka Bean", "Amber", "Citrus", "Woody", "Aromatic"],
+        "longevity": "8–10 Hours",
+        "best_for": ["Date Night", "Parties", "Evening Wear", "Winter Days", "Special Occasions"],
+    },
 ]
 
+
+# =========================================================
+# JSON HELPERS
+# =========================================================
 
 def load_json_file(filename, default=None):
     if default is None:
@@ -235,7 +527,8 @@ def load_json_file(filename, default=None):
         if not os.path.exists(filename):
             return default
         with open(filename, "r", encoding="utf-8") as file:
-            return json.load(file)
+            data = json.load(file)
+        return data
     except Exception as error:
         print("JSON LOAD ERROR:", error)
         return default
@@ -251,6 +544,10 @@ def save_json_file(filename, data):
         return False
 
 
+# =========================================================
+# INITIALIZE PRODUCTS
+# =========================================================
+
 def init_product_file():
     if not os.path.exists(PRODUCT_FILE):
         save_json_file(PRODUCT_FILE, INITIAL_PRODUCTS)
@@ -259,18 +556,30 @@ def init_product_file():
 init_product_file()
 
 
+# =========================================================
+# PRODUCTS
+# =========================================================
+
 def get_products():
     products = load_json_file(PRODUCT_FILE, INITIAL_PRODUCTS)
-    return products if isinstance(products, list) else INITIAL_PRODUCTS
-
-
-def get_orders():
-    orders = load_json_file(ORDER_FILE, [])
-    return orders if isinstance(orders, list) else []
+    if isinstance(products, list):
+        return products
+    return INITIAL_PRODUCTS
 
 
 # =========================================================
-# GOOGLE SHEET CACHE & DOWNLOAD
+# ORDERS
+# =========================================================
+
+def get_orders():
+    orders = load_json_file(ORDER_FILE, [])
+    if isinstance(orders, list):
+        return orders
+    return []
+
+
+# =========================================================
+# GOOGLE SHEET CACHE
 # =========================================================
 
 sheet_cache = {
@@ -281,7 +590,15 @@ sheet_cache = {
 }
 
 
+# =========================================================
+# GOOGLE SHEET DOWNLOAD
+# =========================================================
+
 def download_google_sheet():
+    print("")
+    print("=" * 70)
+    print("GOOGLE SHEET: STARTING DOWNLOAD")
+    print("=" * 70)
     try:
         request_object = urllib.request.Request(
             GOOGLE_SHEET_CSV_URL,
@@ -289,10 +606,20 @@ def download_google_sheet():
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
             },
         )
-        with urllib.request.urlopen(request_object, timeout=10) as response:
-            text = response.read().decode("utf-8-sig", errors="replace")
+        with urllib.request.urlopen(request_object, timeout=30) as response:
+            raw_data = response.read()
+            status_code = response.getcode()
+
+        print("GOOGLE SHEET HTTP STATUS:", status_code)
+        text = raw_data.decode("utf-8-sig", errors="replace")
+        print("GOOGLE SHEET RAW LENGTH:", len(text))
 
         reader = csv.DictReader(io.StringIO(text))
+        print("GOOGLE SHEET HEADERS:", reader.fieldnames)
+
+        if not reader.fieldnames:
+            raise Exception("Google Sheet CSV has no headers.")
+
         rows = []
         for row in reader:
             cleaned = {}
@@ -302,17 +629,52 @@ def download_google_sheet():
                 clean_key = str(key).strip().lower()
                 clean_value = str(value or "").strip()
                 cleaned[clean_key] = clean_value
+
             if any(value.strip() for value in cleaned.values()):
                 rows.append(cleaned)
+
+        required_columns = {"question", "answer", "keywords"}
+        available_columns = set(rows[0].keys()) if rows else set()
+        missing_columns = required_columns - available_columns
+
+        if missing_columns:
+            raise Exception(
+                "Missing required columns: "
+                + ", ".join(sorted(missing_columns))
+            )
 
         sheet_cache["data"] = rows
         sheet_cache["loaded_at"] = datetime.now().isoformat()
         sheet_cache["last_error"] = None
+        print("GOOGLE SHEET ROWS:", len(rows))
+        if rows:
+            print("FIRST SHEET ROW:", rows[0])
+        print("GOOGLE SHEET: SUCCESS")
+        print("=" * 70)
         return rows
-    except Exception as error:
-        sheet_cache["last_error"] = str(error)
+
+    except urllib.error.HTTPError as error:
+        message = f"HTTP {error.code}: {error.reason}"
+        sheet_cache["last_error"] = message
+        print("GOOGLE SHEET HTTP ERROR:", message)
         return sheet_cache.get("data", [])
 
+    except urllib.error.URLError as error:
+        message = f"URL ERROR: {error.reason}"
+        sheet_cache["last_error"] = message
+        print("GOOGLE SHEET URL ERROR:", message)
+        return sheet_cache.get("data", [])
+
+    except Exception as error:
+        message = str(error)
+        sheet_cache["last_error"] = message
+        print("GOOGLE SHEET ERROR:", message)
+        return sheet_cache.get("data", [])
+
+
+# =========================================================
+# GET SHEET DATA
+# =========================================================
 
 def get_sheet_data():
     if not sheet_cache["data"]:
@@ -321,9 +683,8 @@ def get_sheet_data():
 
 
 # =========================================================
-# TEXT NORMALIZATION & TOKENIZE
+# TEXT NORMALIZATION
 # =========================================================
-
 
 def normalize_text(text):
     text = str(text or "").lower().strip()
@@ -331,42 +692,71 @@ def normalize_text(text):
         "tmi": "tumi",
         "tmre": "tomare",
         "tmr": "tomar",
+        "tmra": "tomra",
+        "apnr": "apnar",
         "pls": "please",
         "plz": "please",
+        "15 ml": "15ml",
+        "30 ml": "30ml",
+        "50 ml": "50ml",
         "৳": " taka ",
         "tk": " taka ",
+        "bdt": " taka ",
     }
+
     for old, new in replacements.items():
         text = text.replace(old, new)
+
     text = re.sub(r"[^a-z0-9\u0980-\u09ff\s:/._-]", " ", text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
+
+# =========================================================
+# TOKENIZE
+# =========================================================
 
 def tokenize(text):
     return set(re.findall(r"[a-z0-9\u0980-\u09ff]+", normalize_text(text)))
 
 
 # =========================================================
-# PROFILE ANSWER BUILDER & MATCHING
+# PROFILE ANSWER BUILDER
 # =========================================================
-
 
 def get_profile_answer(intent):
     if intent == "identity":
-        return f"আমি EZKROY-এর AI sales assistant। এই project-এর creator/developer হলেন {PROFILE['name']} ({PROFILE['short_name']})।"
+        return (
+            "আমি EZKROY-এর AI sales assistant। "
+            f"এই project-এর creator/developer হলেন {PROFILE['name']} ({PROFILE['short_name']})।"
+        )
     if intent == "name":
-        return f"আমার project-এর creator/developer হলেন {PROFILE['name']}। তাকে সাধারণত {PROFILE['short_name']} নামে ডাকা হয়।"
+        return (
+            f"আমার project-এর creator/developer হলেন {PROFILE['name']}। "
+            f"তাকে সাধারণত {PROFILE['short_name']} নামে ডাকা হয়।"
+        )
     if intent == "education":
-        return f"Aiman {PROFILE['institution']}-এ {PROFILE['field']} নিয়ে পড়াশোনা করছেন।"
+        return (
+            f"Aiman {PROFILE['institution']}-এ {PROFILE['field']} নিয়ে পড়াশোনা করছেন। "
+            f"তিনি আগে {PROFILE['previous_institution']}-এর সাথেও যুক্ত ছিলেন।"
+        )
     if intent == "hometown":
         return f"Aiman-এর hometown হলো {PROFILE['hometown']}।"
     if intent == "business":
-        return f"Aiman-এর business project-এর মধ্যে {PROFILE['business']} উল্লেখযোগ্য।"
+        return (
+            f"Aiman-এর business project-এর মধ্যে {PROFILE['business']} উল্লেখযোগ্য। "
+            "এটি একটি fragrance/perfume business।"
+        )
     if intent == "project":
-        return f"{PROFILE['project']} হলো Aiman-এর AI-powered sales assistant project।"
+        return (
+            f"{PROFILE['project']} হলো Aiman-এর AI-powered sales assistant project। "
+            "এর লক্ষ্য হলো business-এর customer questions এবং sales process সহজ করা।"
+        )
     if intent == "portfolio":
-        return f"Aiman-এর portfolio দেখতে এখানে যেতে পারেন:\n{PROFILE['portfolio']}"
+        return (
+            "Aiman-এর portfolio দেখতে এখানে যেতে পারেন:\n"
+            f"{PROFILE['portfolio']}"
+        )
     if intent == "about":
         return PROFILE["about"]
     if intent == "interests":
@@ -375,120 +765,56 @@ def get_profile_answer(intent):
     return None
 
 
+# =========================================================
+# PROFILE MATCHING (Fixed & Completed)
+# =========================================================
+
 def find_profile_answer(message):
     user_text = normalize_text(message)
     if not user_text:
         return None
 
+    # Portfolio priority
+    portfolio_terms = [
+        "portfolio",
+        "portfolio link",
+        "website",
+        "personal website",
+        "show portfolio",
+        "give portfolio",
+        "aiman portfolio",
+    ]
+
+    for term in portfolio_terms:
+        if normalize_text(term) in user_text:
+            return get_profile_answer("portfolio")
+
+    best_intent = None
+    best_score = 0
+    user_words = tokenize(user_text)
+
     for intent, phrases in PROFILE_INTENTS.items():
+        score = 0
         for phrase in phrases:
-            if normalize_text(phrase) in user_text:
-                return get_profile_answer(intent)
+            phrase_normalized = normalize_text(phrase)
+            if not phrase_normalized:
+                continue
+
+            if user_text == phrase_normalized:
+                score += 20
+            elif phrase_normalized in user_text:
+                score += 10
+
+            phrase_words = tokenize(phrase)
+            common = user_words & phrase_words
+            if common:
+                score += len(common) * 5
+
+        if score > best_score:
+            best_score = score
+            best_intent = intent
+
+    if best_score >= 5 and best_intent:
+        return get_profile_answer(best_intent)
+
     return None
-
-
-PRODUCT_ALIASES = {
-    "dior": "DIOR SAUVAGE",
-    "sauvage": "DIOR SAUVAGE",
-    "212": "212 MEN NYC",
-    "dunhill": "DUNHILL DESIRE",
-    "bad boy": "BAD BOY",
-}
-
-# =========================================================
-# FLASK ROUTES (Frontend & API)
-# =========================================================
-
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <title>EZKROY AI - Sales Assistant</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .chat-container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .chat-box { height: 400px; border: 1px solid #ddd; border-radius: 5px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; background: #fafafa; }
-        .message { margin-bottom: 10px; padding: 8px 12px; border-radius: 5px; max-width: 80%; }
-        .user { background: #007bff; color: white; margin-left: auto; text-align: right; }
-        .bot { background: #e2e3e5; color: #333; }
-        .input-group { display: flex; gap: 10px; }
-        .input-group input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .input-group button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="chat-container">
-        <h2>EZKROY AI Sales Assistant</h2>
-        <div class="chat-box" id="chatBox"></div>
-        <div class="input-group">
-            <input type="text" id="userInput" placeholder="আপনার প্রশ্ন এখানে লিখুন..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()">পাঠান</button>
-        </div>
-    </div>
-    <script>
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const chatBox = document.getElementById('chatBox');
-            const text = input.value.trim();
-            if(!text) return;
-
-            chatBox.innerHTML += `<div class="message user">${text}</div>`;
-            input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            });
-            const data = await response.json();
-
-            chatBox.innerHTML += `<div class="message bot">${data.reply}</div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
-</body>
-</html>
-"""
-
-
-@app.route("/")
-def index():
-    return render_template_string(HTML_TEMPLATE)
-
-
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json() or {}
-    message = data.get("message", "")
-
-    # Priority 1: Profile Match
-    profile_ans = find_profile_answer(message)
-    if profile_ans:
-        return jsonify({"reply": profile_ans})
-
-    # Priority 2: Google Sheet Data Search
-    sheet_rows = get_sheet_data()
-    user_tokens = tokenize(message)
-    for row in sheet_rows:
-        q_tokens = tokenize(row.get("question", ""))
-        kw_tokens = tokenize(row.get("keywords", ""))
-        if user_tokens & (q_tokens | kw_tokens):
-            return jsonify({"reply": row.get("answer", "উত্তর পাওয়া গেছে।")})
-
-    # Priority 3: Product Match fallback
-    products = get_products()
-    for prod in products:
-        if prod["name"].lower() in message.lower():
-            reply = f"প্রোডাক্ট: {prod['name']}\nমূল্য (১৫মিঃলিঃ): {prod.get('price_15ml')} টাকা\nমূল্য (৩০মিঃলিঃ): {prod.get('price_30ml')} টাকা\nবিবরণ: {prod.get('description')}"
-            return jsonify({"reply": reply})
-
-    # Priority 4: System Fallback
-    return jsonify({
-        "reply": "দুঃখিত, বিষয়টি বুঝতে পারিনি। আপনি আমাদের পোর্টফোলিও দেখতে পারেন অথবা নির্দিষ্ট কোনো পারফিউম বা তথ্য সম্পর্কে জানতে চাইলে তা লিখে পাঠান।"
-    })
-
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
