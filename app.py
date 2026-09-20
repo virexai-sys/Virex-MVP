@@ -1,62 +1,29 @@
 from flask import Flask, request, jsonify, render_template_string
-import os
-import json
-import csv
-import io
-import re
-import urllib.request
-import urllib.error
+import os, json, csv, io, re, urllib.request, urllib.error
 from datetime import datetime
 import google.generativeai as genai
-
-# =========================================================
-# EZKROY AI — DESIGN + GOOGLE SHEET + GEMINI API + ORDER SYNC
-# =========================================================
 
 app = Flask(__name__)
 
 # =========================================================
-# CONFIGURATIONS & GOOGLE SHEETS
+# EZKROY AI — ORIGINAL DESIGN + KNOWLEDGE SHEET + GEMINI
+# + CONVERSATIONAL ORDER COLLECTION + GOOGLE SHEET SYNC
 # =========================================================
 
-# 1. Knowledge Base Google Sheet (Q&A)
 KNOWLEDGE_SHEET_ID = "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
 KNOWLEDGE_CSV_URL = f"https://docs.google.com/spreadsheets/d/{KNOWLEDGE_SHEET_ID}/export?format=csv"
 
-# 2. Orders Google Sheet (Order logging via Google Apps Script Webhook or direct CSV mapping)
-# Note: For sending orders to a Google Sheet via Python, a Google Apps Script web app URL is usually deployed.
 ORDERS_SHEET_ID = "1OSYvfZzBLqTtIlTo42PECUz0UyaxBVdGFWr8m6xVUso"
-ORDERS_WEBHOOK_URL = os.environ.get("ORDERS_WEBHOOK_URL", "") # Google Apps Script URL if available
+# IMPORTANT: set this Render environment variable to your deployed Apps Script /exec URL.
+ORDERS_WEBHOOK_URL = os.environ.get("ORDERS_WEBHOOK_URL", "")
 
-# 3. Gemini API Configuration
-# Make sure to set your Gemini API key in environment variables or put it here directly
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
-# =========================================================
-# PROFILE CONFIG
-# =========================================================
-
-PROFILE = {
-    "name": "Asad Ullah Mozumder Aiman",
-    "short_name": "Aiman",
-    "role": "Student, Entrepreneur, Sales & Data Enthusiast",
-    "project": "EZKROY",
-    "business": "NOIR Fragrance",
-    "education": "Geography student",
-    "institution": "Dhaka Central University",
-    "previous_institution": "Dhaka College",
-    "portfolio": "https://sites.google.com/view/aiman-porfolio/home"
-}
-
-# =========================================================
-# FILE PATHS & INITIAL DATA
-# =========================================================
 DATA_DIR = "data"
 PRODUCT_FILE = os.path.join(DATA_DIR, "products.json")
 ORDER_FILE = os.path.join(DATA_DIR, "orders.json")
-
 os.makedirs(DATA_DIR, exist_ok=True)
 
 INITIAL_PRODUCTS = [
@@ -87,10 +54,10 @@ INITIAL_PRODUCTS = [
 def init_files():
     if not os.path.exists(PRODUCT_FILE):
         with open(PRODUCT_FILE, "w", encoding="utf-8") as f:
-            json.dump(INITIAL_PRODUCTS, f, indent=2)
+            json.dump(INITIAL_PRODUCTS, f, indent=2, ensure_ascii=False)
     if not os.path.exists(ORDER_FILE):
         with open(ORDER_FILE, "w", encoding="utf-8") as f:
-            json.dump([], f, indent=2)
+            json.dump([], f, indent=2, ensure_ascii=False)
 
 init_files()
 
@@ -99,8 +66,8 @@ def load_json(path, default):
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
-    except Exception:
-        pass
+    except Exception as e:
+        print("JSON load error:", e)
     return default
 
 def save_json(path, data):
@@ -108,79 +75,230 @@ def save_json(path, data):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         return True
-    except Exception:
+    except Exception as e:
+        print("JSON save error:", e)
         return False
 
 # =========================================================
-# KNOWLEDGE SHEET CACHE & FETCHER
+# KNOWLEDGE GOOGLE SHEET
 # =========================================================
 sheet_cache = {"data": [], "loaded_at": None}
 
 def fetch_knowledge_sheet():
     try:
         req = urllib.request.Request(KNOWLEDGE_CSV_URL, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            lines = resp.read().decode("utf-8-sig", errors="replace")
-            reader = csv.DictReader(io.StringIO(lines))
-            rows = []
-            for r in reader:
-                cleaned = {str(k).strip().lower(): str(v).strip() for k, v in r.items() if k is not None}
-                if any(cleaned.values()):
-                    rows.append(cleaned)
-            sheet_cache["data"] = rows
-            sheet_cache["loaded_at"] = datetime.now().isoformat()
-            return rows
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            raw = resp.read().decode("utf-8-sig", errors="replace")
+        reader = csv.DictReader(io.StringIO(raw))
+        rows = []
+        for r in reader:
+            cleaned = {str(k).strip().lower(): str(v or "").strip() for k, v in r.items() if k is not None}
+            if any(cleaned.values()):
+                rows.append(cleaned)
+        sheet_cache["data"] = rows
+        sheet_cache["loaded_at"] = datetime.now().isoformat()
+        print(f"Knowledge sheet loaded: {len(rows)} rows")
+        return rows
     except Exception as e:
-        print("Sheet fetch error:", e)
+        print("Knowledge sheet fetch error:", e)
         return sheet_cache.get("data", [])
 
 def get_knowledge_data():
-    if not sheet_cache["data"]:
+    # Refresh if empty or older than 5 minutes.
+    loaded_at = sheet_cache.get("loaded_at")
+    if not sheet_cache["data"] or not loaded_at:
         return fetch_knowledge_sheet()
+    try:
+        age = (datetime.now() - datetime.fromisoformat(loaded_at)).total_seconds()
+        if age > 300:
+            return fetch_knowledge_sheet()
+    except Exception:
+        pass
     return sheet_cache["data"]
 
 def normalize(text):
-    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9\u0980-\u09ff\s]", " ", str(text).lower())).strip()
+    text = str(text or "").lower()
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9\u0980-\u09ff\s]", " ", text)).strip()
 
 def search_sheet_knowledge(query):
     rows = get_knowledge_data()
     q_norm = normalize(query)
     if not q_norm:
         return None
-    
-    # Exact or keyword matching
+
+    # Exact question match first.
     for row in rows:
         question = normalize(row.get("question", ""))
-        keywords = normalize(row.get("keywords", ""))
-        answer = row.get("answer", "")
-        
-        if q_norm in question or question in q_norm:
-            if answer: return answer
-        if keywords and any(kw in q_norm for kw in keywords.split(",")):
-            if answer: return answer
-            
-    return None
+        answer = row.get("answer", "").strip()
+        if answer and question and (q_norm == question or q_norm in question or question in q_norm):
+            return answer
+
+    # Keyword matching. Supports comma, |, or newline separated keywords.
+    best = None
+    best_score = 0
+    q_words = set(q_norm.split())
+    for row in rows:
+        answer = row.get("answer", "").strip()
+        if not answer:
+            continue
+        raw_keywords = row.get("keywords", "")
+        keywords = [normalize(x) for x in re.split(r"[,|\n]+", raw_keywords) if normalize(x)]
+        score = sum(1 for kw in keywords if kw and (kw in q_norm or kw in q_words))
+        if score > best_score:
+            best_score = score
+            best = answer
+    return best if best_score > 0 else None
 
 # =========================================================
-# GEMINI API FALLBACK
+# GEMINI
 # =========================================================
-def ask_gemini_fallback(query):
+def ask_gemini(query, context=""):
     if not GEMINI_API_KEY:
         return None
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        prompt = f"You are EZKROY, an AI sales assistant for NOIR Fragrance created by Aiman. Answer the customer query politely and professionally in Bengali or English based on the query: {query}"
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        prompt = f"""
+You are EZKROY AI, a customer-facing sales assistant for NOIR Fragrance.
+Answer naturally and professionally. Use Bengali when the customer writes Bengali or Banglish; use English when the customer writes English.
+Never invent product prices, stock, policies, delivery promises, or business facts.
+If the provided knowledge context does not contain the answer, say that you do not have that information and ask the customer what they want to know.
+Keep replies concise and useful.
+
+KNOWLEDGE CONTEXT:
+{context}
+
+CUSTOMER MESSAGE:
+{query}
+"""
         response = model.generate_content(prompt)
-        if response and response.text:
+        if response and getattr(response, "text", None):
             return response.text.strip()
     except Exception as e:
-        print("Gemini API Error:", e)
+        print("Gemini API error:", e)
     return None
 
 # =========================================================
-# HTML TEMPLATE (Preserving Original Clean UI Design)
+# ORDER SYSTEM
 # =========================================================
+def new_order_id():
+    return "EZK-" + datetime.now().strftime("%Y%m%d-%H%M%S")
+
+def find_product(name):
+    products = load_json(PRODUCT_FILE, INITIAL_PRODUCTS)
+    n = normalize(name)
+    if not n:
+        return None
+    for p in products:
+        pn = normalize(p.get("name", ""))
+        if n == pn or n in pn or pn in n:
+            return p
+    return None
+
+def save_order_locally(order):
+    orders = load_json(ORDER_FILE, [])
+    orders.append(order)
+    return save_json(ORDER_FILE, orders)
+
+def send_order_to_google_sheet(order):
+    if not ORDERS_WEBHOOK_URL:
+        print("ORDERS_WEBHOOK_URL is not set. Order saved locally only.")
+        return False, "webhook_missing"
+    try:
+        payload = json.dumps(order, ensure_ascii=False).encode("utf-8")
+        req = urllib.request.Request(
+            ORDERS_WEBHOOK_URL,
+            data=payload,
+            headers={"Content-Type": "application/json", "User-Agent": "EZKROY/1.0"},
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            body = resp.read().decode("utf-8", errors="replace")
+            if 200 <= resp.status < 300:
+                print("Order synced to Google Sheet:", body[:300])
+                return True, body
+            return False, f"HTTP {resp.status}"
+    except Exception as e:
+        print("Google Sheet order sync error:", e)
+        return False, str(e)
+
+def complete_order(draft):
+    product = find_product(draft.get("product", ""))
+    if not product:
+        return None, "দুঃখিত, এই প্রোডাক্টটি আমাদের বর্তমান ক্যাটালগে খুঁজে পাচ্ছি না। অন্য কোনো প্রোডাক্টের নাম দিন।"
+
+    size = str(draft.get("size", "15ml")).lower().replace(" ", "")
+    if size not in ("15ml", "30ml"):
+        size = "15ml"
+    unit_price = int(product.get("price_" + size, 0) or 0)
+    quantity = max(1, int(draft.get("quantity", 1) or 1))
+    total = unit_price * quantity
+    order_id = new_order_id()
+
+    order = {
+        "Order ID": order_id,
+        "Customer Name": draft.get("name", "").strip(),
+        "Phone": draft.get("phone", "").strip(),
+        "Address": draft.get("address", "").strip(),
+        "Product": product.get("name", ""),
+        "Size": size,
+        "Quantity": quantity,
+        "Unit Price": unit_price,
+        "Total Price": total,
+        "Payment Status": "Pending",
+        "Order Status": "New",
+        "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Notes": draft.get("notes", "")
+    }
+
+    save_order_locally(order)
+    synced, _ = send_order_to_google_sheet(order)
+    return order, synced
+
+# In-memory conversation drafts. For a production multi-instance deployment,
+# replace this with Redis/database storage.
+order_sessions = {}
+
+def is_order_intent(message):
+    m = normalize(message)
+    triggers = ["order", "অর্ডার", "kinte chai", "নিতে চাই", "buy", "কিনব", "অর্ডার করব"]
+    return any(t in m for t in triggers)
+
+def parse_order_from_message(message):
+    """Best-effort parser for simple labelled order text."""
+    out = {}
+    patterns = {
+        "product": r"(?:product|পণ্য)\s*[:=-]\s*([^,\n]+)",
+        "size": r"(?:size|সাইজ)\s*[:=-]\s*(15ml|30ml)",
+        "quantity": r"(?:quantity|qty|পরিমাণ)\s*[:=-]\s*(\d+)",
+        "name": r"(?:name|নাম)\s*[:=-]\s*([^,\n]+)",
+        "phone": r"(?:phone|mobile|নম্বর|মোবাইল)\s*[:=-]\s*([+\d\- ]{8,20})",
+        "address": r"(?:address|ঠিকানা)\s*[:=-]\s*(.+)$"
+    }
+    for key, pattern in patterns.items():
+        m = re.search(pattern, message, flags=re.I)
+        if m:
+            out[key] = m.group(1).strip()
+    return out
+
+def next_order_question(draft):
+    if not draft.get("product"):
+        return "অবশ্যই 😊 কোন প্রোডাক্টটি অর্ডার করতে চান?"
+    if not draft.get("size"):
+        p = find_product(draft["product"])
+        if p:
+            return f"{p['name']} — 15ml ৳{p.get('price_15ml')} / 30ml ৳{p.get('price_30ml')}। কোন সাইজটি চান?"
+        return "কোন সাইজটি চান—15ml নাকি 30ml?"
+    if not draft.get("quantity"):
+        return "কতটি নিতে চান?"
+    if not draft.get("name"):
+        return "আপনার নামটি দিন।"
+    if not draft.get("phone"):
+        return "আপনার ফোন নম্বরটি দিন।"
+    if not draft.get("address"):
+        return "ডেলিভারির সম্পূর্ণ ঠিকানাটি দিন।"
+    return None
+
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="bn">
@@ -200,16 +318,9 @@ HTML_TEMPLATE = """
                 <p class="text-xs text-slate-400">NOIR Fragrance Smart Sales Assistant</p>
             </div>
         </div>
-        <div class="flex items-center space-x-3">
-            <button type="button" onclick="openPreview()"
-                class="preview-btn bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg">
-                <i class="fa-solid fa-eye"></i>
-                Preview
-            </button>
-            <div class="flex items-center space-x-2">
-                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs text-slate-300 font-medium">Online</span>
-            </div>
+        <div class="flex items-center space-x-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs text-slate-300 font-medium">Online</span>
         </div>
     </header>
 
@@ -229,103 +340,7 @@ HTML_TEMPLATE = """
         </form>
     </main>
 
-    <!-- =========================================================
-         EZKROY PREVIEW MODAL
-    ========================================================== -->
-    <div id="preview-modal"
-         class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-        <div class="relative w-full max-w-md bg-slate-950 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden">
-
-            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-                <div>
-                    <h2 class="font-bold text-white">EZKROY AI Preview</h2>
-                    <p class="text-xs text-slate-400">Customer conversation demo</p>
-                </div>
-                <button type="button" onclick="closePreview()"
-                    class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="p-4 bg-slate-900/70">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-indigo-600 text-white rounded-full w-9 h-9 flex items-center justify-center">
-                        <i class="fa-solid fa-robot text-xs"></i>
-                    </div>
-                    <div>
-                        <div class="text-sm font-semibold text-white">EZKROY AI</div>
-                        <div class="text-[11px] text-emerald-400">● Online</div>
-                    </div>
-                </div>
-
-                <div id="preview-chat" class="space-y-3 max-h-[390px] overflow-y-auto">
-                    <div class="flex justify-end">
-                        <div class="bg-indigo-600 text-white px-3 py-2 rounded-2xl rounded-tr-md text-sm max-w-[78%]">
-                            Dior Sauvage 15ml কত?
-                        </div>
-                    </div>
-
-                    <div class="flex justify-start">
-                        <div class="bg-slate-800 text-slate-200 px-3 py-2 rounded-2xl rounded-tl-md text-sm max-w-[82%]">
-                            Dior Sauvage 15ml এর দাম ৳299। চাইলে আমি আপনার অর্ডার নেওয়ার প্রক্রিয়াটাও শুরু করতে পারি।
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <div class="bg-indigo-600 text-white px-3 py-2 rounded-2xl rounded-tr-md text-sm max-w-[78%]">
-                            অর্ডার করতে চাই
-                        </div>
-                    </div>
-
-                    <div class="flex justify-start">
-                        <div class="bg-slate-800 text-slate-200 px-3 py-2 rounded-2xl rounded-tl-md text-sm max-w-[82%]">
-                            অবশ্যই! পণ্যের নাম, সাইজ, আপনার নাম, ফোন নম্বর ও ঠিকানা দিন।
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 rounded-2xl border border-slate-800 bg-slate-950 p-2 flex gap-2">
-                    <div class="flex-1 px-3 py-2 text-xs text-slate-500">
-                        Customer message...
-                    </div>
-                    <div class="bg-indigo-600 px-4 py-2 rounded-xl text-white text-xs flex items-center">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="px-5 py-4 bg-slate-950 border-t border-slate-800">
-                <button type="button" onclick="closePreview()"
-                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-sm font-semibold transition">
-                    Back to Chat
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        function openPreview() {
-            const modal = document.getElementById('preview-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.classList.add('overflow-hidden');
-        }
-
-        function closePreview() {
-            const modal = document.getElementById('preview-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
-        }
-
-        document.getElementById('preview-modal').addEventListener('click', function(e) {
-            if (e.target === this) closePreview();
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closePreview();
-        });
-
         const chatContainer = document.getElementById('chat-container');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
@@ -334,15 +349,12 @@ HTML_TEMPLATE = """
             const isUser = sender === 'user';
             const wrapper = document.createElement('div');
             wrapper.className = `flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
-            
             const avatar = document.createElement('div');
             avatar.className = `rounded-full w-8 h-8 flex items-center justify-center shrink-0 ${isUser ? 'bg-emerald-600 text-white' : 'bg-indigo-600 text-white'}`;
             avatar.innerHTML = `<i class="fa-solid ${isUser ? 'fa-user' : 'fa-robot'} text-xs"></i>`;
-
             const bubble = document.createElement('div');
             bubble.className = `p-3 rounded-2xl max-w-[80%] text-sm leading-relaxed shadow whitespace-pre-wrap ${isUser ? 'bg-emerald-600/20 border border-emerald-500/30 text-emerald-100' : 'bg-slate-800 text-slate-200'}`;
             bubble.innerText = text;
-
             wrapper.appendChild(avatar);
             wrapper.appendChild(bubble);
             chatContainer.appendChild(wrapper);
@@ -353,10 +365,8 @@ HTML_TEMPLATE = """
             e.preventDefault();
             const text = userInput.value.trim();
             if (!text) return;
-            
             appendMessage('user', text);
             userInput.value = '';
-
             try {
                 const res = await fetch('/api/chat', {
                     method: 'POST',
@@ -378,37 +388,73 @@ HTML_TEMPLATE = """
 def index():
     return render_template_string(HTML_TEMPLATE)
 
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "ok",
+        "knowledge_rows": len(get_knowledge_data()),
+        "gemini_configured": bool(GEMINI_API_KEY),
+        "order_webhook_configured": bool(ORDERS_WEBHOOK_URL)
+    })
+
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    data = request.get_json() or {}
-    message = data.get("message", "").strip()
-    
+    data = request.get_json(silent=True) or {}
+    message = str(data.get("message", "")).strip()
+    session_id = str(data.get("session_id") or request.remote_addr or "default")
+
     if not message:
         return jsonify({"reply": "অনুগ্রহ করে আপনার বার্তা লিখুন।"})
 
-    # 1. Check Knowledge Sheet
-    sheet_ans = search_sheet_knowledge(message)
-    if sheet_ans:
-        return jsonify({"reply": sheet_ans})
+    # Existing draft, or new order intent.
+    draft = order_sessions.get(session_id, {})
+    if is_order_intent(message) or draft:
+        draft.update(parse_order_from_message(message))
 
-    # 2. Check Order Intent or Products Catalog Match
-    products = load_json(PRODUCT_FILE, INITIAL_PRODUCTS)
-    msg_lower = message.lower()
-    
-    if "order" in msg_lower or "অর্ডার" in msg_lower or "kinte chai" in msg_lower or "নিতে চাই" in msg_lower:
-        # Simple interactive order prompt guidance
-        product_list_str = "\n".join([f"- {p['name']} (15ml: ৳{p.get('price_15ml')}, 30ml: {p.get('price_30ml', 'N/A')})" for p in products[:10]])
+        # If the first message is just "I want to order", enter order mode.
+        order_sessions[session_id] = draft
+        question = next_order_question(draft)
+
+        if question:
+            return jsonify({"reply": question, "order_mode": True})
+
+        order, sync_result = complete_order(draft)
+        order_sessions.pop(session_id, None)
+        if not order:
+            return jsonify({"reply": str(sync_result)})
+
+        if sync_result is True:
+            sync_text = "আপনার অর্ডারটি Google Sheet-এ সংরক্ষণ করা হয়েছে।"
+        elif sync_result == "webhook_missing":
+            sync_text = "অর্ডারটি সিস্টেমে নেওয়া হয়েছে, তবে Google Sheet webhook এখনো সেট করা হয়নি।"
+        else:
+            sync_text = "অর্ডারটি সিস্টেমে নেওয়া হয়েছে; Google Sheet sync-এ সাময়িক সমস্যা হয়েছে।"
+
         return jsonify({
-            "reply": f"অর্ডার করতে চাইলে নিচের ফরম্যাটে আপনার তথ্য দিন:\n\nঅর্ডার: [পণ্যের নাম], [সাইজ যেমন 15ml/30ml], [নাম], [ফোন নম্বর], [ঠিকানা]\n\nআমাদের কিছু জনপ্রিয় প্রোডাক্ট:\n{product_list_str}"
+            "reply": f"অর্ডার কনফার্ম হয়েছে! 🎉\n\nOrder ID: {order['Order ID']}\nProduct: {order['Product']}\nSize: {order['Size']}\nQuantity: {order['Quantity']}\nTotal: ৳{order['Total Price']}\n\n{sync_text}",
+            "order_mode": False,
+            "order": order
         })
 
-    # 3. Check Gemini API Fallback
-    gemini_ans = ask_gemini_fallback(message)
-    if gemini_ans:
-        return jsonify({"reply": gemini_ans})
+    # 1. Knowledge Sheet answer first.
+    sheet_ans = search_sheet_knowledge(message)
+    if sheet_ans:
+        return jsonify({"reply": sheet_ans, "source": "knowledge_sheet"})
 
-    # 4. Default fallback
-    return jsonify({"reply": "আপনার প্রশ্নটি বুঝতে পেরেছি। NOIR Fragrance-এর যেকোনো পারফিউম সম্পর্কে জানতে বা অর্ডার করতে আমাদের সাথে যোগাযোগ করতে পারেন!"})
+    # 2. Give Gemini the relevant sheet rows as context when possible.
+    rows = get_knowledge_data()
+    context_rows = []
+    for row in rows[:80]:
+        q = row.get("question", "")
+        a = row.get("answer", "")
+        if q or a:
+            context_rows.append(f"Q: {q}\nA: {a}")
+    context = "\n\n".join(context_rows)
+    gemini_ans = ask_gemini(message, context)
+    if gemini_ans:
+        return jsonify({"reply": gemini_ans, "source": "gemini"})
+
+    return jsonify({"reply": "দুঃখিত, এই প্রশ্নের নির্ভরযোগ্য উত্তর আমার কাছে এখন নেই। আপনি অন্যভাবে প্রশ্নটি লিখে চেষ্টা করতে পারেন।"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
