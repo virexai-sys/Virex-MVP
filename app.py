@@ -5,7 +5,6 @@ import csv
 import io
 import re
 import urllib.request
-import urllib.error
 from datetime import datetime
 import google.generativeai as genai
 
@@ -13,21 +12,6 @@ app = Flask(__name__)
 
 # =========================================================
 # EZKROY AI — SALES AGENT
-# =========================================================
-# FEATURES
-# - EZKROY branded chat dashboard
-# - Preview page
-# - Google Knowledge Sheet
-# - Gemini AI fallback
-# - Conversational order collection
-# - Local order backup
-# - Google Sheet order webhook
-# - Health/status endpoint
-# =========================================================
-
-
-# =========================================================
-# CONFIGURATION
 # =========================================================
 
 KNOWLEDGE_SHEET_ID = "1jS_EIWfTfaqyieN3vUFCnXoA-3IE91_wclG_WnXzRSw"
@@ -39,21 +23,11 @@ KNOWLEDGE_CSV_URL = (
 
 ORDERS_SHEET_ID = "1OSYvfZzBLqTtIlTo42PECUz0UyaxBVdGFWr8m6xVUso"
 
-# Render Environment Variable
-ORDERS_WEBHOOK_URL = os.environ.get(
-    "ORDERS_WEBHOOK_URL",
-    ""
-)
-
-GEMINI_API_KEY = os.environ.get(
-    "GEMINI_API_KEY",
-    ""
-)
+ORDERS_WEBHOOK_URL = os.environ.get("ORDERS_WEBHOOK_URL", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 if GEMINI_API_KEY:
-    genai.configure(
-        api_key=GEMINI_API_KEY
-    )
+    genai.configure(api_key=GEMINI_API_KEY)
 
 
 # =========================================================
@@ -61,21 +35,10 @@ if GEMINI_API_KEY:
 # =========================================================
 
 DATA_DIR = "data"
+PRODUCT_FILE = os.path.join(DATA_DIR, "products.json")
+ORDER_FILE = os.path.join(DATA_DIR, "orders.json")
 
-PRODUCT_FILE = os.path.join(
-    DATA_DIR,
-    "products.json"
-)
-
-ORDER_FILE = os.path.join(
-    DATA_DIR,
-    "orders.json"
-)
-
-os.makedirs(
-    DATA_DIR,
-    exist_ok=True
-)
+os.makedirs(DATA_DIR, exist_ok=True)
 
 
 # =========================================================
@@ -157,7 +120,7 @@ INITIAL_PRODUCTS = [
     },
     {
         "id": 10,
-        "name": "SRK (Shah Rukh Inspired)",
+        "name": "SRK",
         "price_15ml": 299,
         "price_30ml": 499,
         "stock": 20,
@@ -269,37 +232,16 @@ INITIAL_PRODUCTS = [
 def init_files():
 
     if not os.path.exists(PRODUCT_FILE):
-
-        with open(
+        save_json(
             PRODUCT_FILE,
-            "w",
-            encoding="utf-8"
-        ) as f:
-
-            json.dump(
-                INITIAL_PRODUCTS,
-                f,
-                indent=2,
-                ensure_ascii=False
-            )
+            INITIAL_PRODUCTS
+        )
 
     if not os.path.exists(ORDER_FILE):
-
-        with open(
+        save_json(
             ORDER_FILE,
-            "w",
-            encoding="utf-8"
-        ) as f:
-
-            json.dump(
-                [],
-                f,
-                indent=2,
-                ensure_ascii=False
-            )
-
-
-init_files()
+            []
+        )
 
 
 # =========================================================
@@ -309,23 +251,16 @@ init_files()
 def load_json(path, default):
 
     try:
-
         if os.path.exists(path):
-
             with open(
                 path,
                 "r",
                 encoding="utf-8"
             ) as f:
-
                 return json.load(f)
 
     except Exception as e:
-
-        print(
-            "JSON load error:",
-            e
-        )
+        print("JSON load error:", e)
 
     return default
 
@@ -333,13 +268,11 @@ def load_json(path, default):
 def save_json(path, data):
 
     try:
-
         with open(
             path,
             "w",
             encoding="utf-8"
         ) as f:
-
             json.dump(
                 data,
                 f,
@@ -350,17 +283,15 @@ def save_json(path, data):
         return True
 
     except Exception as e:
-
-        print(
-            "JSON save error:",
-            e
-        )
-
+        print("JSON save error:", e)
         return False
 
 
+init_files()
+
+
 # =========================================================
-# KNOWLEDGE GOOGLE SHEET
+# KNOWLEDGE SHEET
 # =========================================================
 
 sheet_cache = {
@@ -401,21 +332,15 @@ def fetch_knowledge_sheet():
             cleaned = {
                 str(k).strip().lower():
                 str(v or "").strip()
-
                 for k, v in row.items()
-
                 if k is not None
             }
 
             if any(cleaned.values()):
-
                 rows.append(cleaned)
 
         sheet_cache["data"] = rows
-
-        sheet_cache["loaded_at"] = (
-            datetime.now().isoformat()
-        )
+        sheet_cache["loaded_at"] = datetime.now().isoformat()
 
         print(
             f"Knowledge sheet loaded: {len(rows)} rows"
@@ -446,7 +371,6 @@ def get_knowledge_data():
         not sheet_cache["data"]
         or not loaded_at
     ):
-
         return fetch_knowledge_sheet()
 
     try:
@@ -459,11 +383,9 @@ def get_knowledge_data():
         ).total_seconds()
 
         if age > 300:
-
             return fetch_knowledge_sheet()
 
     except Exception:
-
         pass
 
     return sheet_cache["data"]
@@ -475,9 +397,7 @@ def get_knowledge_data():
 
 def normalize(text):
 
-    text = str(
-        text or ""
-    ).lower()
+    text = str(text or "").lower()
 
     text = re.sub(
         r"[^a-z0-9\u0980-\u09ff\s]",
@@ -495,7 +415,7 @@ def normalize(text):
 
 
 # =========================================================
-# SEARCH KNOWLEDGE SHEET
+# SEARCH SHEET
 # =========================================================
 
 def search_sheet_knowledge(query):
@@ -505,10 +425,7 @@ def search_sheet_knowledge(query):
     q_norm = normalize(query)
 
     if not q_norm:
-
         return None
-
-    # Exact / partial question match
 
     for row in rows:
 
@@ -533,10 +450,7 @@ def search_sheet_knowledge(query):
                 or question in q_norm
             )
         ):
-
             return answer
-
-    # Keyword match
 
     best = None
     best_score = 0
@@ -553,7 +467,6 @@ def search_sheet_knowledge(query):
         ).strip()
 
         if not answer:
-
             continue
 
         raw_keywords = row.get(
@@ -563,12 +476,10 @@ def search_sheet_knowledge(query):
 
         keywords = [
             normalize(x)
-
             for x in re.split(
                 r"[,|\n]+",
                 raw_keywords
             )
-
             if normalize(x)
         ]
 
@@ -580,16 +491,13 @@ def search_sheet_knowledge(query):
                 keyword in q_norm
                 or keyword in q_words
             ):
-
                 score += 1
 
         if score > best_score:
-
             best_score = score
             best = answer
 
     if best_score > 0:
-
         return best
 
     return None
@@ -599,13 +507,9 @@ def search_sheet_knowledge(query):
 # GEMINI
 # =========================================================
 
-def ask_gemini(
-    query,
-    context=""
-):
+def ask_gemini(query, context=""):
 
     if not GEMINI_API_KEY:
-
         return None
 
     try:
@@ -663,7 +567,6 @@ CUSTOMER MESSAGE:
                 None
             )
         ):
-
             return response.text.strip()
 
     except Exception as e:
@@ -700,7 +603,6 @@ def find_product(name):
     n = normalize(name)
 
     if not n:
-
         return None
 
     for product in products:
@@ -717,7 +619,6 @@ def find_product(name):
             or n in pn
             or pn in n
         ):
-
             return product
 
     return None
@@ -739,7 +640,7 @@ def save_order_locally(order):
 
 
 # =========================================================
-# GOOGLE SHEET ORDER WEBHOOK
+# GOOGLE SHEET WEBHOOK
 # =========================================================
 
 def send_order_to_google_sheet(order):
@@ -843,7 +744,6 @@ def complete_order(draft):
         "15ml",
         "30ml"
     ):
-
         size = "15ml"
 
     unit_price = int(
@@ -871,15 +771,11 @@ def complete_order(draft):
 
         quantity = 1
 
-    total = (
-        unit_price
-        * quantity
-    )
+    total = unit_price * quantity
 
     order_id = new_order_id()
 
     order = {
-
         "Order ID":
             order_id,
 
@@ -937,15 +833,7 @@ def complete_order(draft):
             )
     }
 
-    local_saved = save_order_locally(
-        order
-    )
-
-    if not local_saved:
-
-        print(
-            "WARNING: Local order save failed."
-        )
+    save_order_locally(order)
 
     synced, sync_body = (
         send_order_to_google_sheet(
@@ -954,15 +842,12 @@ def complete_order(draft):
     )
 
     if synced:
-
         sync_result = True
 
     elif sync_body == "webhook_missing":
-
         sync_result = "webhook_missing"
 
     else:
-
         sync_result = False
 
     return order, sync_result
@@ -1051,18 +936,14 @@ def parse_order_from_message(message):
 
 def next_order_question(draft):
 
-    if not draft.get(
-        "product"
-    ):
+    if not draft.get("product"):
 
         return (
             "অবশ্যই 😊 কোন প্রোডাক্টটি "
             "অর্ডার করতে চান?"
         )
 
-    if not draft.get(
-        "size"
-    ):
+    if not draft.get("size"):
 
         product = find_product(
             draft["product"]
@@ -1081,33 +962,25 @@ def next_order_question(draft):
             "কোন সাইজটি চান—15ml নাকি 30ml?"
         )
 
-    if not draft.get(
-        "quantity"
-    ):
+    if not draft.get("quantity"):
 
         return (
             "কতটি নিতে চান?"
         )
 
-    if not draft.get(
-        "name"
-    ):
+    if not draft.get("name"):
 
         return (
             "আপনার নামটি দিন।"
         )
 
-    if not draft.get(
-        "phone"
-    ):
+    if not draft.get("phone"):
 
         return (
             "আপনার ফোন নম্বরটি দিন।"
         )
 
-    if not draft.get(
-        "address"
-    ):
+    if not draft.get("address"):
 
         return (
             "ডেলিভারির সম্পূর্ণ ঠিকানাটি দিন।"
@@ -1117,12 +990,11 @@ def next_order_question(draft):
 
 
 # =========================================================
-# MAIN CHAT HTML
+# MAIN HTML
 # =========================================================
 
 HTML_TEMPLATE = r"""
 <!DOCTYPE html>
-
 <html lang="bn">
 
 <head>
@@ -1180,97 +1052,77 @@ body {
 
 </head>
 
-
 <body class="text-slate-100 min-h-screen flex flex-col font-sans">
-
-
-<!-- HEADER -->
 
 <header
     class="bg-slate-900/90 border-b border-slate-800
     p-4 shadow-md flex justify-between items-center"
 >
 
-    <div class="flex items-center space-x-3">
+<div class="flex items-center space-x-3">
 
-        <div
-            class="bg-sky-500 p-2 rounded-xl
-            text-white font-bold shadow-lg shadow-sky-500/20"
-        >
+<div
+    class="bg-sky-500 p-2 rounded-xl
+    text-white font-bold shadow-lg shadow-sky-500/20"
+>
+    <i class="fa-solid fa-bolt"></i>
+</div>
 
-            <i class="fa-solid fa-bolt"></i>
+<div>
 
-        </div>
+<h1 class="font-bold text-lg text-sky-400">
+EZKROY AI
+</h1>
 
-        <div>
+<p class="text-xs text-slate-400">
+AI Sales Agent for Modern Businesses
+</p>
 
-            <h1
-                class="font-bold text-lg text-sky-400"
-            >
-                EZKROY AI
-            </h1>
+</div>
 
-            <p
-                class="text-xs text-slate-400"
-            >
-                AI Sales Agent for Modern Businesses
-            </p>
+</div>
 
-        </div>
+<div class="flex items-center gap-3">
 
-    </div>
+<a
+    href="/preview"
+    class="preview-btn
+    hidden sm:flex items-center gap-2
+    bg-sky-500/10
+    border border-sky-400/30
+    text-sky-300
+    px-4 py-2
+    rounded-xl
+    text-xs font-semibold
+    hover:bg-sky-500/20"
+>
 
+<i class="fa-solid fa-eye"></i>
 
-    <div class="flex items-center gap-3">
+Preview
 
-        <!-- PREVIEW BUTTON -->
+</a>
 
-        <a
-            href="/preview"
-            class="preview-btn
-            hidden sm:flex items-center gap-2
-            bg-sky-500/10
-            border border-sky-400/30
-            text-sky-300
-            px-4 py-2
-            rounded-xl
-            text-xs font-semibold
-            hover:bg-sky-500/20"
-        >
+<div class="flex items-center space-x-2">
 
-            <i class="fa-solid fa-eye"></i>
+<span
+    class="inline-block
+    w-2.5 h-2.5
+    rounded-full
+    bg-emerald-500
+    animate-pulse"
+></span>
 
-            Preview
+<span class="text-xs text-slate-300 font-medium">
+Online
+</span>
 
-        </a>
+</div>
 
-
-        <div class="flex items-center space-x-2">
-
-            <span
-                class="inline-block
-                w-2.5 h-2.5
-                rounded-full
-                bg-emerald-500
-                animate-pulse"
-            ></span>
-
-            <span
-                class="text-xs
-                text-slate-300
-                font-medium"
-            >
-                Online
-            </span>
-
-        </div>
-
-    </div>
+</div>
 
 </header>
 
-
-<!-- MAIN -->
 
 <main
     class="flex-1 max-w-4xl
@@ -1278,141 +1130,125 @@ body {
     flex flex-col"
 >
 
+<div
+    id="chat-container"
+    class="flex-1 glass
+    border border-slate-800
+    rounded-2xl p-4
+    overflow-y-auto
+    space-y-4
+    mb-4
+    min-h-[450px]
+    max-h-[65vh]"
+>
 
-    <!-- CHAT -->
+<div class="flex items-start space-x-3">
 
-    <div
-        id="chat-container"
-        class="flex-1 glass
-        border border-slate-800
-        rounded-2xl p-4
-        overflow-y-auto
-        space-y-4
-        mb-4
-        min-h-[450px]
-        max-h-[65vh]"
-    >
+<div
+    class="bg-sky-500
+    text-white rounded-full
+    w-8 h-8
+    flex items-center
+    justify-center shrink-0"
+>
 
-        <div
-            class="flex items-start space-x-3"
-        >
+<i class="fa-solid fa-bolt text-xs"></i>
 
-            <div
-                class="bg-sky-500
-                text-white rounded-full
-                w-8 h-8
-                flex items-center
-                justify-center shrink-0"
-            >
+</div>
 
-                <i
-                    class="fa-solid fa-bolt text-xs"
-                ></i>
+<div
+    class="bg-slate-800
+    text-slate-200
+    p-3 rounded-2xl
+    max-w-[80%]
+    text-sm
+    leading-relaxed
+    shadow"
+>
 
-            </div>
+স্বাগতম! আমি EZKROY AI ⚡
 
+<br><br>
 
-            <div
-                class="bg-slate-800
-                text-slate-200
-                p-3 rounded-2xl
-                max-w-[80%]
-                text-sm
-                leading-relaxed
-                shadow"
-            >
+NOIR Fragrance-এর
+পারফিউম সম্পর্কে জানতে,
+দাম জানতে অথবা সরাসরি
+অর্ডার করতে পারেন।
 
-                স্বাগতম! আমি EZKROY AI ⚡
+<br><br>
 
-                <br><br>
+কীভাবে সাহায্য করতে পারি?
 
-                NOIR Fragrance-এর
-                পারফিউম সম্পর্কে জানতে,
-                দাম জানতে অথবা সরাসরি
-                অর্ডার করতে পারেন।
+</div>
 
-                <br><br>
+</div>
 
-                কীভাবে সাহায্য করতে পারি?
-
-            </div>
-
-        </div>
-
-    </div>
+</div>
 
 
-    <!-- INPUT -->
+<form
+    id="chat-form"
+    class="flex gap-2
+    bg-slate-900
+    p-2 rounded-2xl
+    border border-slate-800
+    shadow-lg"
+>
 
-    <form
-        id="chat-form"
-        class="flex gap-2
-        bg-slate-900
-        p-2 rounded-2xl
-        border border-slate-800
-        shadow-lg"
-    >
+<input
+    type="text"
+    id="user-input"
+    autocomplete="off"
+    placeholder="আপনার প্রশ্ন লিখুন..."
+    class="flex-1
+    bg-transparent
+    px-4 py-2
+    text-sm
+    text-slate-100
+    focus:outline-none"
+>
 
-        <input
-            type="text"
-            id="user-input"
-            autocomplete="off"
-            placeholder="আপনার প্রশ্ন লিখুন..."
-            class="flex-1
-            bg-transparent
-            px-4 py-2
-            text-sm
-            text-slate-100
-            focus:outline-none"
-        >
+<button
+    type="submit"
+    class="send-btn
+    bg-sky-500
+    hover:bg-sky-400
+    text-white
+    px-5 py-2
+    rounded-xl
+    text-sm
+    font-medium
+    transition
+    cursor-pointer
+    flex items-center
+    justify-center"
+>
 
+<i class="fa-solid fa-paper-plane"></i>
 
-        <button
-            type="submit"
-            class="send-btn
-            bg-sky-500
-            hover:bg-sky-400
-            text-white
-            px-5 py-2
-            rounded-xl
-            text-sm
-            font-medium
-            transition
-            cursor-pointer
-            flex items-center
-            justify-center"
-        >
+</button>
 
-            <i
-                class="fa-solid fa-paper-plane"
-            ></i>
-
-        </button>
-
-    </form>
+</form>
 
 
-    <!-- MOBILE PREVIEW -->
+<a
+    href="/preview"
+    class="sm:hidden mt-3
+    flex items-center justify-center
+    gap-2
+    bg-sky-500/10
+    border border-sky-400/30
+    text-sky-300
+    px-4 py-3
+    rounded-xl
+    text-sm font-semibold"
+>
 
-    <a
-        href="/preview"
-        class="sm:hidden mt-3
-        flex items-center justify-center
-        gap-2
-        bg-sky-500/10
-        border border-sky-400/30
-        text-sky-300
-        px-4 py-3
-        rounded-xl
-        text-sm font-semibold"
-    >
+<i class="fa-solid fa-eye"></i>
 
-        <i class="fa-solid fa-eye"></i>
+Open Preview
 
-        Open Preview
-
-    </a>
-
+</a>
 
 </main>
 
@@ -1435,10 +1271,6 @@ const userInput =
     );
 
 
-/* =====================================================
-   SESSION ID
-===================================================== */
-
 let sessionId =
     localStorage.getItem(
         'ezkroy_session_id'
@@ -1453,12 +1285,9 @@ if (!sessionId) {
         'ezkroy_session_id',
         sessionId
     );
+
 }
 
-
-/* =====================================================
-   MESSAGE
-===================================================== */
 
 function appendMessage(
     sender,
@@ -1467,7 +1296,6 @@ function appendMessage(
 
     const isUser =
         sender === 'user';
-
 
     const wrapper =
         document.createElement(
@@ -1480,7 +1308,6 @@ function appendMessage(
             ? 'flex-row-reverse space-x-reverse'
             : ''
         }`;
-
 
     const avatar =
         document.createElement(
@@ -1497,14 +1324,12 @@ function appendMessage(
             : 'bg-sky-500 text-white'
         }`;
 
-
     avatar.innerHTML =
         `<i class="fa-solid ${
             isUser
             ? 'fa-user'
             : 'fa-bolt'
         } text-xs"></i>`;
-
 
     const bubble =
         document.createElement(
@@ -1524,10 +1349,8 @@ function appendMessage(
             : 'bg-slate-800 text-slate-200'
         }`;
 
-
     bubble.innerText =
         text;
-
 
     wrapper.appendChild(
         avatar
@@ -1541,15 +1364,10 @@ function appendMessage(
         wrapper
     );
 
-
     chatContainer.scrollTop =
         chatContainer.scrollHeight;
 }
 
-
-/* =====================================================
-   TYPING
-===================================================== */
 
 function showTyping() {
 
@@ -1564,7 +1382,6 @@ function showTyping() {
     typing.className =
         'flex items-start space-x-3';
 
-
     typing.innerHTML = `
 
         <div
@@ -1574,9 +1391,7 @@ function showTyping() {
             flex items-center
             justify-center"
         >
-
             <i class="fa-solid fa-bolt text-xs"></i>
-
         </div>
 
         <div
@@ -1585,15 +1400,11 @@ function showTyping() {
             p-3 rounded-2xl
             text-sm"
         >
-
             <i class="fa-solid fa-circle-notch fa-spin"></i>
-
             &nbsp; EZKROY AI is typing...
-
         </div>
 
     `;
-
 
     chatContainer.appendChild(
         typing
@@ -1612,16 +1423,11 @@ function removeTyping() {
         );
 
     if (typing) {
-
         typing.remove();
-
     }
+
 }
 
-
-/* =====================================================
-   CHAT SUBMIT
-===================================================== */
 
 chatForm.addEventListener(
     'submit',
@@ -1629,25 +1435,19 @@ chatForm.addEventListener(
 
         e.preventDefault();
 
-
         const text =
             userInput.value.trim();
 
-
         if (!text) return;
-
 
         appendMessage(
             'user',
             text
         );
 
-
         userInput.value = '';
 
-
         showTyping();
-
 
         try {
 
@@ -1671,22 +1471,16 @@ chatForm.addEventListener(
                     }
                 );
 
-
             if (!response.ok) {
-
                 throw new Error(
                     'Server error'
                 );
-
             }
-
 
             const data =
                 await response.json();
 
-
             removeTyping();
-
 
             appendMessage(
                 'bot',
@@ -1694,16 +1488,13 @@ chatForm.addEventListener(
                 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।'
             );
 
-
         } catch (error) {
 
             console.error(
                 error
             );
 
-
             removeTyping();
-
 
             appendMessage(
                 'bot',
@@ -1718,7 +1509,6 @@ chatForm.addEventListener(
 </script>
 
 </body>
-
 </html>
 """
 
@@ -1750,7 +1540,6 @@ PREVIEW_TEMPLATE = r"""
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
 >
 
-
 <style>
 
 body {
@@ -1765,7 +1554,6 @@ body {
 
 }
 
-
 .card {
 
     background:
@@ -1776,7 +1564,6 @@ body {
 
 }
 
-
 .float {
 
     animation:
@@ -1784,21 +1571,14 @@ body {
 
 }
 
-
 @keyframes float {
 
     0%,100% {
-
-        transform:
-            translateY(0);
-
+        transform: translateY(0);
     }
 
     50% {
-
-        transform:
-            translateY(-10px);
-
+        transform: translateY(-10px);
     }
 
 }
@@ -1807,13 +1587,11 @@ body {
 
 </head>
 
-
 <body
     class="text-white min-h-screen
     flex items-center
     justify-center p-6"
 >
-
 
 <div
     class="max-w-5xl
@@ -1821,247 +1599,223 @@ body {
     text-center"
 >
 
+<div
+    class="float
+    mx-auto mb-8
+    w-20 h-20
+    rounded-3xl
+    bg-sky-500
+    flex items-center
+    justify-center
+    text-3xl
+    shadow-2xl
+    shadow-sky-500/20"
+>
 
-    <!-- LOGO -->
+<i class="fa-solid fa-bolt"></i>
 
-    <div
-        class="float
-        mx-auto mb-8
-        w-20 h-20
-        rounded-3xl
-        bg-sky-500
-        flex items-center
-        justify-center
-        text-3xl
-        shadow-2xl
-        shadow-sky-500/20"
-    >
+</div>
 
-        <i
-            class="fa-solid fa-bolt"
-        ></i>
+<p
+    class="text-sky-400
+    uppercase
+    tracking-[.35em]
+    text-xs
+    font-bold mb-3"
+>
+AI SALES AGENT
+</p>
 
-    </div>
+<h1
+    class="text-4xl
+    md:text-6xl
+    font-black
+    mb-5"
+>
 
+Meet
 
-    <p
-        class="text-sky-400
-        uppercase
-        tracking-[.35em]
-        text-xs
-        font-bold mb-3"
-    >
-        AI SALES AGENT
-    </p>
+<span
+    class="text-sky-400"
+>
+EZKROY
+</span>
 
+</h1>
 
-    <h1
-        class="text-4xl
-        md:text-6xl
-        font-black
-        mb-5"
-    >
+<p
+    class="text-slate-400
+    max-w-2xl
+    mx-auto
+    text-base
+    md:text-lg
+    leading-relaxed
+    mb-10"
+>
 
-        Meet
+An AI-powered sales assistant
+that talks to customers,
+answers questions,
+collects orders and helps
+businesses sell 24/7.
 
-        <span
-            class="text-sky-400"
-        >
-            EZKROY
-        </span>
-
-    </h1>
-
-
-    <p
-        class="text-slate-400
-        max-w-2xl
-        mx-auto
-        text-base
-        md:text-lg
-        leading-relaxed
-        mb-10"
-    >
-
-        An AI-powered sales assistant
-        that talks to customers,
-        answers questions,
-        collects orders and helps
-        businesses sell 24/7.
-
-    </p>
+</p>
 
 
-    <!-- STORY CARDS -->
+<div
+    class="grid
+    md:grid-cols-3
+    gap-5
+    mb-10"
+>
 
-    <div
-        class="grid
-        md:grid-cols-3
-        gap-5
-        mb-10"
-    >
+<div
+    class="card
+    border border-slate-800
+    rounded-3xl
+    p-7"
+>
 
+<div
+    class="w-12 h-12
+    mx-auto mb-4
+    rounded-2xl
+    bg-sky-500/10
+    text-sky-400
+    flex items-center
+    justify-center"
+>
 
-        <div
-            class="card
-            border border-slate-800
-            rounded-3xl
-            p-7"
-        >
+<i class="fa-solid fa-comments"></i>
 
-            <div
-                class="w-12 h-12
-                mx-auto mb-4
-                rounded-2xl
-                bg-sky-500/10
-                text-sky-400
-                flex items-center
-                justify-center"
-            >
+</div>
 
-                <i
-                    class="fa-solid fa-comments"
-                ></i>
+<h3
+    class="font-bold text-lg mb-2"
+>
+Customer Message
+</h3>
 
-            </div>
+<p
+    class="text-slate-400
+    text-sm"
+>
+A customer asks about
+a product, price or availability.
+</p>
 
-            <h3
-                class="font-bold text-lg mb-2"
-            >
-                Customer Message
-            </h3>
-
-            <p
-                class="text-slate-400
-                text-sm"
-            >
-                A customer asks about
-                a product, price or availability.
-            </p>
-
-        </div>
+</div>
 
 
-        <div
-            class="card
-            border border-slate-800
-            rounded-3xl
-            p-7"
-        >
+<div
+    class="card
+    border border-slate-800
+    rounded-3xl
+    p-7"
+>
 
-            <div
-                class="w-12 h-12
-                mx-auto mb-4
-                rounded-2xl
-                bg-sky-500/10
-                text-sky-400
-                flex items-center
-                justify-center"
-            >
+<div
+    class="w-12 h-12
+    mx-auto mb-4
+    rounded-2xl
+    bg-sky-500/10
+    text-sky-400
+    flex items-center
+    justify-center"
+>
 
-                <i
-                    class="fa-solid fa-robot"
-                ></i>
+<i class="fa-solid fa-robot"></i>
 
-            </div>
+</div>
 
-            <h3
-                class="font-bold text-lg mb-2"
-            >
-                EZKROY Responds
-            </h3>
+<h3
+    class="font-bold text-lg mb-2"
+>
+EZKROY Responds
+</h3>
 
-            <p
-                class="text-slate-400
-                text-sm"
-            >
-                EZKROY understands the
-                customer and responds naturally.
-            </p>
+<p
+    class="text-slate-400
+    text-sm"
+>
+EZKROY understands the
+customer and responds naturally.
+</p>
 
-        </div>
+</div>
 
 
-        <div
-            class="card
-            border border-slate-800
-            rounded-3xl
-            p-7"
-        >
+<div
+    class="card
+    border border-slate-800
+    rounded-3xl
+    p-7"
+>
 
-            <div
-                class="w-12 h-12
-                mx-auto mb-4
-                rounded-2xl
-                bg-sky-500/10
-                text-sky-400
-                flex items-center
-                justify-center"
-            >
+<div
+    class="w-12 h-12
+    mx-auto mb-4
+    rounded-2xl
+    bg-sky-500/10
+    text-sky-400
+    flex items-center
+    justify-center"
+>
 
-                <i
-                    class="fa-solid fa-cart-shopping"
-                ></i>
+<i class="fa-solid fa-cart-shopping"></i>
 
-            </div>
+</div>
 
-            <h3
-                class="font-bold text-lg mb-2"
-            >
-                Order Collected
-            </h3>
+<h3
+    class="font-bold text-lg mb-2"
+>
+Order Collected
+</h3>
 
-            <p
-                class="text-slate-400
-                text-sm"
-            >
-                Product, size, quantity,
-                name, phone and address
-                are collected.
-            </p>
+<p
+    class="text-slate-400
+    text-sm"
+>
+Product, size, quantity,
+name, phone and address
+are collected.
+</p>
 
-        </div>
+</div>
 
-
-    </div>
+</div>
 
 
-    <!-- CTA -->
+<a
+    href="/"
+    class="inline-flex
+    items-center
+    gap-3
+    bg-sky-500
+    hover:bg-sky-400
+    px-7 py-4
+    rounded-2xl
+    font-bold
+    transition
+    shadow-xl
+    shadow-sky-500/20"
+>
 
-    <a
-        href="/"
-        class="inline-flex
-        items-center
-        gap-3
-        bg-sky-500
-        hover:bg-sky-400
-        px-7 py-4
-        rounded-2xl
-        font-bold
-        transition
-        shadow-xl
-        shadow-sky-500/20"
-    >
+<i class="fa-solid fa-bolt"></i>
 
-        <i
-            class="fa-solid fa-bolt"
-        ></i>
+Try EZKROY AI
 
-        Try EZKROY AI
+</a>
 
-    </a>
+<p
+    class="text-xs
+    text-slate-600
+    mt-8"
+>
 
+EZKROY AI Sales Agent
 
-    <p
-        class="text-xs
-        text-slate-600
-        mt-8"
-    >
-
-        EZKROY AI Sales Agent
-
-    </p>
-
+</p>
 
 </div>
 
@@ -2094,9 +1848,12 @@ def preview():
 @app.route("/health")
 def health():
 
-    knowledge_rows = len(
-        get_knowledge_data()
-    )
+    try:
+        knowledge_rows = len(
+            get_knowledge_data()
+        )
+    except Exception:
+        knowledge_rows = 0
 
     return jsonify({
 
@@ -2188,36 +1945,22 @@ def chat():
             )
         )
 
-        # Simple natural-language size detection
-
         normalized_message = normalize(
             message
         )
 
-        if not draft.get(
-            "size"
-        ):
+        if not draft.get("size"):
 
-            if (
-                "30ml"
-                in normalized_message
-            ):
+            if "30ml" in normalized_message:
 
                 draft["size"] = "30ml"
 
-            elif (
-                "15ml"
-                in normalized_message
-            ):
+            elif "15ml" in normalized_message:
 
                 draft["size"] = "15ml"
 
 
-        # Simple quantity detection
-
-        if not draft.get(
-            "quantity"
-        ):
+        if not draft.get("quantity"):
 
             quantity_match = re.search(
                 r"(?:x\s*)?(\d+)\s*(?:টা|pcs?|piece|pieces)?",
@@ -2234,8 +1977,40 @@ def chat():
                     )
 
                 except Exception:
-
                     pass
+
+
+        # Natural language product detection
+        if not draft.get("product"):
+
+            products = load_json(
+                PRODUCT_FILE,
+                INITIAL_PRODUCTS
+            )
+
+            normalized = normalize(
+                message
+            )
+
+            for product in products:
+
+                product_name = normalize(
+                    product.get(
+                        "name",
+                        ""
+                    )
+                )
+
+                if (
+                    product_name
+                    and product_name in normalized
+                ):
+
+                    draft["product"] = product.get(
+                        "name"
+                    )
+
+                    break
 
 
         order_sessions[
@@ -2361,7 +2136,7 @@ def chat():
 
 
     # =====================================================
-    # GEMINI CONTEXT
+    # GEMINI
     # =====================================================
 
     rows = get_knowledge_data()
@@ -2380,7 +2155,6 @@ def chat():
             "answer",
             ""
         )
-
 
         if q or a:
 
