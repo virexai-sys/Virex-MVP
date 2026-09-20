@@ -1,5 +1,5 @@
+21 august gemini er d=code add korar age 
 from flask import Flask, request, jsonify, render_template
-
 import os
 import json
 import csv
@@ -91,7 +91,8 @@ PROFILE = {
         "Bangladesh",
 
     "portfolio":
-        "https://sites.google.com/view/aiman-porfolio/home",
+        "https://sites.google.com/view/"
+        "aiman-porfolio/home",
 
     "portfolio_name":
         "Aiman's Portfolio",
@@ -139,7 +140,6 @@ PROFILE = {
 PROFILE_INTENTS = {
 
     "identity": [
-
         "who are you",
         "who is aiman",
         "who is asad",
@@ -154,7 +154,7 @@ PROFILE_INTENTS = {
         "who designed you",
         "ke banaise",
         "ke banayse",
-        "ke banaise",
+        "ke banaiছে",
         "ke design korse",
         "creator ke",
         "owner ke",
@@ -168,7 +168,6 @@ PROFILE_INTENTS = {
     ],
 
     "name": [
-
         "your name",
         "tomar nam",
         "naam ki",
@@ -178,7 +177,6 @@ PROFILE_INTENTS = {
     ],
 
     "education": [
-
         "where do you study",
         "where are you studying",
         "kothay poro",
@@ -196,7 +194,6 @@ PROFILE_INTENTS = {
     ],
 
     "hometown": [
-
         "where are you from",
         "where is aiman from",
         "aiman kothay thake",
@@ -208,7 +205,6 @@ PROFILE_INTENTS = {
     ],
 
     "business": [
-
         "what business",
         "business ki",
         "business koren",
@@ -221,7 +217,6 @@ PROFILE_INTENTS = {
     ],
 
     "project": [
-
         "what is ezkroy",
         "ezkroy ki",
         "ezkroy",
@@ -233,7 +228,6 @@ PROFILE_INTENTS = {
     ],
 
     "portfolio": [
-
         "portfolio",
         "portfolio link",
         "show portfolio",
@@ -245,7 +239,6 @@ PROFILE_INTENTS = {
     ],
 
     "about": [
-
         "tell me about aiman",
         "aiman somporke bolo",
         "asad somporke bolo",
@@ -257,7 +250,6 @@ PROFILE_INTENTS = {
     ],
 
     "interests": [
-
         "interest ki",
         "ki niye interested",
         "what are your interests",
@@ -1015,9 +1007,7 @@ def download_google_sheet():
     try:
 
         request_object = urllib.request.Request(
-
             GOOGLE_SHEET_CSV_URL,
-
             headers={
                 "User-Agent":
                     "Mozilla/5.0 "
@@ -1086,7 +1076,9 @@ def download_google_sheet():
                     .strip()
                 )
 
-                cleaned[clean_key] = clean_value
+                cleaned[
+                    clean_key
+                ] = clean_value
 
             if any(
                 value.strip()
@@ -1096,7 +1088,6 @@ def download_google_sheet():
                 rows.append(cleaned)
 
         # Validate expected columns
-
         required_columns = {
             "question",
             "answer",
@@ -1117,8 +1108,7 @@ def download_google_sheet():
 
             raise Exception(
                 "Missing required columns: "
-                +
-                ", ".join(
+                + ", ".join(
                     sorted(missing_columns)
                 )
             )
@@ -1212,6 +1202,7 @@ def download_google_sheet():
 def get_sheet_data():
 
     if not sheet_cache["data"]:
+
         return download_google_sheet()
 
     return sheet_cache["data"]
@@ -1277,7 +1268,7 @@ def normalize_text(text):
         )
 
     text = re.sub(
-        r"[^a-z0-9\u0980-\u09ff\s\:/.\_-]",
+        r"[^a-z0-9\u0980-\u09ff\s:/._-]",
         " ",
         text
     )
@@ -1332,8 +1323,7 @@ def get_profile_answer(intent):
 
         return (
             f"Aiman {PROFILE['institution']}-এ "
-            f"{PROFILE['field']} নিয়ে "
-            "পড়াশোনা করছেন। "
+            f"{PROFILE['field']} নিয়ে পড়াশোনা করছেন। "
             f"তিনি আগে {PROFILE['previous_institution']}-এর "
             "সাথেও যুক্ত ছিলেন।"
         )
@@ -1401,9 +1391,7 @@ def find_profile_answer(message):
         return None
 
     # Portfolio priority
-
     portfolio_terms = [
-
         "portfolio",
         "portfolio link",
         "website",
@@ -1464,7 +1452,6 @@ def find_profile_answer(message):
         if score > best_score:
 
             best_score = score
-
             best_intent = intent
 
     if (
@@ -1614,7 +1601,6 @@ def find_product(message):
     products = get_products()
 
     # Full product name first
-
     for product in products:
 
         product_name = normalize_text(
@@ -1632,7 +1618,6 @@ def find_product(message):
             return product
 
     # Aliases
-
     aliases_sorted = sorted(
         PRODUCT_ALIASES.items(),
         key=lambda item: len(
@@ -1680,7 +1665,7 @@ def detect_size(message):
     )
 
     match = re.search(
-        r"\b(15|30|50)ml\b",
+        r"\b(15|30|50)\s*ml\b",
         text
     )
 
@@ -1815,6 +1800,7 @@ def product_matches_row(
     )
 
     if product_name in combined:
+
         return True
 
     for alias, target in PRODUCT_ALIASES.items():
@@ -1847,11 +1833,13 @@ def find_product_sheet_answer(message):
     )
 
     if not product:
+
         return None
 
     rows = get_sheet_data()
 
     if not rows:
+
         return None
 
     user_text = normalize_text(
@@ -1884,6 +1872,7 @@ def find_product_sheet_answer(message):
             product,
             row
         ):
+
             continue
 
         question = get_row_question(
@@ -1931,11 +1920,9 @@ def find_product_sheet_answer(message):
         score = 0
 
         # Strong product context
-
         score += 30
 
         # Exact question
-
         if question:
 
             if user_text == question:
@@ -1947,13 +1934,9 @@ def find_product_sheet_answer(message):
                 score += 70
 
         # Keyword phrase
-
         keyword_phrases = [
-
             k.strip()
-
             for k in keywords.split(",")
-
             if k.strip()
         ]
 
@@ -1971,14 +1954,12 @@ def find_product_sheet_answer(message):
                 score += 50
 
         # Meaningful overlap
-
         score += (
             len(meaningful_common)
             * 8
         )
 
         # Coverage
-
         if user_words:
 
             score += (
@@ -2003,7 +1984,6 @@ def find_product_sheet_answer(message):
             ) * 15
 
         # Size relevance
-
         size = detect_size(
             message
         )
@@ -2031,6 +2011,7 @@ def find_product_sheet_answer(message):
         })
 
     if not candidates:
+
         return None
 
     candidates.sort(
@@ -2044,7 +2025,6 @@ def find_product_sheet_answer(message):
     best = candidates[0]
 
     # Strict minimum threshold
-
     if best["score"] < 18:
 
         print(
@@ -2090,6 +2070,7 @@ def find_matching_sheet_answer(message):
     )
 
     if not user_text:
+
         return None
 
     user_words = tokenize(
@@ -2179,7 +2160,6 @@ def find_matching_sheet_answer(message):
         )
 
         # Avoid generic-only matches
-
         if (
             not meaningful_common
             and len(user_words) > 1
@@ -2194,11 +2174,8 @@ def find_matching_sheet_answer(message):
         # -------------------------------------------------
 
         keyword_phrases = [
-
             k.strip()
-
             for k in keywords.split(",")
-
             if k.strip()
         ]
 
@@ -2254,7 +2231,9 @@ def find_matching_sheet_answer(message):
                 )
                 /
                 max(
-                    len(user_meaningful),
+                    len(
+                        user_meaningful
+                    ),
                     1
                 )
             ) * 30
@@ -2376,20 +2355,35 @@ def is_order_request(message):
     phrases = [
 
         "order",
+
         "order korte chai",
+
         "order korbo",
+
         "order dibo",
+
         "order dite chai",
+
         "nibo",
+
         "nite chai",
+
         "kinbo",
+
         "kinte chai",
+
         "buy",
+
         "book",
+
         "অর্ডার",
+
         "নিব",
+
         "নিতে চাই",
+
         "কিনবো",
+
         "কিনতে চাই"
     ]
 
@@ -2746,20 +2740,21 @@ def debug_api():
         "openai":
             "DISABLED",
 
-        "profile": {
+        "profile":
+            {
 
-            "name":
-                PROFILE["name"],
+                "name":
+                    PROFILE["name"],
 
-            "project":
-                PROFILE["project"],
+                "project":
+                    PROFILE["project"],
 
-            "business":
-                PROFILE["business"],
+                "business":
+                    PROFILE["business"],
 
-            "portfolio":
-                PROFILE["portfolio"]
-        },
+                "portfolio":
+                    PROFILE["portfolio"]
+            },
 
         "google_sheet": {
 
@@ -3211,13 +3206,8 @@ def health():
 if __name__ == "__main__":
 
     print("")
-
     print("=" * 70)
-
-    print(
-        "                         EZKROY AI"
-    )
-
+    print("                         EZKROY AI")
     print("=" * 70)
 
     print(
