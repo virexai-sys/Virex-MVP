@@ -1,4 +1,3 @@
-```python
 from flask import Flask, request, jsonify, render_template_string
 import os
 import json
@@ -40,14 +39,21 @@ KNOWLEDGE_CSV_URL = (
 
 ORDERS_SHEET_ID = "1OSYvfZzBLqTtIlTo42PECUz0UyaxBVdGFWr8m6xVUso"
 
-# IMPORTANT:
-# Add this in Render Environment Variables.
-ORDERS_WEBHOOK_URL = os.environ.get("ORDERS_WEBHOOK_URL", "")
+# Render Environment Variable
+ORDERS_WEBHOOK_URL = os.environ.get(
+    "ORDERS_WEBHOOK_URL",
+    ""
+)
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_API_KEY = os.environ.get(
+    "GEMINI_API_KEY",
+    ""
+)
 
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+    genai.configure(
+        api_key=GEMINI_API_KEY
+    )
 
 
 # =========================================================
@@ -56,10 +62,20 @@ if GEMINI_API_KEY:
 
 DATA_DIR = "data"
 
-PRODUCT_FILE = os.path.join(DATA_DIR, "products.json")
-ORDER_FILE = os.path.join(DATA_DIR, "orders.json")
+PRODUCT_FILE = os.path.join(
+    DATA_DIR,
+    "products.json"
+)
 
-os.makedirs(DATA_DIR, exist_ok=True)
+ORDER_FILE = os.path.join(
+    DATA_DIR,
+    "orders.json"
+)
+
+os.makedirs(
+    DATA_DIR,
+    exist_ok=True
+)
 
 
 # =========================================================
@@ -253,11 +269,13 @@ INITIAL_PRODUCTS = [
 def init_files():
 
     if not os.path.exists(PRODUCT_FILE):
+
         with open(
             PRODUCT_FILE,
             "w",
             encoding="utf-8"
         ) as f:
+
             json.dump(
                 INITIAL_PRODUCTS,
                 f,
@@ -266,11 +284,13 @@ def init_files():
             )
 
     if not os.path.exists(ORDER_FILE):
+
         with open(
             ORDER_FILE,
             "w",
             encoding="utf-8"
         ) as f:
+
             json.dump(
                 [],
                 f,
@@ -302,7 +322,10 @@ def load_json(path, default):
 
     except Exception as e:
 
-        print("JSON load error:", e)
+        print(
+            "JSON load error:",
+            e
+        )
 
     return default
 
@@ -328,7 +351,10 @@ def save_json(path, data):
 
     except Exception as e:
 
-        print("JSON save error:", e)
+        print(
+            "JSON save error:",
+            e
+        )
 
         return False
 
@@ -382,6 +408,7 @@ def fetch_knowledge_sheet():
             }
 
             if any(cleaned.values()):
+
                 rows.append(cleaned)
 
         sheet_cache["data"] = rows
@@ -482,6 +509,7 @@ def search_sheet_knowledge(query):
         return None
 
     # Exact / partial question match
+
     for row in rows:
 
         question = normalize(
@@ -509,6 +537,7 @@ def search_sheet_knowledge(query):
             return answer
 
     # Keyword match
+
     best = None
     best_score = 0
 
@@ -524,6 +553,7 @@ def search_sheet_knowledge(query):
         ).strip()
 
         if not answer:
+
             continue
 
         raw_keywords = row.get(
@@ -907,9 +937,15 @@ def complete_order(draft):
             )
     }
 
-    save_order_locally(
+    local_saved = save_order_locally(
         order
     )
+
+    if not local_saved:
+
+        print(
+            "WARNING: Local order save failed."
+        )
 
     synced, sync_body = (
         send_order_to_google_sheet(
@@ -1161,7 +1197,9 @@ body {
             class="bg-sky-500 p-2 rounded-xl
             text-white font-bold shadow-lg shadow-sky-500/20"
         >
+
             <i class="fa-solid fa-bolt"></i>
+
         </div>
 
         <div>
@@ -1266,9 +1304,11 @@ body {
                 flex items-center
                 justify-center shrink-0"
             >
+
                 <i
                     class="fa-solid fa-bolt text-xs"
                 ></i>
+
             </div>
 
 
@@ -1534,7 +1574,9 @@ function showTyping() {
             flex items-center
             justify-center"
         >
+
             <i class="fa-solid fa-bolt text-xs"></i>
+
         </div>
 
         <div
@@ -1543,8 +1585,11 @@ function showTyping() {
             p-3 rounded-2xl
             text-sm"
         >
+
             <i class="fa-solid fa-circle-notch fa-spin"></i>
+
             &nbsp; EZKROY AI is typing...
+
         </div>
 
     `;
@@ -1818,6 +1863,7 @@ body {
     >
 
         Meet
+
         <span
             class="text-sky-400"
         >
@@ -2096,14 +2142,12 @@ def chat():
         or {}
     )
 
-
     message = str(
         data.get(
             "message",
             ""
         )
     ).strip()
-
 
     session_id = str(
         data.get(
@@ -2112,7 +2156,6 @@ def chat():
         or request.remote_addr
         or "default"
     )
-
 
     if not message:
 
@@ -2134,7 +2177,6 @@ def chat():
         {}
     )
 
-
     if (
         is_order_intent(message)
         or draft
@@ -2146,12 +2188,11 @@ def chat():
             )
         )
 
-
         # Simple natural-language size detection
+
         normalized_message = normalize(
             message
         )
-
 
         if not draft.get(
             "size"
@@ -2173,6 +2214,7 @@ def chat():
 
 
         # Simple quantity detection
+
         if not draft.get(
             "quantity"
         ):
@@ -2407,4 +2449,3 @@ if __name__ == "__main__":
         port=port,
         debug=False
     )
-```
