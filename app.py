@@ -200,9 +200,16 @@ HTML_TEMPLATE = """
                 <p class="text-xs text-slate-400">NOIR Fragrance Smart Sales Assistant</p>
             </div>
         </div>
-        <div class="flex items-center space-x-2">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs text-slate-300 font-medium">Online</span>
+        <div class="flex items-center space-x-3">
+            <button type="button" onclick="openPreview()"
+                class="preview-btn bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-eye"></i>
+                Preview
+            </button>
+            <div class="flex items-center space-x-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs text-slate-300 font-medium">Online</span>
+            </div>
         </div>
     </header>
 
@@ -222,7 +229,103 @@ HTML_TEMPLATE = """
         </form>
     </main>
 
+    <!-- =========================================================
+         EZKROY PREVIEW MODAL
+    ========================================================== -->
+    <div id="preview-modal"
+         class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+        <div class="relative w-full max-w-md bg-slate-950 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden">
+
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+                <div>
+                    <h2 class="font-bold text-white">EZKROY AI Preview</h2>
+                    <p class="text-xs text-slate-400">Customer conversation demo</p>
+                </div>
+                <button type="button" onclick="closePreview()"
+                    class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-4 bg-slate-900/70">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-indigo-600 text-white rounded-full w-9 h-9 flex items-center justify-center">
+                        <i class="fa-solid fa-robot text-xs"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold text-white">EZKROY AI</div>
+                        <div class="text-[11px] text-emerald-400">● Online</div>
+                    </div>
+                </div>
+
+                <div id="preview-chat" class="space-y-3 max-h-[390px] overflow-y-auto">
+                    <div class="flex justify-end">
+                        <div class="bg-indigo-600 text-white px-3 py-2 rounded-2xl rounded-tr-md text-sm max-w-[78%]">
+                            Dior Sauvage 15ml কত?
+                        </div>
+                    </div>
+
+                    <div class="flex justify-start">
+                        <div class="bg-slate-800 text-slate-200 px-3 py-2 rounded-2xl rounded-tl-md text-sm max-w-[82%]">
+                            Dior Sauvage 15ml এর দাম ৳299। চাইলে আমি আপনার অর্ডার নেওয়ার প্রক্রিয়াটাও শুরু করতে পারি।
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <div class="bg-indigo-600 text-white px-3 py-2 rounded-2xl rounded-tr-md text-sm max-w-[78%]">
+                            অর্ডার করতে চাই
+                        </div>
+                    </div>
+
+                    <div class="flex justify-start">
+                        <div class="bg-slate-800 text-slate-200 px-3 py-2 rounded-2xl rounded-tl-md text-sm max-w-[82%]">
+                            অবশ্যই! পণ্যের নাম, সাইজ, আপনার নাম, ফোন নম্বর ও ঠিকানা দিন।
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 rounded-2xl border border-slate-800 bg-slate-950 p-2 flex gap-2">
+                    <div class="flex-1 px-3 py-2 text-xs text-slate-500">
+                        Customer message...
+                    </div>
+                    <div class="bg-indigo-600 px-4 py-2 rounded-xl text-white text-xs flex items-center">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-4 bg-slate-950 border-t border-slate-800">
+                <button type="button" onclick="closePreview()"
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-sm font-semibold transition">
+                    Back to Chat
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function openPreview() {
+            const modal = document.getElementById('preview-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closePreview() {
+            const modal = document.getElementById('preview-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        document.getElementById('preview-modal').addEventListener('click', function(e) {
+            if (e.target === this) closePreview();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closePreview();
+        });
+
         const chatContainer = document.getElementById('chat-container');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
